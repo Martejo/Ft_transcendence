@@ -6,5 +6,5 @@ app_name = 'accounts'  # Nom de l'application pour les noms d'URL
 urlpatterns = [
 	path('login/', views.login, name='login'),
 	path('register/', views.register, name='register'),
-	path('loginGuest/', views.logAsguest, name='loginGuest'),
+	path('log_guest/', views.logAsguest, name='log_guest'),
 ]

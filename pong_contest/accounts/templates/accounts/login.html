@@ -10,7 +10,7 @@
 </head>
 <body>
 	<div class="firstbar">
-		<a href="pongame.html">
+		<a href="{% url 'home' %}">
 			<button class="btn button-link">PONGAME</button>
 		</a>
 	</div>
@@ -25,7 +25,7 @@
 		</div>	
 	</div>
 	<div class="container">
-		<a href="{% url 'accounts:loginGuest' %}">
+		<a href="{% url 'accounts:log_guest' %}">
 			<button id="guest" class="btn interactive-button">Login as guest</button>
 		</a>
 		<button id="api" class="btn interactive-button">Login with 42</button>
