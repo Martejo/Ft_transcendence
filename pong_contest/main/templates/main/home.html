@@ -1,4 +1,4 @@
-
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -6,12 +6,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pongame</title>
-  <link rel="stylesheet" href="style.css"> 
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="{% static 'main/css/style.css' %}"> 
+  <script src="{% static 'main/js/script.js'%}" defer></script>
 </head>
 <body>
 	<div class="firstbar">
-		<a href="pongame.html">
+		<a href="{% url 'home' %}">
 			<button class="btn button-link">PONGAME</button>
 		</a>
 	</div>
@@ -26,10 +26,10 @@
 		</div>	
 	</div>
 	<div class="container">
-				<a href="login.html">
+				<a href="{% url 'accounts:login' %}">
 					<button id="login" class="btn interactive-button">Login</button>
 				</a>
-				<a href="register.html">
+				<a href="{% url 'accounts:register' %}">
 					<button id="register" class="btn interactive-button">Register</button>
 				</a>
 		</div>

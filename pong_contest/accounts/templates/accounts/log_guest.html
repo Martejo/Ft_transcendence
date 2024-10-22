@@ -1,11 +1,13 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pongame</title>
-  <link rel="stylesheet" href="style.css"> 
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="{% static 'accounts/css/style.css' %}"> 
+  <script src="{% static 'main/js/script.js'%}" defer></script>
 </head>
 <body>
 	<div class="firstbar">
@@ -24,12 +26,12 @@
 		</div>	
 	</div>
 	<div class="flex-form-container">
-		<div class="register-form">
-			<h2>Inscription</h2>
-			<form action="/submit_registration" method="POST">
+		<div class="login-form">
+			<h2>Connexion</h2>
+			<form action="/submit_login" method="POST">
 				<div class="form-group">
-					<label for="email">E-mail :</label>
-					<input type="email" id="email" name="email" required>
+					<label for="username">Nom d'utilisateur :</label>
+					<input type="text" id="username" name="username" required>
 				</div>
 	
 				<div class="form-group">
@@ -37,12 +39,10 @@
 					<input type="password" id="password" name="password" required>
 				</div>
 	
-				<div class="form-group">
-					<label for="confirm-password">Confirmer le mot de passe :</label>
-					<input type="password" id="confirm-password" name="confirm-password" required>
+				<div class="forgot-password">
+					<a href="#">Mot de passe oublié ?</a>
 				</div>
-	
-				<button type="submit" class="btn register-btn">S'inscrire</button>
+				<button type="submit" class="btn validate-btn">Valider</button>
 			</form>
 		</div>
 	</div>
