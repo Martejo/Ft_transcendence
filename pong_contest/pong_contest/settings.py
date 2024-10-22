@@ -13,9 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'accounts',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -79,17 +78,6 @@ WSGI_APPLICATION = 'pong_contest.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-def get_env_variable(var_name):
-    """Récupère une variable d'environnement ou déclenche une erreur."""
-    try:
-        value = os.environ[var_name]
-        print(f"{var_name} = {value}")
-        return value
-    except KeyError:
-        error_msg = f"Set the {var_name} environment variable"
-        print(error_msg)
-        raise ImproperlyConfigured(error_msg)
 
 DATABASES = {
     'default': {
@@ -141,3 +129,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#indiquez à Django d'utiliser votre modèle d'utilisateur personnalisé
+AUTH_USER_MODEL = 'users.CustomUser'
