@@ -1,6 +1,10 @@
 import hashlib
 import os
 import base64
+import jwt
+from datetime import datetime, timedelta
+from django.conf import settings
+import random
 
 def hash_password(password):
     # Générer un sel unique de 16 octets
@@ -23,3 +27,33 @@ def verify_password(stored_password, provided_password):
     # Comparer les hachés
     return pwd_hash == stored_hash
 
+def generate_jwt_token(user_id, type='access'):
+    expiry = datetime.utcnow() + (
+        timedelta(minutes=60) if type == 'access' 
+        else timedelta(days=1)
+    )
+    
+    payload = {
+        'user_id': user_id,
+        'exp': expiry,
+        'type': type
+    }
+    
+    return jwt.encode(
+        payload,
+        settings.SECRET_KEY,
+        algorithm='HS256'
+    )
+
+def verify_jwt_token(token):
+    try:
+        return jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=['HS256']
+        )
+    except:
+        return None
+
+def generate_2fa_code():
+    return ''.join([str(random.randint(0, 9)) for _ in range(6)])
