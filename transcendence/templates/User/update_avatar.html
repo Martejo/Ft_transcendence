@@ -1,0 +1,31 @@
+<!-- templates/User/update_avatar.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mettre à Jour l'Avatar</title>
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+</head>
+<body>
+    <h1>Mettre à Jour Votre Avatar</h1>
+    
+    <!-- Afficher les messages de feedback -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Mettre à Jour</button>
+    </form>
+    
+    <!-- Lien pour revenir au profil -->
+    <a href="{% url 'User:profile' username=profile_user.username %}">Retour au Profil</a>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!-- templates/User/profile.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil de {{ profile_user.username }}</title>
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+</head>
+<body>
+    <h1>Profil de {{ profile_user.username }}</h1>
+    
+    <!-- Afficher l'avatar s'il existe, sinon l'image par défaut -->
+    <div class="avatar">
+        <img src="{{ profile_user.avatar.url }}" alt="Avatar de {{ profile_user.username }}">
+    </div>
+    
+    <!-- Option pour mettre à jour l'avatar -->
+    <div class="update-avatar">
+        <a href="{% url 'User:update_avatar' %}" class="btn">Mettre à Jour l'Avatar</a>
+    </div>
+    
+    <!-- Autres informations du profil -->
+    <p>Email: {{ profile_user.email }}</p>
+    <!-- Ajoutez d'autres champs selon vos besoins -->
+</body>
+</html>

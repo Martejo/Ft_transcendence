@@ -1,0 +1,19 @@
+# User/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'User'
+
+urlpatterns = [
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profile/<str:username>/', views.profile_view, name='profile'),
+    path('update-profile/', views.update_profile_view, name='update_profile'),
+    path('match-history/', views.match_history_view, name='match_history'),
+    path('send-friend-request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),
+    path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
+    path('reject-friend-request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
+    path('update-avatar/', views.update_avatar_view, name='update_avatar'),
+
+]

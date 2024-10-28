@@ -1,0 +1,15 @@
+<!-- templates/User/update_profile.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mettre à jour le Profil</title>
+</head>
+<body>
+    <h1>Mettre à jour le Profil</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Mettre à jour</button>
+    </form>
+</body>
+</html>
