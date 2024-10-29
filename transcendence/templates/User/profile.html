@@ -19,9 +19,17 @@
         {% endif %}
     </div>
     
-    <!-- Option pour mettre à jour l'avatar -->
-    <div class="update-avatar">
+    <!-- Options de mise à jour -->
+    <div class="update-options">
         <a href="{% url 'User:update_avatar' %}" class="btn">Mettre à Jour l'Avatar</a>
+        <a href="{% url 'User:update_profile' %}" class="btn">Modifier le Profil</a>
+        <a href="{% url 'User:change_password' %}" class="btn btn-secondary">Changer le Mot de Passe</a>
+        
+        <!-- Formulaire de déconnexion -->
+        <form method="POST" action="{% url 'User:logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Se Déconnecter</button>
+        </form>
     </div>
     
     <!-- Autres informations du profil -->
