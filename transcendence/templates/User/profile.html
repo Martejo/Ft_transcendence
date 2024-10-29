@@ -19,6 +19,11 @@
     <div class="update-avatar">
         <a href="{% url 'User:update_avatar' %}" class="btn">Mettre à Jour l'Avatar</a>
     </div>
+
+    <!-- Option pour activer le 2fa -->
+	<div class="enable-2fa">
+        <a href="{% url 'User:enable_2fa' %}" class="btn">Activer 2FA</a>
+    </div>
     
     <!-- Autres informations du profil -->
     <p>Email: {{ profile_user.email }}</p>

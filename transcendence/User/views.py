@@ -6,6 +6,12 @@ from .models import User, UserProfile, FriendRequest, Game, MatchHistory
 from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm
 from .utils import hash_password, verify_password
 from .decorators import login_required
+from io import BytesIO
+from datetime import datetime, timedelta
+import pyotp
+import jwt
+import qrcode
+import base64
 
 
 def register_view(request):
@@ -31,7 +37,6 @@ def login_view(request):
                 user = User.objects.get(username=username)
                 if verify_password(user.password_hash, password):
                     request.session['user_id'] = user.id
-                    messages.success(request, 'Vous êtes connecté avec succès.')
                     return redirect('User:profile', username=user.username)  # Correction ici
                 else:
                     form.add_error('password', 'Mot de passe incorrect.')
@@ -157,3 +162,83 @@ def log_guest_view(request):
         request.session['user_id'] = guest_user.id
         return redirect('home')  # Rediriger vers la page d'accueil ou autre
     return render(request, 'User/login.html')  # Ou une autre page si nécessaire
+
+# ------------------------------------------------------------------------------------
+
+JWT_SECRET = 'your-secret-key-here' #Move this to .env or someplace we wont git push
+
+# ------------------------------------------------------------------------------------
+
+def enable_2fa(request):
+    if request.method == 'POST':
+        # Generate TOTP secret
+        totp_secret = pyotp.random_base32()
+        
+        # Create TOTP object
+        totp = pyotp.TOTP(totp_secret)
+        
+        # Create JWT with the TOTP secret
+        token = jwt.encode({
+            'totp_secret': totp_secret,
+            'exp': datetime.utcnow() + timedelta(minutes=5)  # Give user 5 minutes to set up
+        }, JWT_SECRET, algorithm='HS256')
+        
+        # Store token in session
+        request.session['setup_token'] = token
+        
+        # Generate QR code
+        provisioning_uri = totp.provisioning_uri(
+            name="Transcendence",
+            issuer_name="ggwp"
+        )
+        img = qrcode.make(provisioning_uri)
+        
+        # Convert QR to display in template
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        qr_code = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Show QR and secret
+        return render(request, 'User/show_qr.html', {
+            'qr_code': qr_code,
+            'secret': totp_secret
+        })
+    
+    return render(request, 'User/enable_2fa.html')
+
+def verify_2fa(request):
+    setup_token = request.session.get('setup_token')
+    
+    if not setup_token:
+        messages.error(request, 'No 2FA setup in progress')
+        return redirect('User/request_2fa')
+    
+    try:
+        # Get TOTP secret from JWT
+        payload = jwt.decode(setup_token, JWT_SECRET, algorithms=['HS256'])
+        totp_secret = payload['totp_secret']
+        
+        if request.method == 'POST':
+            # Get code from form
+            entered_code = request.POST.get('code')
+            
+            # Verify TOTP code
+            totp = pyotp.TOTP(totp_secret)
+            if totp.verify(entered_code):
+                # Success! Here you would normally save the secret for future use
+                del request.session['setup_token']
+                messages.success(request, '2FA setup successful!')
+                return redirect('User/request_2fa')
+            else:
+                messages.error(request, 'Invalid code')
+                
+    except jwt.ExpiredSignatureError:
+        del request.session['setup_token']
+        messages.error(request, 'Setup expired. Please try again.')
+        return redirect('User/request_2fa')
+    except jwt.InvalidTokenError:
+        del request.session['setup_token']
+        messages.error(request, 'Invalid session. Please try again.')
+        return redirect('User/request_2fa')
+    
+    return render(request, 'User/verify_2fa.html')

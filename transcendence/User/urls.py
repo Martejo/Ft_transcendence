@@ -15,5 +15,9 @@ urlpatterns = [
     path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
     path('reject-friend-request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
     path('update-avatar/', views.update_avatar_view, name='update_avatar'),
+	path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
+	path('qr-code/', views.enable_2fa, name='show_qr'),
+	path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
+
 
 ]

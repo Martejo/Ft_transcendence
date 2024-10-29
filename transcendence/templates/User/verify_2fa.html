@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Code</title>
+</head>
+<body>
+    <h1>Enter Code from Authenticator App</h1>
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="code" required pattern="[0-9]{6}">
+        <button type="submit">Verify</button>
+    </form>
+</body>
+</html>
