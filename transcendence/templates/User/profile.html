@@ -12,7 +12,11 @@
     
     <!-- Afficher l'avatar s'il existe, sinon l'image par défaut -->
     <div class="avatar">
-        <img src="{{ profile_user.avatar.url }}" alt="Avatar de {{ profile_user.username }}">
+        {% if profile_user.avatar and profile_user.avatar.url %}
+            <img src="{{ profile_user.avatar.url }}" alt="Avatar de {{ profile_user.username }}">
+        {% else %}
+            <img src="{% static 'avatars/default_avatar.png' %}" alt="Avatar par défaut">
+        {% endif %}
     </div>
     
     <!-- Option pour mettre à jour l'avatar -->
