@@ -27,8 +27,55 @@ class LoginForm(forms.Form):
 
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = UserProfile
-        fields = ['avatar', 'bio']
+        model = User
+        fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom d\'utilisateur'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+        }
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.exclude(id=self.instance.id).filter(username=username).exists():
+            raise forms.ValidationError("Ce nom d'utilisateur est déjà pris.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.exclude(id=self.instance.id).filter(email=email).exists():
+            raise forms.ValidationError("Cet email est déjà utilisé.")
+        return email
+
+
+# User/forms.py
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(
+        label="Ancien Mot de Passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Ancien Mot de Passe'}),
+        required=True
+    )
+    new_password = forms.CharField(
+        label="Nouveau Mot de Passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Nouveau Mot de Passe'}),
+        required=True
+    )
+    confirm_new_password = forms.CharField(
+        label="Confirmer le Nouveau Mot de Passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirmer le Nouveau Mot de Passe'}),
+        required=True
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_new_password = cleaned_data.get("confirm_new_password")
+
+        if new_password and confirm_new_password and new_password != confirm_new_password:
+            self.add_error('confirm_new_password', "Les mots de passe ne correspondent pas.")
+
+        return cleaned_data
+
 
 class AvatarUpdateForm(forms.ModelForm):
     class Meta:

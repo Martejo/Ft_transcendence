@@ -1,9 +1,10 @@
 # User/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import User, UserProfile, FriendRequest, Game, MatchHistory
-from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm
+from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm  # Ajoutez PasswordChangeForm ici
 from .utils import hash_password, verify_password
 from .decorators import login_required
 from io import BytesIO
@@ -12,7 +13,6 @@ import pyotp
 import jwt
 import qrcode
 import base64
-
 
 def register_view(request):
     if request.method == 'POST':
@@ -48,31 +48,62 @@ def login_view(request):
 
 @login_required
 def logout_view(request):
-    try:
-        del request.session['user_id']
-        messages.success(request, 'Vous êtes déconnecté avec succès.')
-    except KeyError:
-        messages.error(request, 'Vous n\'êtes pas connecté.')
-    return redirect('landing')
+    if request.method == 'POST':
+        try:
+            del request.session['user_id']
+            messages.success(request, 'Vous êtes déconnecté avec succès.')
+        except KeyError:
+            messages.error(request, 'Vous n\'êtes pas connecté.')
+        return redirect('landing')
+    else:
+        # Si la requête n'est pas POST, redirigez ou retournez une erreur
+        return redirect('User:profile', username=request.user.username)
 
 @login_required
 def update_profile_view(request):
     user_id = request.session.get('user_id')
-    if not user_id:
-        return redirect('User:login')
-    
     user = get_object_or_404(User, id=user_id)
-    profile = user.profile
-    
+
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        form = ProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Votre profil a été mis à jour avec succès.')
             return redirect('User:profile', username=user.username)
+        else:
+            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
     else:
-        form = ProfileForm(instance=profile)
-    
-    return render(request, 'User/update_profile.html', {'form': form})
+        form = ProfileForm(instance=user)
+
+    return render(request, 'User/update_profile.html', {'form': form, 'profile_user': user})
+
+
+@login_required
+def change_password_view(request):
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data['old_password']
+            new_password = form.cleaned_data['new_password']
+
+            if verify_password(user.password_hash, old_password):
+                user.password_hash = hash_password(new_password)
+                user.save()
+                messages.success(request, 'Votre mot de passe a été mis à jour avec succès.')
+                return redirect('User:profile', username=user.username)
+            else:
+                form.add_error('old_password', 'L\'ancien mot de passe est incorrect.')
+                messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+        else:
+            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+    else:
+        form = PasswordChangeForm()
+
+    return render(request, 'User/change_password.html', {'form': form, 'profile_user': user})
+
 
 @login_required
 def profile_view(request, username):
