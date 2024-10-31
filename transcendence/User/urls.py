@@ -20,9 +20,7 @@ urlpatterns = [
 	path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
 	path('qr-code/', views.enable_2fa, name='show_qr'),
 	path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
-
-
-]
     path('log-guest/', views.log_guest_view, name='log_guest'),
-    # Ajoutez d'autres URLs si nécessaire
+	path('verify-2fa-login/', views.verify_2fa_login, name='verify_2fa_login'),
+
 ]

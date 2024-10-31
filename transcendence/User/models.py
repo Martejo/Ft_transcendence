@@ -13,6 +13,8 @@ class User(models.Model):
     password_hash = models.CharField(max_length=256)  # Hachage du mot de passe
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_2fa_enabled = models.BooleanField(default=False)
+    totp_secret = models.CharField(max_length=32, null=True, blank=True)
     avatar = models.ImageField(
         upload_to='avatars/',
         null=True,

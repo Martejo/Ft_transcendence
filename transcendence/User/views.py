@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import User, UserProfile, FriendRequest, Game, MatchHistory
-from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm  # Ajoutez PasswordChangeForm ici
+from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm, Two_factor_login_Form  # Ajoutez PasswordChangeForm ici
 from .utils import hash_password, verify_password
 from .decorators import login_required
 from io import BytesIO
@@ -37,7 +37,11 @@ def login_view(request):
                 user = User.objects.get(username=username)
                 if verify_password(user.password_hash, password):
                     request.session['user_id'] = user.id
-                    return redirect('User:profile', username=user.username)  # Correction ici
+                    if user.is_2fa_enabled:
+                        request.session['auth_partial'] = True
+                        return redirect('User:verify_2fa_login')
+                    else:
+                        return redirect('User:profile', username=user.username)  # Correction ici
                 else:
                     form.add_error('password', 'Mot de passe incorrect.')
             except User.DoesNotExist:
@@ -201,6 +205,13 @@ JWT_SECRET = 'your-secret-key-here' #Move this to .env or someplace we wont git 
 # ------------------------------------------------------------------------------------
 
 def enable_2fa(request):
+
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        messages.error(request, 'No user found')
+        return redirect('User:login')
+
     if request.method == 'POST':
         # Generate TOTP secret
         totp_secret = pyotp.random_base32()
@@ -210,6 +221,7 @@ def enable_2fa(request):
         
         # Create JWT with the TOTP secret
         token = jwt.encode({
+            'user_id' : user_id,
             'totp_secret': totp_secret,
             'exp': datetime.utcnow() + timedelta(minutes=5)  # Give user 5 minutes to set up
         }, JWT_SECRET, algorithm='HS256')
@@ -242,13 +254,20 @@ def verify_2fa(request):
     
     if not setup_token:
         messages.error(request, 'No 2FA setup in progress')
-        return redirect('User/request_2fa')
+        return redirect('User:register') #redirect vers profile?
     
     try:
         # Get TOTP secret from JWT
         payload = jwt.decode(setup_token, JWT_SECRET, algorithms=['HS256'])
+        user_id = payload['user_id']
         totp_secret = payload['totp_secret']
-        
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            messages.error(request, 'User not found')
+            return redirect('User:register')
+
         if request.method == 'POST':
             # Get code from form
             entered_code = request.POST.get('code')
@@ -257,19 +276,55 @@ def verify_2fa(request):
             totp = pyotp.TOTP(totp_secret)
             if totp.verify(entered_code):
                 # Success! Here you would normally save the secret for future use
+                user.totp_secret = totp_secret
+                user.is_2fa_enabled = True
+                user.save()
+
                 del request.session['setup_token']
                 messages.success(request, '2FA setup successful!')
-                return redirect('User/request_2fa')
+                return redirect('User:profile', username=user.username)
             else:
                 messages.error(request, 'Invalid code')
                 
     except jwt.ExpiredSignatureError:
         del request.session['setup_token']
         messages.error(request, 'Setup expired. Please try again.')
-        return redirect('User/request_2fa')
+        return redirect('User:register')
     except jwt.InvalidTokenError:
         del request.session['setup_token']
         messages.error(request, 'Invalid session. Please try again.')
-        return redirect('User/request_2fa')
+        return redirect('User:register')
     
     return render(request, 'User/verify_2fa.html')
+
+def verify_2fa_login(request):
+    user_id = request.session.get('user_id')
+    auth_partial = request.session.get('auth_partial')
+
+    if not user_id or auth_partial:
+        return redirect('User:login')
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        if not user.totp_secret:
+            messages.error(request, '2FA not properly set up')
+            return redirect('User:login')
+
+        totp = pyotp.TOTP(user.totp_secret)
+
+        if request.method == 'POST':
+            code = request.POST.get('code')
+            totp = pyotp.TOTP(user.totp_secret)
+
+        if totp.verify(code):
+            del request.session['auth_partial']
+            messages.success(request, 'Login successful')
+            return redirect ('User:profile', username=user.username)
+        else:
+            messages.error(request, 'Invalid 2FA code')
+    except User.DoesNotExist:
+        request.session.flush()
+        return redirect('User:login')
+
+    return render(request, 'User/verify_2fa_login.html')
