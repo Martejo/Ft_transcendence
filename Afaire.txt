@@ -1,0 +1,3 @@
+Gerer le cas ou l'utilisateur ou :
+
+- L'utilisateur ne peux pas supprimer l'avatar par defaut mais peux juste le remplacer
