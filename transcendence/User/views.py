@@ -28,11 +28,6 @@ def register_view(request):
         form = RegistrationForm()
     return render(request, 'User/register.html', {'form': form})
 
-
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.contrib import messages
-
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -45,7 +40,6 @@ def login_view(request):
                     request.session['user_id'] = user.id
                     if user.is_2fa_enabled:
                         request.session['auth_partial'] = True
-                        print("Redirecting to 2FA verification")
                         return redirect('User:verify_2fa_login')
                     else:
                         return redirect('User:profile', username=user.username)  # Correction ici
@@ -338,8 +332,12 @@ def verify_2fa_login(request):
 
 @login_required
 def disable_2fa(request):
-    user = request.user
-    is_2fa_enabled = bool(user.totp_secret)
+    user_id = request.session.get('user_id')
+    
+    # Fetch the user using user_id
+    user = get_object_or_404(User, id=user_id)
+    
+    is_2fa_enabled = user.is_2fa_enabled
 
     if not is_2fa_enabled:
         messages.error(request, 'Le 2FA n\'est pas activé sur votre compte')
@@ -350,10 +348,12 @@ def disable_2fa(request):
         totp = pyotp.TOTP(user.totp_secret)
         
         if totp.verify(code):
-            user.totp_secret = ''
+            user.totp_secret = ''  # Clear the TOTP secret to disable 2FA
+            user.is_2fa_enabled = False  # Also set is_2fa_enabled to False
             user.save()
             messages.success(request, 'Le 2FA a été désactivé')
-            return redirect('User:profile', username = user.username)
+            return redirect('User:profile', username=user.username)
         else:
-            messages.error(request, 'code 2FA invalide')
-    return render(request, 'User/disable_2fa.html', {'is_2fa_enabled': is_2fa_enabled})
+            messages.error(request, 'Code 2FA invalide')
+
+    return render(request, 'User/disable_2fa.html', {'username': user.username})
