@@ -1,0 +1,109 @@
+<!-- Conteneur principal pour le profil -->
+<div class="container-fluid mt-5" style="height: calc(100vh - 50px); ">
+	<h1 class="text-center title mb-4">Profil Utilisateur</h1>
+
+	<!-- Informations du profil -->
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="card p-4">
+				<div class="profile-info">
+					<img src="png/7.avif" alt="Avatar">
+					<div>
+						<h3>Pseudo : JohnDoe42</h3>
+						<p>Nombre de matchs joués : <strong>150</strong></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Section Statistiques -->
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="statistics text-center">
+				<h4 class="stat-title">Statistiques Générales</h4>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item bg-transparent text-white">Victoires : 80</li>
+					<li class="list-group-item bg-transparent text-white">Défaites : 70</li>
+					<li class="list-group-item bg-transparent text-white">Meilleur score : 2000 pts</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- Section Amis -->
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="friends-section text-center">
+				<h4 class="stat-title">Amis</h4>
+				<p>Nombre d'amis : <strong>42</strong></p>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bouton Gestion -->
+	<div class="row d-flex justify-content-center mb-5">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+				<button id="gestion-btn" class="btn btn-primary w-100 " style="min-width: 300px;">Gestion de Profil</button>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.html, body {
+		overflow: scroll;
+	}
+	.card {
+		background-color: rgba(255, 255, 255, 0.2);
+		border: none;
+		min-width: 300px;
+	}
+		body {
+		background-color: #101A32;
+		color: white;
+	}
+		h1, .card-title, .stat-title {
+		color: #2DB4F3;
+	}
+	.profile-info {
+		display: flex;
+		align-items: center;
+	}
+	.profile-info img {
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		margin-right: 20px;
+	}
+	.statistics {
+		background-color: rgba(255, 255, 255, 0.2);
+		border: none;
+		padding: 20px;
+		border-radius: 10px;
+		min-width: 300px;
+	}
+	.friends-section {
+		background-color: rgba(255, 255, 255, 0.2);
+		padding: 20px;
+		border-radius: 10px;
+		min-width: 300px;
+	}
+
+	/* Menu burger caché sous le bouton Profil */
+	.burger-menu {
+		position: absolute;
+		top: 60px; /* Ajuste la position pour qu'il apparaisse sous la navbar */
+		right: 10px; /* Tout à droite de l'écran */
+		width: 200px; /* Largeur du menu */
+		background-color: #2DB4F3;
+		border-radius: 8px;
+		padding: 10px;
+		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+		display: none; /* Caché par défaut */
+	}
+
+	.hidden {
+		display: none;
+	}
+</style>

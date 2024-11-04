@@ -1,0 +1,90 @@
+<!-- Main container for profile management -->
+<div class="container-fluid mt-4 " style="height: calc(100vh - 50px);">
+	<h1 class="text-center title mb-4">Gestion de Profil</h1>
+
+	<!-- Change Username Section -->
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Changer de pseudo</h5>
+					<form action="/change-username" method="POST">
+							<div class="form-group w-100 mb-3">
+								<label for="pseudo" class="form-label">Nouveau pseudo :</label>
+								<input type="text" class="form-control" id="pseudo" name="pseudo" required>
+							</div>
+						<button type="submit" class="btn btn-primary w-90">Valider</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Change Password Section -->
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="card w-100">
+				<div class="card-body">
+					<h5 class="card-title">Changer de mot de passe</h5>
+					<form action="/change-password" method="POST">
+						<div class="form-group w-100 mb-3">
+							<label for="current-password" class="form-label">Mot de passe actuel :</label>
+							<input type="password" class="form-control" id="current-password" name="current-password" required>
+						</div>
+						<div class="form-group w-100 mb-3">
+							<label for="new-password" class="form-label">Nouveau mot de passe :</label>
+							<input type="password" class="form-control" id="new-password" name="new-password" required>
+						</div>
+						<div class="form-group w-100 mb-3">
+							<label for="confirm-password" class="form-label">Confirmer le nouveau mot de passe :</label>
+							<input type="password" class="form-control" id="confirm-password" name="confirm-password" required>
+						</div>
+						<button type="submit" class="btn btn-primary w-90">Changer le mot de passe</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Change Avatar Section -->
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4 mb-4">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Changer d'avatar</h5>
+					<form action="/change-avatar" method="POST" enctype="multipart/form-data">
+						<div class="form-group w-100 mb-3">
+							<label for="avatar" class="form-label">Choisir un nouvel avatar :</label>
+							<input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" required>
+						</div>
+						<button type="submit" class="btn btn-primary w-90">Changer l'avatar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.html, body {
+		overflow: scroll;
+	}
+	.card {
+		background-color: rgba(255, 255, 255, 0.2);
+		border: none;
+		min-width: 250px;
+	}
+	h1, .card-title {
+		color: #2DB4F3;
+	}
+	/* Optional: responsive font sizing */
+	.form-control, label {
+		font-size: calc(0.9rem + 0.4vw); /* Adjust font size based on viewport width */
+	}
+	.w-90 {
+		width: 90%;
+		max-width: 100%;
+		display: block;
+		margin: 0 auto; /* Centre le bouton dans son conteneur */
+	}
+</style>
