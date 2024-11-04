@@ -32,9 +32,13 @@
         </form>
     </div>
 
-    <!-- Option pour activer le 2fa -->
+    <!-- Option pour activer/désactiver le 2fa -->
 	<div class="enable-2fa">
-        <a href="{% url 'User:enable_2fa' %}" class="btn">Activer 2FA</a>
+        {% if is_2fa_enabled %}
+            <a href="{% url 'User:disable_2fa' %}" class="btn">Désactiver 2FA</a>
+        {% else %}
+            <a href="{% url 'User:enable_2fa' %}" class="btn">Activer 2FA</a>
+        {% endif %}
     </div>
     
     <!-- Autres informations du profil -->

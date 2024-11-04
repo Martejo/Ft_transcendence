@@ -3,6 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from .models import User, UserProfile, FriendRequest, Game, MatchHistory
 from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm, Two_factor_login_Form  # Ajoutez PasswordChangeForm ici
 from .utils import hash_password, verify_password
@@ -27,6 +28,11 @@ def register_view(request):
         form = RegistrationForm()
     return render(request, 'User/register.html', {'form': form})
 
+
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -39,6 +45,7 @@ def login_view(request):
                     request.session['user_id'] = user.id
                     if user.is_2fa_enabled:
                         request.session['auth_partial'] = True
+                        print("Redirecting to 2FA verification")
                         return redirect('User:verify_2fa_login')
                     else:
                         return redirect('User:profile', username=user.username)  # Correction ici
@@ -67,7 +74,6 @@ def logout_view(request):
 def update_profile_view(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(User, id=user_id)
-
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=user)
         if form.is_valid():
@@ -112,7 +118,8 @@ def change_password_view(request):
 @login_required
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
-    return render(request, 'User/profile.html', {'profile_user': user})
+    is_2fa_enabled = user.is_2fa_enabled
+    return render(request, 'User/profile.html', {'profile_user': user, 'is_2fa_enabled' : is_2fa_enabled})
 
 @login_required
 def match_history_view(request):
@@ -203,7 +210,7 @@ def log_guest_view(request):
 JWT_SECRET = 'your-secret-key-here' #Move this to .env or someplace we wont git push
 
 # ------------------------------------------------------------------------------------
-
+@login_required
 def enable_2fa(request):
 
     user_id = request.session.get('user_id')
@@ -249,6 +256,7 @@ def enable_2fa(request):
     
     return render(request, 'User/enable_2fa.html')
 
+@login_required
 def verify_2fa(request):
     setup_token = request.session.get('setup_token')
     
@@ -301,7 +309,7 @@ def verify_2fa_login(request):
     user_id = request.session.get('user_id')
     auth_partial = request.session.get('auth_partial')
 
-    if not user_id or auth_partial:
+    if not user_id or not auth_partial:
         return redirect('User:login')
 
     try:
@@ -311,20 +319,41 @@ def verify_2fa_login(request):
             messages.error(request, '2FA not properly set up')
             return redirect('User:login')
 
-        totp = pyotp.TOTP(user.totp_secret)
+        # totp = pyotp.TOTP(user.totp_secret)
 
         if request.method == 'POST':
             code = request.POST.get('code')
             totp = pyotp.TOTP(user.totp_secret)
 
-        if totp.verify(code):
-            del request.session['auth_partial']
-            messages.success(request, 'Login successful')
-            return redirect ('User:profile', username=user.username)
-        else:
-            messages.error(request, 'Invalid 2FA code')
+            if totp.verify(code):
+                del request.session['auth_partial']
+                return redirect ('User:profile', username=user.username)
+            else:
+                messages.error(request, 'Invalid 2FA code')
     except User.DoesNotExist:
         request.session.flush()
         return redirect('User:login')
 
     return render(request, 'User/verify_2fa_login.html')
+
+@login_required
+def disable_2fa(request):
+    user = request.user
+    is_2fa_enabled = bool(user.totp_secret)
+
+    if not is_2fa_enabled:
+        messages.error(request, 'Le 2FA n\'est pas activé sur votre compte')
+        return redirect('User:profile', username=user.username)
+    
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        totp = pyotp.TOTP(user.totp_secret)
+        
+        if totp.verify(code):
+            user.totp_secret = ''
+            user.save()
+            messages.success(request, 'Le 2FA a été désactivé')
+            return redirect('User:profile', username = user.username)
+        else:
+            messages.error(request, 'code 2FA invalide')
+    return render(request, 'User/disable_2fa.html', {'is_2fa_enabled': is_2fa_enabled})

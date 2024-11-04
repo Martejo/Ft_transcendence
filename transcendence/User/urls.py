@@ -22,5 +22,6 @@ urlpatterns = [
 	path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
     path('log-guest/', views.log_guest_view, name='log_guest'),
 	path('verify-2fa-login/', views.verify_2fa_login, name='verify_2fa_login'),
+    path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
 
 ]
