@@ -1,0 +1,121 @@
+<div class="game-menu">
+    <div class="container py-4" style="height: calc(100vh - 50px); overflow-y: auto; font-size: 20px;">
+        <h1 class="text-center mb-4">Menu de Jeu</h1>
+
+        <!-- Section de choix de type de partie -->
+        <div class="card mb-3 bg-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Type de Partie</h5>
+                <div class="d-flex flex-column gap-2">
+                    <button class="btn btn-primary w-100" onclick="chooseLocalGame()">Partie Locale</button>
+                    <button class="btn btn-primary w-100" onclick="inviteFriend()">Inviter un Ami</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statut de l'invitation (affiché uniquement après l'envoi) -->
+        <div id="invitation-status" class="card mb-3 bg-secondary d-none">
+            <div class="card-body">
+                <h5 class="card-title">Statut de l'Invitation</h5>
+                <p id="status-text" class="mb-0"></p>
+            </div>
+        </div>
+
+        <!-- Section des modes de jeu (affichée après le choix du type de partie) -->
+        <div id="game-modes" class="card mb-3 bg-secondary d-none">
+            <div class="card-body">
+                <h5 class="card-title">Modes de Jeu</h5>
+                <div class="d-flex flex-column gap-2">
+                    <button class="btn btn-primary w-100" onclick="startStandardGame()">Jeu Standard</button>
+                    <button class="btn btn-primary w-100" onclick="showCustomization()">Jeu Personnalisé</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu de personnalisation du gameplay (affiché uniquement pour Jeu Personnalisé) -->
+        <div id="customization-menu" class="card mb-3 bg-secondary d-none">
+            <div class="card-body">
+                <h5 class="card-title">Personnalisation du Gameplay</h5>
+                
+                <!-- Vitesse de la balle -->
+                <div class="mb-3">
+                    <label for="ballSpeed" class="form-label">Vitesse de la Balle (<span id="ballSpeedValue">1</span>)</label>
+                    <input type="range" class="form-range" id="ballSpeed" min="1" max="3" value="1" oninput="updateBallSpeed()">
+                </div>
+
+                <!-- Taille de la raquette -->
+                <div class="mb-3">
+                    <label for="paddleSizeSelect" class="form-label">Taille de la Raquette</label>
+                    <select id="paddleSizeSelect" class="form-select" onchange="updatePaddleSize()">
+                        <option value="small">Petite</option>
+                        <option value="medium" selected>Moyenne</option>
+                        <option value="large">Grande</option>
+                    </select>
+                </div>
+
+                <!-- Obstacle toggle -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="obstacleToggle">
+                    <label class="form-check-label" for="obstacleToggle">Activer Obstacle</label>
+                </div>
+
+                <!-- Bonus/malus toggle -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="bonusToggle">
+                    <label class="form-check-label" for="bonusToggle">Activer Bonus/Malus</label>
+                </div>
+
+                <button class="btn btn-primary w-100 mt-3" onclick="startCustomGame()">Lancer la Partie Personnalisée</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .game-menu * {
+        color: rgb(223, 216, 216) !important;
+    }
+</style>
+
+<script>
+    // Affiche les modes de jeu pour une partie locale
+    function chooseLocalGame() {
+        document.getElementById('game-modes').classList.remove('d-none');
+        document.getElementById('customization-menu').classList.add('d-none');
+    }
+
+    // Affiche la section d'invitation à un ami pour une partie en ligne
+    function inviteFriend() {
+        // Simuler une requête AJAX vers la liste d'amis ou la recherche
+        document.getElementById('invitation-status').classList.remove('d-none');
+        document.getElementById('status-text').innerText = "En attente d'acceptation...";
+    }
+
+    // Met à jour l'affichage de la valeur de la vitesse de la balle
+    function updateBallSpeed() {
+        document.getElementById('ballSpeedValue').innerText = document.getElementById('ballSpeed').value;
+    }
+
+    // Met à jour la taille de la raquette selon l'option choisie
+    function updatePaddleSize() {
+        const paddleSize = document.getElementById('paddleSizeSelect').value;
+        console.log("Taille de la raquette choisie :", paddleSize);
+    }
+
+    // Affiche les options de personnalisation
+    function showCustomization() {
+        document.getElementById('customization-menu').classList.remove('d-none');
+    }
+
+    // Lance une partie standard
+    function startStandardGame() {
+        alert("Lancement de la partie standard...");
+        // Requête AJAX pour démarrer la partie standard
+    }
+
+    // Lance une partie personnalisée
+    function startCustomGame() {
+        alert("Lancement de la partie personnalisée avec les options choisies...");
+        // Requête AJAX pour démarrer la partie personnalisée avec les paramètres
+    }
+</script>
