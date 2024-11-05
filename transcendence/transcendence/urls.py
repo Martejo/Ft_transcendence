@@ -24,7 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('User/', include('User.urls', namespace='User')),
     path('', include('core.urls')),  #landing page
-
 ]
 
 if settings.DEBUG:

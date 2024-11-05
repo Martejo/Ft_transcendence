@@ -1,6 +1,11 @@
 # User/models.py
 from django.db import models
 from django.utils import timezone
+from pathlib import Path
+from django.contrib.auth.models import User
+import random
+from datetime import datetime, timedelta
+
 
 class User(models.Model):
     username = models.CharField(max_length=150, unique=True)
@@ -8,6 +13,8 @@ class User(models.Model):
     password_hash = models.CharField(max_length=256)  # Hachage du mot de passe
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_2fa_enabled = models.BooleanField(default=False)
+    totp_secret = models.CharField(max_length=32, null=True, blank=True)
     avatar = models.ImageField(
         upload_to='avatars/',
         null=True,
@@ -59,3 +66,21 @@ class MatchHistory(models.Model):
     
     def __str__(self):
         return f"{self.user} - {self.game} - {self.result}"
+
+
+class TwoFactorCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    @classmethod
+    def generate_code(cls, user):
+        # Delete old codes
+        cls.objects.filter(user=user).delete()
+        # Generate new code
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        return cls.objects.create(user=user, code=code)
+    
+    def is_valid(self):
+        # Code expires after 10 minutes
+        return datetime.now() - timedelta(minutes=10) <= self.created_at.replace(tzinfo=None)

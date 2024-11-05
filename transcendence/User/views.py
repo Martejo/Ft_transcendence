@@ -3,10 +3,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from .models import User, UserProfile, FriendRequest, Game, MatchHistory
-from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm  # Ajoutez PasswordChangeForm ici
+from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm, Two_factor_login_Form  # Ajoutez PasswordChangeForm ici
 from .utils import hash_password, verify_password
 from .decorators import login_required
+from io import BytesIO
+from datetime import datetime, timedelta
+import pyotp
+import jwt
+import qrcode
+import base64
 
 def register_view(request):
     if request.method == 'POST':
@@ -31,8 +38,11 @@ def login_view(request):
                 user = User.objects.get(username=username)
                 if verify_password(user.password_hash, password):
                     request.session['user_id'] = user.id
-                    messages.success(request, 'Vous êtes connecté avec succès.')
-                    return redirect('User:profile', username=user.username)  # Correction ici
+                    if user.is_2fa_enabled:
+                        request.session['auth_partial'] = True
+                        return redirect('User:verify_2fa_login')
+                    else:
+                        return redirect('User:profile', username=user.username)  # Correction ici
                 else:
                     form.add_error('password', 'Mot de passe incorrect.')
             except User.DoesNotExist:
@@ -58,7 +68,6 @@ def logout_view(request):
 def update_profile_view(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(User, id=user_id)
-
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=user)
         if form.is_valid():
@@ -103,7 +112,8 @@ def change_password_view(request):
 @login_required
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
-    return render(request, 'User/profile.html', {'profile_user': user})
+    is_2fa_enabled = user.is_2fa_enabled
+    return render(request, 'User/profile.html', {'profile_user': user, 'is_2fa_enabled' : is_2fa_enabled})
 
 @login_required
 def match_history_view(request):
@@ -188,3 +198,162 @@ def log_guest_view(request):
         request.session['user_id'] = guest_user.id
         return redirect('home')  # Rediriger vers la page d'accueil ou autre
     return render(request, 'User/login.html')  # Ou une autre page si nécessaire
+
+# ------------------------------------------------------------------------------------
+
+JWT_SECRET = 'your-secret-key-here' #Move this to .env or someplace we wont git push
+
+# ------------------------------------------------------------------------------------
+@login_required
+def enable_2fa(request):
+
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        messages.error(request, 'No user found')
+        return redirect('User:login')
+
+    if request.method == 'POST':
+        # Generate TOTP secret
+        totp_secret = pyotp.random_base32()
+        
+        # Create TOTP object
+        totp = pyotp.TOTP(totp_secret)
+        
+        # Create JWT with the TOTP secret
+        token = jwt.encode({
+            'user_id' : user_id,
+            'totp_secret': totp_secret,
+            'exp': datetime.utcnow() + timedelta(minutes=5)  # Give user 5 minutes to set up
+        }, JWT_SECRET, algorithm='HS256')
+        
+        # Store token in session
+        request.session['setup_token'] = token
+        
+        # Generate QR code
+        provisioning_uri = totp.provisioning_uri(
+            name="Transcendence",
+            issuer_name="ggwp"
+        )
+        img = qrcode.make(provisioning_uri)
+        
+        # Convert QR to display in template
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        qr_code = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Show QR and secret
+        return render(request, 'User/show_qr.html', {
+            'qr_code': qr_code,
+            'secret': totp_secret
+        })
+    
+    return render(request, 'User/enable_2fa.html')
+
+@login_required
+def verify_2fa(request):
+    setup_token = request.session.get('setup_token')
+    
+    if not setup_token:
+        messages.error(request, 'No 2FA setup in progress')
+        return redirect('User:register') #redirect vers profile?
+    
+    try:
+        # Get TOTP secret from JWT
+        payload = jwt.decode(setup_token, JWT_SECRET, algorithms=['HS256'])
+        user_id = payload['user_id']
+        totp_secret = payload['totp_secret']
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            messages.error(request, 'User not found')
+            return redirect('User:register')
+
+        if request.method == 'POST':
+            # Get code from form
+            entered_code = request.POST.get('code')
+            
+            # Verify TOTP code
+            totp = pyotp.TOTP(totp_secret)
+            if totp.verify(entered_code):
+                # Success! Here you would normally save the secret for future use
+                user.totp_secret = totp_secret
+                user.is_2fa_enabled = True
+                user.save()
+
+                del request.session['setup_token']
+                messages.success(request, '2FA setup successful!')
+                return redirect('User:profile', username=user.username)
+            else:
+                messages.error(request, 'Invalid code')
+                
+    except jwt.ExpiredSignatureError:
+        del request.session['setup_token']
+        messages.error(request, 'Setup expired. Please try again.')
+        return redirect('User:register')
+    except jwt.InvalidTokenError:
+        del request.session['setup_token']
+        messages.error(request, 'Invalid session. Please try again.')
+        return redirect('User:register')
+    
+    return render(request, 'User/verify_2fa.html')
+
+def verify_2fa_login(request):
+    user_id = request.session.get('user_id')
+    auth_partial = request.session.get('auth_partial')
+
+    if not user_id or not auth_partial:
+        return redirect('User:login')
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        if not user.totp_secret:
+            messages.error(request, '2FA not properly set up')
+            return redirect('User:login')
+
+        # totp = pyotp.TOTP(user.totp_secret)
+
+        if request.method == 'POST':
+            code = request.POST.get('code')
+            totp = pyotp.TOTP(user.totp_secret)
+
+            if totp.verify(code):
+                del request.session['auth_partial']
+                return redirect ('User:profile', username=user.username)
+            else:
+                messages.error(request, 'Invalid 2FA code')
+    except User.DoesNotExist:
+        request.session.flush()
+        return redirect('User:login')
+
+    return render(request, 'User/verify_2fa_login.html')
+
+@login_required
+def disable_2fa(request):
+    user_id = request.session.get('user_id')
+    
+    # Fetch the user using user_id
+    user = get_object_or_404(User, id=user_id)
+    
+    is_2fa_enabled = user.is_2fa_enabled
+
+    if not is_2fa_enabled:
+        messages.error(request, 'Le 2FA n\'est pas activé sur votre compte')
+        return redirect('User:profile', username=user.username)
+    
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        totp = pyotp.TOTP(user.totp_secret)
+        
+        if totp.verify(code):
+            user.totp_secret = ''  # Clear the TOTP secret to disable 2FA
+            user.is_2fa_enabled = False  # Also set is_2fa_enabled to False
+            user.save()
+            messages.success(request, 'Le 2FA a été désactivé')
+            return redirect('User:profile', username=user.username)
+        else:
+            messages.error(request, 'Code 2FA invalide')
+
+    return render(request, 'User/disable_2fa.html', {'username': user.username})

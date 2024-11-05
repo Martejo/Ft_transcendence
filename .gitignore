@@ -1,7 +1,10 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*/__pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+*.class
 
 # C extensions
 *.so
@@ -108,3 +111,4 @@ cython_debug/
 # Windows
 Thumbs.db
 
+>>>>>>> origin/main

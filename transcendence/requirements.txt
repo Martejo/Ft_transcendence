@@ -3,4 +3,6 @@ psycopg2-binary
 python-dotenv
 bcrypt
 Pillow
-
+pyotp
+PyJWT==2.8.0
+qrcode

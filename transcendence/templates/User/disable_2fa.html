@@ -1,0 +1,35 @@
+<!-- templates/User/disable_2fa.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Désactiver 2FA</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .message { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .error { background-color: #f2dede; }
+        .success { background-color: #dff0d8; }
+    </style>
+</head>
+<body>
+    <h1>Disable 2FA</h1>
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div class="message error">{{ message }}</div>
+            {% elif message.tags == 'success' %}
+                <div class="message success">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="code" required placeholder="Enter 2FA code" pattern="[0-9]{6}">
+        <button type="submit">Disable 2FA</button>
+    </form>
+</body>
+</html>

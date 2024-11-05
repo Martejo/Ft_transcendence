@@ -25,6 +25,16 @@ class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, label='Nom d\'utilisateur')
     password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
 
+class Two_factor_login_Form(forms.Form):
+	code = forms.CharField(max_length=6, min_length=6, label='Code 2FA')
+
+	def clean_code(self):
+		code = self.cleaned_data['code']
+		if not code.isdigit():
+			raise forms.ValidationError("Le code doit contenir uniquement des chiffres")
+		return code
+
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
