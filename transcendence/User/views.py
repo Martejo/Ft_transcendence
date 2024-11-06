@@ -10,11 +10,14 @@ from .utils import hash_password, verify_password
 from .decorators import login_required
 from io import BytesIO
 from datetime import datetime, timedelta
+import hashlib
 import pyotp
 import jwt
 import qrcode
 import base64
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -28,6 +31,7 @@ def register_view(request):
         form = RegistrationForm()
     return render(request, 'User/register.html', {'form': form})
 
+@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -40,29 +44,21 @@ def login_view(request):
                     request.session['user_id'] = user.id
                     if user.is_2fa_enabled:
                         request.session['auth_partial'] = True
-                        return redirect('User:verify_2fa_login')
+                        return JsonResponse({'success': True})
                     else:
-                        return redirect('User:profile', username=user.username)  # Correction ici
+                        return JsonResponse({'success': True})
                 else:
-                    form.add_error('password', 'Mot de passe incorrect.')
+                    return JsonResponse({'success': False, 'error': 'Mot de passe incorrect'})
             except User.DoesNotExist:
-                form.add_error('username', 'Utilisateur non trouvé.')
+                return JsonResponse({'success': False, 'error': 'Identifiants incorrects'})
     else:
-        form = LoginForm()
-    return render(request, 'User/login.html', {'form': form})
+        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'})
 
 @login_required
 def logout_view(request):
-    if request.method == 'POST':
-        try:
-            del request.session['user_id']
-            messages.success(request, 'Vous êtes déconnecté avec succès.')
-        except KeyError:
-            messages.error(request, 'Vous n\'êtes pas connecté.')
-        return redirect('landing')
-    else:
-        # Si la requête n'est pas POST, redirigez ou retournez une erreur
-        return redirect('User:profile', username=request.user.username)
+    if 'user_id' in request.session:
+        del request.session['user_id']
+    return JsonResponse({'success': True})
 
 @login_required
 def update_profile_view(request):

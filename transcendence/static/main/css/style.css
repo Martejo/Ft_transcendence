@@ -1,166 +1,97 @@
 @font-face {
 	font-family: "Jersey 10";
 	src: url('fonts/Jersey10-Regular.ttf');
+
 }
+@font-face {
+
+	font-family: "Jersey 25";
+	src: url('fonts/Jersey25-Regular.ttf');
+
+}
+/* base pour tous les html */
 
 html, body {
 	height: 100%;
 	overflow: hidden;
 	background-color: #101A32;
 	margin: 0;
-  	padding: 0;
-	justify-content: center;
-	align-items: center;
+	padding: 0;
+	/* justify-content: center;
+	align-items: center; */
+	font-family: "Jersey 25";
+	font-size: 18px;
 }
 
-.container {
-	text-align: center; /* Centre les boutons horizontalement */
-	margin-top: 350px; /* Ajoute un espace au-dessus des boutons */
-	z-index: 10;
-	position: relative;
-	
-}
-
-.firstbar {
-	width: 100vw;
+.navbar {
+	min-width: 300px; 
 	height: 50px;
-	background-color: #2DB4F3;
+	width: 100%;
+	background-color: rgba(45, 180, 243, 0.9);
 	text-align: left;
-	z-index: 15; /* Garder la barre au-dessus de tout */
-	position: relative;
+	z-index: 30; /* Garder la barre au-dessus de tout */
+	position: sticky;
+	top:0;
+	justify-content: center;
+
 }
 
-.btn {
+.navbar-brand {
 	font-family: "Jersey 10";
-	background-color: #2DB4F3;
 	color: white;
+	font-size: 40px;
 	text-align: center;
 	border: none;
 	cursor: pointer;
 	display: inline-block;
+	padding-left: 10px;
+
 }
 
-.button-link {
-	padding: 3.5px 20px;
-	font-size: 40px;
+.backg {
+
+	position: absolute;
+	top: 50px; 
+	left: 0; 
+	width: 100vw; 
+	z-index: 0; 
+	 
 }
 
-.interactive-button {
-	text-shadow: 
-	1px 1px 0px black,  
-	-1px -1px 0px black,  
-	1px -1px 0px black,   
-	-1px 1px 0px black, 
-	1px 4px 4px rgba(0, 0, 0, 0.5);
-	border-radius: 20px;
+.container-fluid {
+	text-align: center; /* Centre les boutons horizontalement */
+	z-index: 20;
+	position: relative;
+}
+
+/* Pongame et login */
+
+.custom-btn {
+	font-family: "Jersey 10";
+	background-color: #2DB4F3;
+	color: white;
 	font-size: 28px;
-	width: 200px;
 	height: 50px;
-	margin-right: 20px;
-	margin-left: 20px;
+	min-width: 160px;
+	border-radius: 20px;
 	transition: color 1000ms ease;
+	border: none;
+	text-shadow: 
+		1px 1px 0px black,
+		-1px -1px 0px black,
+		1px -1px 0px black, 
+		-1px 1px 0px black, 
+		1px 4px 4px rgba(0, 0, 0, 0.5);
 }
 
-.interactive-button:hover {
+.custom-btn:hover {
 	background-color: #75d3ff;
 }
 
-.container-flex {
-	display: flex; 
-	justify-content: center; 
-	align-items: center; 
-	height: 100vh; 
-	position: absolute; 
-	top: 0px; 
-	left: 0; 
-	width: 100vw; 
-	z-index: 1; 
-	filter: blur(8px); /* Applique un flou sur l'animation */
-}
 
-.terrain {
-	width: 912px;
-	height: 460px;
-	background-color: #101A32;
-	border: 1px solid white;
-	position: relative;
-}
-
-.container-flex2 {
-	display: flex; 
-	justify-content: center; 
-	align-items: center; 
-	height: 100vh; 
-	position: absolute; 
-	top: 0px; 
-	left: 0; 
-	width: 100vw; 
-	z-index: 1; 
-}
-.terrain2 {
-	width: 912px;
-	height: 460px;
-	background-color: #101A32;
-	position: relative;
-}
-
-.ligne-centrale {
-	position: absolute;
-	width: 1px;
-	height: 100%;
-	background-color: white;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-}
-
-.cercle-central {
-	position: absolute;
-	width: 200px;
-	height: 200px;
-	border: 1px solid white;
-	border-radius: 50%;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.point-central {
-	position: absolute;
-	width: 5px;
-	height: 5px;
-	background-color: white;
-	border-radius: 50%;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.balle {
-	width: 20px;
-	height: 20px;
-	background-color: white;
-	border-radius: 50%;
-	position: absolute;
-	top: 140px;
-	left: 5px;
-}
-
-.trait-gauche, .trait-droit {
-	width: 10px;
-	height: 120px;
-	background-color: white;
-	position: absolute;
-}
-
-.trait-gauche {
-	top: 140px;
-	left: 0;
-}
-
-.trait-droit {
-	top: 140px;
-	right: 0;
+.title{
+	font-family: "Jersey 10";
+	color: white;
 }
 
 /* Conteneur Flex pour centrer les formulaires */
@@ -187,10 +118,9 @@ html, body {
 }
 
 /* Titre centré */
-.register-form h2, .login-form h2 {
+.register-form h1, .login-form h1 {
 	color: white;
 	font-family: "Jersey 10";
-	margin-bottom: 30px;
 	font-size: 36px; /* Taille de police augmentée */
 	text-align: center; /* Centre le titre */
 }
@@ -203,6 +133,7 @@ html, body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	min-width: 150px;
 }
 
 /* Libellés des champs */
@@ -213,6 +144,7 @@ html, body {
 	display: block;
 	margin-bottom: 10px;
 	text-align: center; /* Centre le texte des labels */
+	min-width: 180px;
 }
 
 /* Champs de texte */
@@ -226,6 +158,7 @@ html, body {
 	text-align: center; /* Centre le texte à l'intérieur des champs */
 	box-shadow: none; /* Supprime toute ombre éventuelle */
 	margin-bottom: 5px;
+	min-width: 200px;
 }
 
 /* Boutons */
@@ -240,9 +173,9 @@ html, body {
 	margin-top: 30px; /* Espace supplémentaire au-dessus du bouton */
 	border-radius: 20px;
 	font-size: 25px; /* Taille de police augmentée */
-	width: 100%; /* Assure que le bouton prend toute la largeur disponible */
-	max-width: 500px; /* Limite la taille maximale des boutons (augmentée) */
 	display: block;
+	min-width: 180px;
+
 }
 
 .btn.register-btn:hover, .btn.validate-btn:hover {
@@ -253,6 +186,7 @@ html, body {
 .forgot-password {
 	margin-bottom: 30px; /* Augmente l'espacement en bas */
 	text-align: center; /* Centre le lien */
+	min-width: 150px;
 }
 
 .forgot-password a {
@@ -268,107 +202,221 @@ html, body {
 	text-decoration: underline;
 }
 
-/* Styles pour le bouton de connexion en tant qu'invité */
-.guest-login {
-	margin-top: 15px;
-	text-align: center;
-  }
-  
-  .guest-login a {
-	color: #555; /* Couleur plus discrète */
+/* log_guest et register */
+
+.btn-70 {
+	width: 70%;
+	max-width: 100%;
+	display: block;
+	margin: 0 auto; /* Centre le bouton dans le conteneur */
+	border-radius: 20px;
+}
+
+
+/* Fichier play.html */
+
+
+.play-button {
+	font-family: "Jersey 10";
+	font-size: 10vw; 
+	color: #2DB4F3;
+	background: none;
+	border: none;
+	animation: blink 2s infinite;
+}
+
+@keyframes blink {
+	0%, 100% 
+	{
+		opacity: 1;
+	}
+	50% 
+	{
+		opacity: 0;
+	}
+}
+
+/* Fichier profil.html */
+
+.btn-primary {
+	font-family: "Jersey 10";
+	background-color: #2DB4F3;
+	border: none;
+	font-size: 1.2em;
+	min-width: 150px;
+	
+}
+
+.btn-primary:hover, .btn-primary:focus {
+	background-color: #75d3ff;
+	border-color: #75d3ff;
+}
+
+/* profil gestion_profil */
+
+.card-title {
+
+	font-family: "Jersey 10";
+}
+
+/* Terrain de base */
+.terrain {
+	background-color: #101A32;
+	border: 1px solid white;
+	position: relative;
+	width: 80vw;
+	height: 40vw;
+	filter: blur(6px);
+} 
+
+/* Ligne centrale */
+.ligne-centrale {
+	width: 1px;
+	height: 100%;
+	background-color: white;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	filter: blur(2px);
+}
+
+/* Cercle central */
+.cercle-central {
+	width: 20vw;
+	height: 20vw;
+	border: 1px solid white;
+	border-radius: 50%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+/* Point central */
+.point-central {
+	width: 0.5vw;
+	height: 0.5vw;
+	background-color: white;
+	border-radius: 50%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+/* Balle */
+.balle {
+	width: 2.5%;
+	height: 5%;
+	background-color: white;
+	border-radius: 50%;
+	top: 50%;
+	left: 1vw;
+}
+
+/* Traits (Gauche et Droite) */
+.trait-gauche, .trait-droit {
+	width: 1.25%;
+	height: 30%;
+	background-color: white;
+}
+
+.trait-gauche {
+	left: 0;
+	top: 38%;
+}
+
+.trait-droit {
+	right: 0;
+	top: 38%;
+}
+
+.card .form-control {
+	width: 90%; /* Définit la largeur à 80 % de la carte */
+	margin: 0 auto; /* Centre les champs dans la carte */
+	min-width: 200px;
+}
+
+/* Styles pour le menu burger */
+#burger-menu {
+	position: fixed;
+	top: 58px;
+	right: 8px;
+	width: 400px; /* Largeur en pixels ajustable */
+	height: calc(100vh - 66px); /* Prend toute la hauteur sous la navbar */
+	/* background-color: rgba(45, 180, 243, 1); */
+	border-radius: 8px 8px 8px 8px;
+	/* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); */
+	display: none; /* Caché par défaut */
+	overflow-y: auto; /* Permet le défilement vertical si nécessaire */
+	/* padding: 15px; */
+	z-index: 98; /* Plus haut que l'overlay pour rester visible */
+	background-color: #141b2e;
+	overflow: scroll;
+}
+
+#burger-menu .dropdown-item {
+	padding: 10px 15px;
+	color: white;
 	text-decoration: none;
-	font-size: 0.9em; /* Taille de police plus petite */
-  }
-  
-  .guest-login a:hover {
-	text-decoration: underline;
-	color: #000; /* Couleur plus sombre au survol */
-  }
-
-  /***********************/
-  /* Styles pour l'avatar */
-.avatar {
-    text-align: center;
-    margin: 20px 0;
 }
 
-.avatar img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
+#burger-menu .dropdown-item:hover {
+	background-color: rgba(75, 75, 75, 0.3); /* Couleur de survol */
 }
 
-/* Styles pour le formulaire de mise à jour de l'avatar */
-.update-avatar {
-    text-align: center;
-    margin-top: 20px;
+#overlay {
+    position: fixed;
+    top: 50px; /* Hauteur de la navbar */
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 50px); /* Hauteur de la page moins la navbar */
+    background-color: rgba(0, 0, 0, 0.5); /* Couleur sombre avec transparence */
+    z-index: 97; /* Doit être derrière le menu burger */
 }
 
-.update-avatar .btn {
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: #fff;
+/* Styles pour le bouton profil */
+#menu-btn {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	border: 2px solid white;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#menu-btn i {
+	font-size: 35px;
+	color: white;
+}
+
+.profile-section h5 {
+    margin-bottom: 0;
+    color: white;
+}
+
+.profile-section p {
+    margin-top: 0;
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+.action-buttons .btn-primary {
+    background-color: #3798fa; /* Couleur du bouton Voir le profil */
     border: none;
-    border-radius: 4px;
-    text-decoration: none;
+    color: white;
 }
 
-.update-avatar .btn:hover {
-    background-color: #2980b9;
+.action-buttons .btn-secondary {
+    background-color: #333; /* Couleur du bouton Déconnexion */
+    border: none;
+    color: white;
 }
 
-/* Styles pour le bouton enable 2fa */
-.enable-2fa {
-	text-align: right;
-	margin-top: 20px;
-}
-
-.enable-2fa .btn {
-	padding: 5px 10px;
-    background-color: #3498db;
-	color: #fff;
-	border-radius: 2px;
-	text-decoration: none;
-}
-
-.enable-2fa .btn:hover {
-    background-color: #2980b9;
-}
-
-/* Styles pour les messages de feedback */
-.messages {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
-}
-
-.messages li {
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-}
-
-.messages li.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.messages li.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* Styles pour les boutons */
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #2ecc71;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-}
-
-.btn:hover {
-    background-color: #27ae60;
+.action-buttons .btn-primary,
+.action-buttons .btn-secondary {
+    display: block; /* Les boutons prennent toute la largeur du conteneur */
+    width: auto; /* Ajuste la largeur pour qu'ils ne soient pas en pleine largeur */
+    margin: 5px 0; /* Ajoute une marge verticale pour les espacer */
+    text-align: center; /* Centre le texte dans chaque bouton */
 }

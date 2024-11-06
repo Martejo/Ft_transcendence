@@ -1,38 +1,49 @@
-<!-- templates/home.html -->
+<!-- your_app/templates/base.html -->
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pongame</title>
-  <link rel="stylesheet" href="{% static 'main/css/style.css' %}"> 
-  <script src="{% static 'main/js/script.js' %}" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pongame</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'main/js/script.js' %}" defer></script> 
 </head>
 <body>
-  <div class="firstbar">
-    <a href="{% url 'landing' %}">
-      <button class="btn button-link">PONGAME</button>
-    </a>
-  </div>
-  <div class="container-flex">
-    <div class="terrain">
-      <div class="balle"></div>
-      <div class="ligne-centrale"></div>
-      <!-- <div class="cercle-central"></div> -->
-      <div class="point-central"></div>
-      <div class="trait-gauche"></div> 
-      <div class="trait-droit"></div> 
-    </div>  
-  </div>
-  <div class="container">
-    <a href="{% url 'User:login' %}">
-      <button id="login" class="btn interactive-button">Login</button>
-    </a>
-    <a href="{% url 'User:register' %}">
-      <button id="register" class="btn interactive-button">Register</button>
-    </a>
-  </div>
+    <!-- Barre du haut -->
+	<nav id="navbar" class="navbar navbar-expand">
+		<div class="container-fluid">
+			<a id="home-btn" class="navbar-brand text-white" href="#">PONGAME</a>
+			<div class="d-flex ms-auto" id="navbar-right"></div>
+		</div>
+	</nav>
+
+    <!-- Conteneur pour l'animation -->
+	<div id="ground-game" class=" backg d-flex justify-content-center align-items-center" style="height: calc(100vh - 50px); ">
+		<div class="terrain position-relative">
+			<div class="balle position-absolute"></div>
+			<div class="ligne-centrale position-absolute"></div>
+			<div class="cercle-central position-absolute"></div>
+			<div class="point-central position-absolute"></div>
+			<div class="trait-gauche position-absolute"></div> 
+			<div class="trait-droit position-absolute"></div> 
+		</div>
+	</div>
+
+
+    <div id="content">
+        <!-- Le contenu dynamique sera chargé ici -->
+    </div>
+    
+    
+    <!-- Inclure une variable JavaScript indiquant si l'utilisateur est authentifié -->
+    <script>
+        const isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
