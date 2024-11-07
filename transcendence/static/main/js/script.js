@@ -140,7 +140,7 @@ $.ajaxSetup({
 // Fonction pour charger le contenu basé sur l'application et la vue
 function loadContent(app, view) {
     $.ajax({
-        url: `/views/${app}/${view}/`,
+        url: `/${app}/${view}/`,
         method: 'GET',
         success: function(response) {
             $('#content').html(response);
@@ -171,7 +171,6 @@ function handleHashChange() {
         window.location.hash = '#core-home';
         return;
     }
-
     loadContent(app, view);
 }
 
@@ -184,8 +183,140 @@ function initializeView(app, view) { // MODIFICATION 4 : Accepter 'app' et 'view
       initializeProfileView(); // Vous devrez créer cette fonction
   } else if (app === 'User' && view === 'register') {
         initializeRegisterView(); // Appelle la fonction d'initialisation pour l'inscription
+  } else if (app === 'User' && view === 'gestion_profil') {
+    initializeGestionProfileView(); // Appelle la fonction d'initialisation pour l'inscription
   }
     // Ajouter des conditions pour d'autres applications et vues si nécessaire
+}
+
+// Initialiser la vue de gestion de profil
+function initializeGestionProfileView() {
+    console.log("initializeManageProfileView called."); // Débogage
+
+    // Gestionnaire pour le formulaire de changement de pseudo
+    $(document).on('submit', '#change-username-form', function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
+        console.log("Changement de pseudo soumis via AJAX."); // Débogage
+
+        $.ajax({
+            url: '/User/update_profile/',
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log("Réponse AJAX reçue pour le changement de pseudo :", response); // Débogage
+                if (response.success) {
+                    $('#change-username-success').text('Pseudo mis à jour avec succès.');
+                    $('#change-username-error').empty();
+                    // Mettre à jour l'état d'authentification si nécessaire
+                } else {
+                    if (response.errors) {
+                        let errors = response.errors;
+                        let errorMessages = '';
+                        for (let field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += errors[field].join('<br>') + '<br>';
+                            }
+                        }
+                        $('#change-username-error').html(errorMessages);
+                        $('#change-username-success').empty();
+                    } else if (response.error) {
+                        $('#change-username-error').text(response.error);
+                        $('#change-username-success').empty();
+                    }
+                }
+            },
+            error: function(error) {
+                console.error("Erreur lors du changement de pseudo :", error);
+                $('#change-username-error').html('<p>Une erreur est survenue lors du changement de pseudo. Veuillez réessayer.</p>');
+                $('#change-username-success').empty();
+            }
+        });
+    });
+
+    // Gestionnaire pour le formulaire de changement de mot de passe
+    $(document).on('submit', '#change-password-form', function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
+        console.log("Changement de mot de passe soumis via AJAX."); // Débogage
+
+        $.ajax({
+            url: '/User/change_password/',
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log("Réponse AJAX reçue pour le changement de mot de passe :", response); // Débogage
+                if (response.success) {
+                    $('#change-password-success').text('Mot de passe mis à jour avec succès.');
+                    $('#change-password-error').empty();
+                } else {
+                    if (response.errors) {
+                        let errors = response.errors;
+                        let errorMessages = '';
+                        for (let field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += errors[field].join('<br>') + '<br>';
+                            }
+                        }
+                        $('#change-password-error').html(errorMessages);
+                        $('#change-password-success').empty();
+                    } else if (response.error) {
+                        $('#change-password-error').text(response.error);
+                        $('#change-password-success').empty();
+                    }
+                }
+            },
+            error: function(error) {
+                console.error("Erreur lors du changement de mot de passe :", error);
+                $('#change-password-error').html('<p>Une erreur est survenue lors du changement de mot de passe. Veuillez réessayer.</p>');
+                $('#change-password-success').empty();
+            }
+        });
+    });
+
+    // Gestionnaire pour le formulaire de changement d'avatar
+    $(document).on('submit', '#change-avatar-form', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        console.log("Changement d'avatar soumis via AJAX."); // Débogage
+
+        $.ajax({
+            url: '/User/update_avatar/',
+            method: 'POST',
+            data: formData,
+            processData: false, // Nécessaire pour les formulaires multipart/form-data
+            contentType: false, // Nécessaire pour les formulaires multipart/form-data
+            success: function(response) {
+                console.log("Réponse AJAX reçue pour le changement d'avatar :", response); // Débogage
+                if (response.success) {
+                    $('#change-avatar-success').text('Avatar mis à jour avec succès.');
+                    $('#change-avatar-error').empty();
+                    // Optionnel : Mettre à jour l'avatar affiché
+                    // location.reload(); // Rafraîchir la page pour voir le nouvel avatar
+                } else {
+                    if (response.errors) {
+                        let errors = response.errors;
+                        let errorMessages = '';
+                        for (let field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += errors[field].join('<br>') + '<br>';
+                            }
+                        }
+                        $('#change-avatar-error').html(errorMessages);
+                        $('#change-avatar-success').empty();
+                    } else if (response.error) {
+                        $('#change-avatar-error').text(response.error);
+                        $('#change-avatar-success').empty();
+                    }
+                }
+            },
+            error: function(error) {
+                console.error("Erreur lors du changement d'avatar :", error);
+                $('#change-avatar-error').html('<p>Une erreur est survenue lors du changement d\'avatar. Veuillez réessayer.</p>');
+                $('#change-avatar-success').empty();
+            }
+        });
+    });
 }
 
 function initializeHomeView() {
@@ -231,6 +362,7 @@ function initializeRegisterView() {
                     $('#register-error').html(errorMessages);
                 }
             },
+            // Demander a gpt ce qu'est #register-error
             error: function(error) {
                 console.error("Erreur lors de la soumission du formulaire :", error);
                 $('#register-error').html('<p>Une erreur est survenue lors de l\'inscription. Veuillez réessayer.</p>');

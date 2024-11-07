@@ -1,0 +1,97 @@
+<!-- templates/User/manage_profile.html -->
+<div class="container-fluid mt-4" style="height: calc(100vh - 50px);">
+    <h1 class="text-center title mb-4">Gestion de Profil</h1>
+
+    <!-- Change Username Section -->
+    <div class="row d-flex justify-content-center mb-4">
+        <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Changer de pseudo</h5>
+                    <form id="change-username-form" method="POST">
+                        {% csrf_token %}
+                        {{ profile_form.as_p }}
+                        <button type="submit" class="btn btn-primary w-90">Valider</button>
+                        <div id="change-username-error" class="text-danger mt-2"></div>
+                        <div id="change-username-success" class="text-success mt-2"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Section -->
+    <div class="row d-flex justify-content-center mb-4">
+        <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+            <div class="card w-100">
+                <div class="card-body">
+                    <h5 class="card-title">Changer de mot de passe</h5>
+                    <form id="change-password-form" method="POST">
+                        {% csrf_token %}
+                        {{ password_form.as_p }}
+                        <button type="submit" class="btn btn-primary w-90">Valider</button>
+                        <div id="change-password-error" class="text-danger mt-2"></div>
+                        <div id="change-password-success" class="text-success mt-2"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Avatar Section -->
+    <div class="row d-flex justify-content-center mb-4">
+        <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Changer d'avatar</h5>
+                    <form id="change-avatar-form" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ avatar_form.as_p }}
+                        <button type="submit" class="btn btn-primary w-90">Valider</button>
+                        <div id="change-avatar-error" class="text-danger mt-2"></div>
+                        <div id="change-avatar-success" class="text-success mt-2"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- 2FA Section -->
+	<div class="row d-flex justify-content-center mb-4">
+ 		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+        	<div class="card w-100">  <!-- Added w-100 like your other cards -->
+            	<div class="card-body">
+                	<h5 class="card-title">Authentification à deux facteurs</h5>
+                	{% if user.is_2fa_enabled %}
+                    	<a href="{% url 'User:disable_2fa' %}" class="btn btn-primary w-90">Désactiver 2FA</a>
+                	{% else %}
+                    	<a href="{% url 'User:enable_2fa' %}" class="btn btn-primary w-90">Activer 2FA</a>
+                	{% endif %}
+            	</div>
+        	</div>
+    	</div>
+	</div>
+</div>
+
+<style>
+    .html, body {
+        overflow: scroll;
+    }
+    .card {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        min-width: 250px;
+    }
+    h1, .card-title {
+        color: #2DB4F3;
+    }
+    /* Optional: responsive font sizing */
+    .form-control, label {
+        font-size: calc(0.9rem + 0.4vw); /* Adjust font size based on viewport width */
+    }
+    .w-90 {
+        width: 90%;
+        display: block;
+        margin: 0 auto; /* Centre le bouton dans son conteneur */
+    }
+</style>

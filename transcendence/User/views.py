@@ -82,6 +82,35 @@ def logout_view(request):
         del request.session['user_id']
     return JsonResponse({'success': True})
 
+############ Gestion de profil #############
+
+#Renvoie la page gestion de profil + formulaire
+@csrf_exempt
+#@login_required
+def manage_profile_view(request):
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'GET':
+        profile_form = ProfileForm(instance=user)
+        password_form = PasswordChangeForm()
+        avatar_form = AvatarUpdateForm(instance=user)
+        # context = {
+        #     # 'profile_form': profile_form,
+        #     'password_form': password_form,
+        #     # 'avatar_form': avatar_form,
+        #     # 'profile_user': user
+        #     # Rajouter form pour changement de pseudo
+        # }
+        context = {
+            'password_form': password_form
+        }
+        return render(request, 'User/gestion_profil.html', context)
+    else:
+        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+# Met à jour le profil
+@csrf_protect
 @login_required
 def update_profile_view(request):
     user_id = request.session.get('user_id')
@@ -99,7 +128,8 @@ def update_profile_view(request):
 
     return render(request, 'User/update_profile.html', {'form': form, 'profile_user': user})
 
-
+# Changer le mot de passe
+@csrf_protect
 @login_required
 def change_password_view(request):
     user_id = request.session.get('user_id')
@@ -114,19 +144,189 @@ def change_password_view(request):
             if verify_password(user.password_hash, old_password):
                 user.password_hash = hash_password(new_password)
                 user.save()
-                messages.success(request, 'Votre mot de passe a été mis à jour avec succès.')
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'error': 'L\'ancien mot de passe est incorrect.'})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+@csrf_protect
+@login_required
+def update_avatar_view(request):
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+@csrf_protect
+@login_required
+def enable_2fa(request):
+
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        messages.error(request, 'No user found')
+        return redirect('User:login')
+
+    if request.method == 'POST':
+        # Generate TOTP secret
+        totp_secret = pyotp.random_base32()
+        
+        # Create TOTP object
+        totp = pyotp.TOTP(totp_secret)
+        
+        # Create JWT with the TOTP secret
+        token = jwt.encode({
+            'user_id' : user_id,
+            'totp_secret': totp_secret,
+            'exp': datetime.utcnow() + timedelta(minutes=5)  # Give user 5 minutes to set up
+        }, JWT_SECRET, algorithm='HS256')
+        
+        # Store token in session
+        request.session['setup_token'] = token
+        
+        # Generate QR code
+        provisioning_uri = totp.provisioning_uri(
+            name="Transcendence",
+            issuer_name="ggwp"
+        )
+        img = qrcode.make(provisioning_uri)
+        
+        # Convert QR to display in template
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        qr_code = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Show QR and secret
+        return render(request, 'User/show_qr.html', {
+            'qr_code': qr_code,
+            'secret': totp_secret
+        })
+    
+    return render(request, 'User/enable_2fa.html')
+
+@csrf_protect
+@login_required
+def verify_2fa(request):
+    setup_token = request.session.get('setup_token')
+    
+    if not setup_token:
+        messages.error(request, 'No 2FA setup in progress')
+        return redirect('User:register') #redirect vers profile?
+    
+    try:
+        # Get TOTP secret from JWT
+        payload = jwt.decode(setup_token, JWT_SECRET, algorithms=['HS256'])
+        user_id = payload['user_id']
+        totp_secret = payload['totp_secret']
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            messages.error(request, 'User not found')
+            return redirect('User:register')
+
+        if request.method == 'POST':
+            # Get code from form
+            entered_code = request.POST.get('code')
+            
+            # Verify TOTP code
+            totp = pyotp.TOTP(totp_secret)
+            if totp.verify(entered_code):
+                # Success! Here you would normally save the secret for future use
+                user.totp_secret = totp_secret
+                user.is_2fa_enabled = True
+                user.save()
+
+                del request.session['setup_token']
+                messages.success(request, '2FA setup successful!')
                 return redirect('User:profile', username=user.username)
             else:
-                form.add_error('old_password', 'L\'ancien mot de passe est incorrect.')
-                messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+                messages.error(request, 'Invalid code')
+                
+    except jwt.ExpiredSignatureError:
+        del request.session['setup_token']
+        messages.error(request, 'Setup expired. Please try again.')
+        return redirect('User:register')
+    except jwt.InvalidTokenError:
+        del request.session['setup_token']
+        messages.error(request, 'Invalid session. Please try again.')
+        return redirect('User:register')
+    
+    return render(request, 'User/verify_2fa.html')
+
+@csrf_protect
+def verify_2fa_login(request):
+    user_id = request.session.get('user_id')
+    auth_partial = request.session.get('auth_partial')
+
+    if not user_id or not auth_partial:
+        return redirect('User:login')
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        if not user.totp_secret:
+            messages.error(request, '2FA not properly set up')
+            return redirect('User:login')
+
+        # totp = pyotp.TOTP(user.totp_secret)
+
+        if request.method == 'POST':
+            code = request.POST.get('code')
+            totp = pyotp.TOTP(user.totp_secret)
+
+            if totp.verify(code):
+                del request.session['auth_partial']
+                return redirect ('User:profile', username=user.username)
+            else:
+                messages.error(request, 'Invalid 2FA code')
+    except User.DoesNotExist:
+        request.session.flush()
+        return redirect('User:login')
+
+    return render(request, 'User/verify_2fa_login.html')
+
+@csrf_protect
+@login_required
+def disable_2fa(request):
+    user_id = request.session.get('user_id')
+    
+    # Fetch the user using user_id
+    user = get_object_or_404(User, id=user_id)
+    
+    is_2fa_enabled = user.is_2fa_enabled
+
+    if not is_2fa_enabled:
+        messages.error(request, 'Le 2FA n\'est pas activé sur votre compte')
+        return redirect('User:profile', username=user.username)
+    
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        totp = pyotp.TOTP(user.totp_secret)
+        
+        if totp.verify(code):
+            user.totp_secret = ''  # Clear the TOTP secret to disable 2FA
+            user.is_2fa_enabled = False  # Also set is_2fa_enabled to False
+            user.save()
+            messages.success(request, 'Le 2FA a été désactivé')
+            return redirect('User:profile', username=user.username)
         else:
-            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
-    else:
-        form = PasswordChangeForm()
+            messages.error(request, 'Code 2FA invalide')
 
-    return render(request, 'User/change_password.html', {'form': form, 'profile_user': user})
+    return render(request, 'User/disable_2fa.html', {'username': user.username})
 
-
+############## Fin de gestion de profil ###############
 @login_required
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
@@ -186,24 +386,6 @@ def reject_friend_request(request, request_id):
     
     return redirect('User:profile', username=friend_request.from_user.username)
 
-@login_required
-def update_avatar_view(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(User, id=user_id)
-    
-    if request.method == 'POST':
-        form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Votre avatar a été mis à jour avec succès.')
-            return redirect('User:profile', username=user.username)
-        else:
-            messages.error(request, 'Il y a eu une erreur lors de la mise à jour de votre avatar.')
-    else:
-        form = AvatarUpdateForm(instance=user)
-    
-    return render(request, 'User/update_avatar.html', {'form': form, 'profile_user': user})
-
 
 def log_guest_view(request):
     # Logique pour connecter un utilisateur en tant qu'invité
@@ -216,162 +398,3 @@ def log_guest_view(request):
         request.session['user_id'] = guest_user.id
         return redirect('home')  # Rediriger vers la page d'accueil ou autre
     return render(request, 'User/login.html')  # Ou une autre page si nécessaire
-
-# ------------------------------------------------------------------------------------
-
-JWT_SECRET = 'your-secret-key-here' #Move this to .env or someplace we wont git push
-
-# ------------------------------------------------------------------------------------
-@login_required
-def enable_2fa(request):
-
-    user_id = request.session.get('user_id')
-
-    if not user_id:
-        messages.error(request, 'No user found')
-        return redirect('User:login')
-
-    if request.method == 'POST':
-        # Generate TOTP secret
-        totp_secret = pyotp.random_base32()
-        
-        # Create TOTP object
-        totp = pyotp.TOTP(totp_secret)
-        
-        # Create JWT with the TOTP secret
-        token = jwt.encode({
-            'user_id' : user_id,
-            'totp_secret': totp_secret,
-            'exp': datetime.utcnow() + timedelta(minutes=5)  # Give user 5 minutes to set up
-        }, JWT_SECRET, algorithm='HS256')
-        
-        # Store token in session
-        request.session['setup_token'] = token
-        
-        # Generate QR code
-        provisioning_uri = totp.provisioning_uri(
-            name="Transcendence",
-            issuer_name="ggwp"
-        )
-        img = qrcode.make(provisioning_uri)
-        
-        # Convert QR to display in template
-        buffered = BytesIO()
-        img.save(buffered, format="PNG")
-        qr_code = base64.b64encode(buffered.getvalue()).decode()
-        
-        # Show QR and secret
-        return render(request, 'User/show_qr.html', {
-            'qr_code': qr_code,
-            'secret': totp_secret
-        })
-    
-    return render(request, 'User/enable_2fa.html')
-
-@login_required
-def verify_2fa(request):
-    setup_token = request.session.get('setup_token')
-    
-    if not setup_token:
-        messages.error(request, 'No 2FA setup in progress')
-        return redirect('User:register') #redirect vers profile?
-    
-    try:
-        # Get TOTP secret from JWT
-        payload = jwt.decode(setup_token, JWT_SECRET, algorithms=['HS256'])
-        user_id = payload['user_id']
-        totp_secret = payload['totp_secret']
-
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            messages.error(request, 'User not found')
-            return redirect('User:register')
-
-        if request.method == 'POST':
-            # Get code from form
-            entered_code = request.POST.get('code')
-            
-            # Verify TOTP code
-            totp = pyotp.TOTP(totp_secret)
-            if totp.verify(entered_code):
-                # Success! Here you would normally save the secret for future use
-                user.totp_secret = totp_secret
-                user.is_2fa_enabled = True
-                user.save()
-
-                del request.session['setup_token']
-                messages.success(request, '2FA setup successful!')
-                return redirect('User:profile', username=user.username)
-            else:
-                messages.error(request, 'Invalid code')
-                
-    except jwt.ExpiredSignatureError:
-        del request.session['setup_token']
-        messages.error(request, 'Setup expired. Please try again.')
-        return redirect('User:register')
-    except jwt.InvalidTokenError:
-        del request.session['setup_token']
-        messages.error(request, 'Invalid session. Please try again.')
-        return redirect('User:register')
-    
-    return render(request, 'User/verify_2fa.html')
-
-def verify_2fa_login(request):
-    user_id = request.session.get('user_id')
-    auth_partial = request.session.get('auth_partial')
-
-    if not user_id or not auth_partial:
-        return redirect('User:login')
-
-    try:
-        user = User.objects.get(id=user_id)
-
-        if not user.totp_secret:
-            messages.error(request, '2FA not properly set up')
-            return redirect('User:login')
-
-        # totp = pyotp.TOTP(user.totp_secret)
-
-        if request.method == 'POST':
-            code = request.POST.get('code')
-            totp = pyotp.TOTP(user.totp_secret)
-
-            if totp.verify(code):
-                del request.session['auth_partial']
-                return redirect ('User:profile', username=user.username)
-            else:
-                messages.error(request, 'Invalid 2FA code')
-    except User.DoesNotExist:
-        request.session.flush()
-        return redirect('User:login')
-
-    return render(request, 'User/verify_2fa_login.html')
-
-@login_required
-def disable_2fa(request):
-    user_id = request.session.get('user_id')
-    
-    # Fetch the user using user_id
-    user = get_object_or_404(User, id=user_id)
-    
-    is_2fa_enabled = user.is_2fa_enabled
-
-    if not is_2fa_enabled:
-        messages.error(request, 'Le 2FA n\'est pas activé sur votre compte')
-        return redirect('User:profile', username=user.username)
-    
-    if request.method == 'POST':
-        code = request.POST.get('code')
-        totp = pyotp.TOTP(user.totp_secret)
-        
-        if totp.verify(code):
-            user.totp_secret = ''  # Clear the TOTP secret to disable 2FA
-            user.is_2fa_enabled = False  # Also set is_2fa_enabled to False
-            user.save()
-            messages.success(request, 'Le 2FA a été désactivé')
-            return redirect('User:profile', username=user.username)
-        else:
-            messages.error(request, 'Code 2FA invalide')
-
-    return render(request, 'User/disable_2fa.html', {'username': user.username})
