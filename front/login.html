@@ -1,20 +1,60 @@
 <!-- Conteneur pour les boutons -->
-<div id="guest" class="container-fluid d-flex justify-content-center align-items-center" style="height: calc(100vh - 50px);">
+<div id="guest" class=" container-fluid d-flex justify-content-center align-items-center" style="height: var(--sin-nav-height);">
 	<div class="col-8 col-sm-6 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-		<h1 class="text-center text-white title mb-4">Connexion</h1>
+		<h1 class="text-center text-white title mb-3">Connexion</h1>
 		<form action="/submit_login" method="POST">
-			<div class="form-group mb-3">
+			<div class="form-group mb-2">
 				<label for="username" class="form-label text-white w-100">Nom d'utilisateur :</label>
 				<input type="text" class="form-control w-100" id="username" name="username" required>
 			</div>
-			<div class="form-group mb-3">
+			<div class="form-group mb-2">
 				<label for="password" class="form-label text-white w-100">Mot de passe :</label>
 				<input type="password" class="form-control w-100" id="password" name="password" required>
 			</div>
-			<div class="forgot-password text-center mb-3">
+			<div class="forgot-password text-center mb-2">
 				<a href="#" class="text-info">Mot de passe oublié ?</a>
 			</div>
-				<button id= "validate-btn" type="submit" class="btn btn-primary btn-70">Valider</button>
+				<button id= "validate-btn" type="submit" class=" btn btn-primary btn-70 mb-4">Valider</button>
 		</form>
 	</div>
 </div>
+<script>
+	
+</script>
+
+<style>
+	 html, body {
+	
+		overflow-y: auto;
+	 }
+	
+	 .btn-primary {
+		min-width: 100px;
+	 }
+	@media (max-height: 450px) {
+		#guest {
+			top : 50px;
+		}
+		
+	}
+	@media (max-height: 350px) {
+		#guest {
+			top : 75px;
+		}
+		
+	}
+	@media (max-height: 260px) {
+		#guest {
+			top : 100px;
+		}
+		
+	}
+	@media (max-height: 220px) {
+		#guest {
+			top : 130px;
+		}
+		
+	}
+
+
+</style>

@@ -1,4 +1,4 @@
-
+// Animation du texte des boutons de la page d'accueil
 function animateTextColor() {
 	let loginButton = document.getElementById('login-btn');
 	let registerButton = document.getElementById('register-btn');
@@ -34,8 +34,34 @@ function animateTextColor() {
 	  isOriginalColor = !isOriginalColor;
 	}, 1000); 
 }
-  
-window.onload = animateTextColor;
+
+// Ajuster la hauteur du menu burger avec marges
+function adjustBurgerHeight() {
+    const navAndMarginHeight = 66; // Hauteur navbar et marge pour le menu burger
+    const availableHeight = window.innerHeight - navAndMarginHeight;
+    document.documentElement.style.setProperty('--burger-height', `${availableHeight}px`);
+}
+
+// Ajuster la hauteur sans la barre navigation
+function adjustSinNavHeight() {
+    const navAndMarginHeight = 50; // Hauteur sans la navbar
+    const availableHeight = window.innerHeight - navAndMarginHeight;
+    document.documentElement.style.setProperty('--sin-nav-height', `${availableHeight}px`);
+}
+
+
+// lancement des fonctions au chargement de la page
+window.onload = function() {
+    animateTextColor();
+    adjustBurgerHeight();
+	adjustSinNavHeight();
+
+    // Écouteur d'événement pour ajuster les hauteurs lors du redimensionnement de la page
+    window.addEventListener('resize', () => {
+        adjustBurgerHeight();
+		adjustSinNavHeight();
+    });
+};
 
 // animation terrain background
 
@@ -91,12 +117,13 @@ function deplacerBalleEtRaquettes() {
   requestAnimationFrame(animate);
 }
 
-// Initialisation
+// Initialisation des positions de la balle et des raquettes
 balle.style.left = frames[0].balleX + '%';
 balle.style.top = frames[0].balleY + '%';
 traitGauche.style.top = frames[0].raquetteGaucheY + '%';
 traitDroit.style.top = frames[0].raquetteDroiteY + '%';
 
+// Lancement de l'animation
 deplacerBalleEtRaquettes();
 
 
@@ -105,7 +132,7 @@ deplacerBalleEtRaquettes();
 function addMenuButton() {
     const menuButton = `
         <a id="menu-btn" class="nav-link text-white d-flex justify-content-center align-items-center" href="#profile">
-            <img src="png/7.avif" alt="Menu" style="width: 50px; height:50px; "></img>
+            <img src="png/7.avif" alt="Menu" style="width: 40px; height:40px; "></img>
         </a>
 		`;
     document.getElementById("navbar-right").innerHTML = menuButton;
@@ -113,6 +140,7 @@ function addMenuButton() {
 	// Afficher/masquer le menu burger au clic sur le bouton profil
     $("#menu-btn").click(function(event) {
         event.preventDefault();
+		adjustBurgerHeight();
 		// Vérifier si le menu burger est déjà visible
         if ($("#burger-menu").is(":visible")) {
             $("#burger-menu, #overlay").hide(); // Si visible, on cache le menu et l'overlay
@@ -131,6 +159,7 @@ function addMenuButton() {
 				// Gestion des clics pour cacher le menu lorsqu'on clique sur les boutons
 				$("#profile-btn, #logout-btn").click(function() {
 					$("#burger-menu, #overlay").hide();
+					
 				});
 
 				$("#profile-btn").click(function(event) {
@@ -139,12 +168,13 @@ function addMenuButton() {
 					url: 'profil.html',
 					method: 'GET',
 					success: function(response) {
-						$('#home').html(response); // Remplace le contenu de #home par login
+						$('#home').html(response); // Remplace le contenu de #home
 						if ($('#ground-game').length) {
 							groundGameContent = $('#ground-game').detach();
-						}
+						} // Cache le terrain de jeu
 						addMenuButton();
 						initializeNavigation(); // Réinitialise les écouteurs d’événements
+						
 					},
 					error: function(error) {
 						console.log("Erreur lors du chargement de la page :", error);
@@ -163,10 +193,12 @@ function addMenuButton() {
 						if (!$('#ground-game').length) {
 							$('#home').before(groundGameContent);
 						}
-						$('#navbar-right').html('');
+						$('#navbar-right').html(''); // Supprime le bouton de menu
+						
 						initializeNavigation(); // Réinitialise les écouteurs d’événements
 
 						$("#burger-menu, #overlay").hide();
+						
 					},
 					error: function(error) {
 						console.log("Erreur lors du chargement de la page :", error);
@@ -189,6 +221,7 @@ function addMenuButton() {
     });
 }
 
+
 function initializeNavigation() {
 	
 // Revenir à l'accueil
@@ -202,8 +235,8 @@ $("#home-btn").click(function(event) {
 		$('#home').html(homeContent); // Remplace le contenu de #home par accueil
 		if (!$('#ground-game').length) {
             $('#home').before(groundGameContent);
-        }
-		$('#navbar-right').html('');
+        } // Ajoute le terrain de jeu
+		$('#navbar-right').html(''); // Supprime le bouton de menu
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 	},
 	error: function(error) {
@@ -222,10 +255,9 @@ $("#login-btn").click(function(event) {
         $('#home').html(response);
 		if (!$('#ground-game').length) {
             $('#home').before(groundGameContent);
-        }
-		// $('#navbar-right').html('');
-		addMenuButton();
-        initializeNavigation();
+        } // Ajoute le terrain de jeu
+		$('#navbar-right').html(''); // Supprime le bouton de menu
+        initializeNavigation(); // Réinitialise les écouteurs d’événements
       },
       error: function(error) {
         console.log("Erreur lors du chargement de la page :", error);
@@ -233,17 +265,18 @@ $("#login-btn").click(function(event) {
     });
 });
 
+
 $("#submit-btn").click(function(event) {
 	event.preventDefault();
 	$.ajax({
 	url: 'login.html',
 	method: 'GET',
 	success: function(response) {
-		$('#home').html(response); // Remplace le contenu de #home par login
+		$('#home').html(response); // Remplace le contenu de #home
 		if (!$('#ground-game').length) {
             $('#home').before(groundGameContent);
-        }
-		$('#navbar-right').html('');
+        } // Ajoute le terrain de jeu
+		$('#navbar-right').html(''); // Supprime le bouton de menu
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 	},
 	error: function(error) {
@@ -253,16 +286,16 @@ $("#submit-btn").click(function(event) {
 });
 
 $("#register-btn").click(function(event) {
-	event.preventDefault();
+	event.preventDefault(); 
 	$.ajax({
 	url: 'register.html',
 	method: 'GET',
 	success: function(response) {
-		$('#home').html(response); // Remplace le contenu de #home par login
+		$('#home').html(response); // Remplace le contenu de #home
 		if (!$('#ground-game').length) {
             $('#home').before(groundGameContent);
-        }
-		$('#navbar-right').html('');
+        } // Ajoute le terrain de jeu
+		$('#navbar-right').html(''); // Supprime le bouton de menu
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 	},
 	error: function(error) {
@@ -277,10 +310,10 @@ $("#validate-btn").click(function(event) {
 	url: 'play.html',
 	method: 'GET',
 	success: function(response) {
-		$('#home').html(response); // Remplace le contenu de #home par login
+		$('#home').html(response); // Remplace le contenu de #home
 		if (!$('#ground-game').length) {
             $('#home').before(groundGameContent);
-        }
+        } // Ajoute le terrain de jeu
 		addMenuButton();
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 	},
@@ -296,10 +329,10 @@ $("#play-btn").click(function(event) {
 	url: 'game-menu.html',
 	method: 'GET',
 	success: function(response) {
-		$('#home').html(response);
+		$('#home').html(response); // Remplace le contenu de #home
 		if ($('#ground-game').length) {
 			groundGameContent = $('#ground-game').detach();
-		}
+		} // Cache le terrain de jeu
 		addMenuButton();
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 	},
@@ -318,9 +351,9 @@ $("#gestion-btn").click(function(event) {
 		$('#home').html(response);
 		if ($('#ground-game').length) {
 			groundGameContent = $('#ground-game').detach();
-		}
+		} // Cache le terrain de jeu
 		addMenuButton();
-		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		initializeNavigation(); // Réinitialise les écouteurs d’événements	
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);

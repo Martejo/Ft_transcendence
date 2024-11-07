@@ -238,13 +238,24 @@
         color: white;
         border-radius: 8px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
+        z-index: 100;
 		outline: 1px solid rgb(255, 255, 255);
 		transform: translate(-50%, -100%)
     }
     .friend-item:hover {
         cursor: pointer;
     }
+
+	@media (max-width: 576px) {
+    #burger-menu {
+        width: 100%; /* Prend toute la largeur de l'écran */
+        height: var(--sin-nav-height); /* Prend toute la hauteur de l'écran */
+        top: 50px; /* Aligne en haut de l'écran */
+        left: 0; /* Aligne à gauche pour couvrir tout l'écran */
+        border-radius: 0; /* Supprime les coins arrondis */
+    }
+}
+
 </style>
 
 <!-- Script pour changer la couleur de la pastille -->

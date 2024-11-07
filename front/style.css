@@ -13,24 +13,25 @@
 
 html, body {
 	height: 100%;
-	overflow: hidden;
+	width: 100%;
+	/* max-width: 100%; */
 	background-color: #101A32;
+	overflow-y: auto;
 	margin: 0;
 	padding: 0;
-	/* justify-content: center;
-	align-items: center; */
 	font-family: "Jersey 25";
 	font-size: 18px;
 }
 
 .navbar {
-	min-width: 300px; 
+	/* min-width: 300px;  */
 	height: 50px;
 	width: 100%;
-	background-color: rgba(45, 180, 243, 0.9);
+    max-width: 100%;
+	background-color: rgba(45, 180, 243);
 	text-align: left;
 	z-index: 30; /* Garder la barre au-dessus de tout */
-	position: sticky;
+	position: fixed;
 	top:0;
 	justify-content: center;
 
@@ -49,13 +50,10 @@ html, body {
 }
 
 .backg {
-
 	position: absolute;
 	top: 50px; 
 	left: 0; 
-	width: 100vw; 
 	z-index: 0; 
-	 
 }
 
 .container-fluid {
@@ -72,7 +70,7 @@ html, body {
 	color: white;
 	font-size: 28px;
 	height: 50px;
-	min-width: 160px;
+	min-width: 100px;
 	border-radius: 20px;
 	transition: color 1000ms ease;
 	border: none;
@@ -102,7 +100,7 @@ html, body {
 	top: -50px;
 	height: 100vh; /* Prend toute la hauteur de l'écran */
 	position: relative;
-	z-index: 10;
+	z-index: 15;
 }
 
 /* Formulaire sans cadre visible et centré */
@@ -133,7 +131,7 @@ html, body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	min-width: 150px;
+	/* min-width: 150px; */
 }
 
 /* Libellés des champs */
@@ -144,7 +142,7 @@ html, body {
 	display: block;
 	margin-bottom: 10px;
 	text-align: center; /* Centre le texte des labels */
-	min-width: 180px;
+	/* min-width: 180px; */
 }
 
 /* Champs de texte */
@@ -158,28 +156,7 @@ html, body {
 	text-align: center; /* Centre le texte à l'intérieur des champs */
 	box-shadow: none; /* Supprime toute ombre éventuelle */
 	margin-bottom: 5px;
-	min-width: 200px;
-}
-
-/* Boutons */
-.btn.register-btn, .btn.validate-btn {
-	font-family: "Jersey 10";
-	background-color: #2DB4F3;
-	color: white;
-	text-align: center;
-	border: none;
-	cursor: pointer;
-	padding: 10px 50px; /* Augmente la taille du bouton */
-	margin-top: 30px; /* Espace supplémentaire au-dessus du bouton */
-	border-radius: 20px;
-	font-size: 25px; /* Taille de police augmentée */
-	display: block;
-	min-width: 180px;
-
-}
-
-.btn.register-btn:hover, .btn.validate-btn:hover {
-	background-color: #75d3ff;
+	min-width: 100px;
 }
 
 /* Lien "Mot de passe oublié" discret */
@@ -212,39 +189,12 @@ html, body {
 	border-radius: 20px;
 }
 
-
-/* Fichier play.html */
-
-
-.play-button {
-	font-family: "Jersey 10";
-	font-size: 10vw; 
-	color: #2DB4F3;
-	background: none;
-	border: none;
-	animation: blink 2s infinite;
-}
-
-@keyframes blink {
-	0%, 100% 
-	{
-		opacity: 1;
-	}
-	50% 
-	{
-		opacity: 0;
-	}
-}
-
-/* Fichier profil.html */
-
 .btn-primary {
 	font-family: "Jersey 10";
 	background-color: #2DB4F3;
 	border: none;
 	font-size: 1.2em;
-	min-width: 150px;
-	
+	min-width: 100px;
 }
 
 .btn-primary:hover, .btn-primary:focus {
@@ -266,8 +216,9 @@ html, body {
 	position: relative;
 	width: 80vw;
 	height: 40vw;
-	filter: blur(6px);
-} 
+	min-width: 320px;
+	min-height: 160px;
+}
 
 /* Ligne centrale */
 .ligne-centrale {
@@ -277,7 +228,8 @@ html, body {
 	top: 0;
 	left: 50%;
 	transform: translateX(-50%);
-	filter: blur(2px);
+	min-height: 160px;
+	/* filter: blur(2px); */
 }
 
 /* Cercle central */
@@ -289,6 +241,8 @@ html, body {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	min-width: 80px;
+	min-height: 80px;
 }
 
 /* Point central */
@@ -332,7 +286,7 @@ html, body {
 .card .form-control {
 	width: 90%; /* Définit la largeur à 80 % de la carte */
 	margin: 0 auto; /* Centre les champs dans la carte */
-	min-width: 200px;
+	/* min-width: 200px; */
 }
 
 /* Styles pour le menu burger */
@@ -341,16 +295,12 @@ html, body {
 	top: 58px;
 	right: 8px;
 	width: 400px; /* Largeur en pixels ajustable */
-	height: calc(100vh - 66px); /* Prend toute la hauteur sous la navbar */
-	/* background-color: rgba(45, 180, 243, 1); */
+	height: var(--burger-height); /* Prend toute la hauteur sous la navbar */
 	border-radius: 8px 8px 8px 8px;
-	/* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); */
 	display: none; /* Caché par défaut */
-	overflow-y: auto; /* Permet le défilement vertical si nécessaire */
-	/* padding: 15px; */
 	z-index: 98; /* Plus haut que l'overlay pour rester visible */
 	background-color: #141b2e;
-	overflow: scroll;
+	overflow-y: auto;
 }
 
 #burger-menu .dropdown-item {
@@ -368,15 +318,15 @@ html, body {
     top: 50px; /* Hauteur de la navbar */
     left: 0;
     width: 100vw;
-    height: calc(100vh - 50px); /* Hauteur de la page moins la navbar */
+    height: var(--sin-nav-height); /* Hauteur de la page moins la navbar */
     background-color: rgba(0, 0, 0, 0.5); /* Couleur sombre avec transparence */
     z-index: 97; /* Doit être derrière le menu burger */
 }
 
 /* Styles pour le bouton profil */
 #menu-btn {
-	width: 50px;
-	height: 50px;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 	border: 2px solid white;
 	overflow: hidden;
@@ -401,22 +351,3 @@ html, body {
     color: #aaa;
 }
 
-.action-buttons .btn-primary {
-    background-color: #3798fa; /* Couleur du bouton Voir le profil */
-    border: none;
-    color: white;
-}
-
-.action-buttons .btn-secondary {
-    background-color: #333; /* Couleur du bouton Déconnexion */
-    border: none;
-    color: white;
-}
-
-.action-buttons .btn-primary,
-.action-buttons .btn-secondary {
-    display: block; /* Les boutons prennent toute la largeur du conteneur */
-    width: auto; /* Ajuste la largeur pour qu'ils ne soient pas en pleine largeur */
-    margin: 5px 0; /* Ajoute une marge verticale pour les espacer */
-    text-align: center; /* Centre le texte dans chaque bouton */
-}
