@@ -126,6 +126,16 @@ traitDroit.style.top = frames[0].raquetteDroiteY + '%';
 // Lancement de l'animation
 deplacerBalleEtRaquettes();
 
+function resetScrollPosition() {
+    // Défilement en haut avec scrollTo, qui fonctionne de manière générale
+    window.scrollTo(0, 0);
+
+    // Défilement en haut pour les navigateurs qui utilisent document.documentElement
+    document.documentElement.scrollTop = 0;
+
+    // Défilement en haut pour les navigateurs qui utilisent document.body (notamment Safari)
+    document.body.scrollTop = 0;
+}
 
 
 //ajax / sap
@@ -174,6 +184,7 @@ function addMenuButton() {
 						} // Cache le terrain de jeu
 						addMenuButton();
 						initializeNavigation(); // Réinitialise les écouteurs d’événements
+						resetScrollPosition();
 						
 					},
 					error: function(error) {
@@ -196,6 +207,7 @@ function addMenuButton() {
 						$('#navbar-right').html(''); // Supprime le bouton de menu
 						
 						initializeNavigation(); // Réinitialise les écouteurs d’événements
+						resetScrollPosition();
 
 						$("#burger-menu, #overlay").hide();
 						
@@ -238,6 +250,7 @@ $("#home-btn").click(function(event) {
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);
@@ -258,6 +271,7 @@ $("#login-btn").click(function(event) {
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
         initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();
       },
       error: function(error) {
         console.log("Erreur lors du chargement de la page :", error);
@@ -278,6 +292,7 @@ $("#submit-btn").click(function(event) {
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);
@@ -297,6 +312,7 @@ $("#register-btn").click(function(event) {
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);
@@ -316,6 +332,7 @@ $("#validate-btn").click(function(event) {
         } // Ajoute le terrain de jeu
 		addMenuButton();
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);
@@ -335,6 +352,7 @@ $("#play-btn").click(function(event) {
 		} // Cache le terrain de jeu
 		addMenuButton();
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);
@@ -353,7 +371,8 @@ $("#gestion-btn").click(function(event) {
 			groundGameContent = $('#ground-game').detach();
 		} // Cache le terrain de jeu
 		addMenuButton();
-		initializeNavigation(); // Réinitialise les écouteurs d’événements	
+		initializeNavigation(); // Réinitialise les écouteurs d’événements
+		resetScrollPosition();	
 	},
 	error: function(error) {
 		console.log("Erreur lors du chargement de la page :", error);
