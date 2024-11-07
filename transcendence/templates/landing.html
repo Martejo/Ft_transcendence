@@ -10,7 +10,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
+    </script>
     <script src="{% static 'main/js/script.js' %}" defer></script> 
+    <!-- Initialiser isAuthenticated -->
+    <!-- Inclure le token CSRF dans une balise meta -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
     <!-- Barre du haut -->
@@ -37,13 +43,6 @@
     <div id="content">
         <!-- Le contenu dynamique sera chargé ici -->
     </div>
-    
-    
-    <!-- Inclure une variable JavaScript indiquant si l'utilisateur est authentifié -->
-    <script>
-        const isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

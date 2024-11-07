@@ -15,10 +15,14 @@ import pyotp
 import jwt
 import qrcode
 import base64
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.http import require_POST
 
-@csrf_exempt
-def register_view(request):
+
+
+@csrf_protect
+@require_POST
+def submit_registration(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -26,33 +30,51 @@ def register_view(request):
             user.password_hash = hash_password(form.cleaned_data['password'])
             user.save()
             UserProfile.objects.create(user=user)  # Crée un profil vide par défaut
-            return redirect('User:login')
+            return JsonResponse({'success': True})
+        else:
+            # Renvoyer les erreurs du formulaire
+            return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = RegistrationForm()
     return render(request, 'User/register.html', {'form': form})
 
-@csrf_exempt
+@csrf_protect
+def register_view(request):
+    form = RegistrationForm() # genere un form vide et le donne au html
+    return render(request, 'User/register.html', {'form': form})
+
+
+@csrf_protect
 def login_view(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            try:
-                user = User.objects.get(username=username)
-                if verify_password(user.password_hash, password):
-                    request.session['user_id'] = user.id
-                    if user.is_2fa_enabled:
-                        request.session['auth_partial'] = True
-                        return JsonResponse({'success': True})
-                    else:
-                        return JsonResponse({'success': True})
-                else:
-                    return JsonResponse({'success': False, 'error': 'Mot de passe incorrect'})
-            except User.DoesNotExist:
-                return JsonResponse({'success': False, 'error': 'Identifiants incorrects'})
+    if request.method == 'GET':
+        form = LoginForm()
+        return render(request, 'User/login.html', {'form': form})
     else:
-        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'})
+        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+@csrf_protect
+@require_POST
+def submit_login(request):
+    form = LoginForm(request.POST)
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        try:
+            user = User.objects.get(username=username)
+            if verify_password(user.password_hash, password):
+                request.session['user_id'] = user.id
+                if user.is_2fa_enabled:
+                    request.session['auth_partial'] = True
+                    return JsonResponse({'success': True, 'requires_2fa': True})
+                else:
+                    return JsonResponse({'success': True, 'requires_2fa': False})
+            else:
+                return JsonResponse({'success': False, 'error': 'Mot de passe incorrect'})
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Identifiants incorrects'})
+    else:
+        # Renvoyer les erreurs du formulaire
+        return JsonResponse({'success': False, 'errors': form.errors})
 
 @login_required
 def logout_view(request):

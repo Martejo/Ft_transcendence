@@ -1,104 +1,104 @@
 // Fonction pour animer la couleur du texte des boutons
 function animateTextColor() {
-  let loginButton = document.getElementById('login-btn');
-  let registerButton = document.getElementById('register-btn');
-  let guestButton = document.getElementById('guest-btn');
-  let apiButton = document.getElementById('api-btn');
-
-  let isOriginalColor = true;
-
-  setInterval(function() {
-    if (isOriginalColor) {
-      setTimeout(function() {
-        if (registerButton) registerButton.style.color = "#8EC7E1";
-        if (loginButton) loginButton.style.color = "#8EC7E1";
-      }, 10);
-
-      setTimeout(function() {
-        if (guestButton) guestButton.style.color = "#8EC7E1";
-        if (apiButton) apiButton.style.color = "#8EC7E1";
-      }, 10);
-    } else {
-      setTimeout(function() {
-        if (registerButton) registerButton.style.color = "white";
-        if (loginButton) loginButton.style.color = "white";
-      }, 10);
-
-      setTimeout(function() {
-        if (guestButton) guestButton.style.color = "white";
-        if (apiButton) apiButton.style.color = "white";
-      }, 10);
-    }
-
-    isOriginalColor = !isOriginalColor;
-  }, 1000);
+	let loginButton = document.getElementById('login-btn');
+	let registerButton = document.getElementById('register-btn');
+	let guestButton = document.getElementById('guest-btn');
+	let apiButton = document.getElementById('api-btn');
+	
+	let isOriginalColor = true;
+  
+	setInterval(function() {
+	  if (isOriginalColor) {
+		
+		setTimeout(function() {
+		  if (registerButton) registerButton.style.color = "#8EC7E1";
+		  if (loginButton) loginButton.style.color = "#8EC7E1"; 
+		}, 10); 
+  
+		setTimeout(function() {
+		  if (guestButton) guestButton.style.color = "#8EC7E1";
+		  if (apiButton) apiButton.style.color = "#8EC7E1"; 
+		}, 10); 
+	  } else {
+		setTimeout(function() {
+		  if (registerButton) registerButton.style.color = "white"; 
+		  if (loginButton) loginButton.style.color = "white"; 
+		}, 10);
+  
+		setTimeout(function() {
+		  if (guestButton) guestButton.style.color = "white"; 
+		  if (apiButton) apiButton.style.color = "white"; 
+		}, 10);
+	  }
+  
+	  isOriginalColor = !isOriginalColor;
+	}, 1000); 
 }
-
+  
 window.onload = animateTextColor;
 
-// Animation du terrain background
+// animation terrain background
+
 let balle = document.querySelector('.balle');
 let traitGauche = document.querySelector('.trait-gauche');
 let traitDroit = document.querySelector('.trait-droit');
 
-// MODIFICATION 1 : Vérification de l'existence des éléments avant de les manipuler
-if (balle && traitGauche && traitDroit) {
-  // Dimensions du terrain en pourcentage
-  let terrainWidth = 80; // 80vw
-  let terrainHeight = 40; // 40vw
+// Dimensions du terrain en pourcentage
+let terrainWidth = 80; // 80vw
+let terrainHeight = 40; // 40vw
 
-  // Frames adaptées en pourcentage
-  let frames = [
-      { balleX: 1, balleY: 47, raquetteGaucheY: 36.5, raquetteDroiteY: 36.5 },  // Frame 1
-      { balleX: 48, balleY: 0, raquetteGaucheY: 0, raquetteDroiteY: 73 },       // Frame 2
-      { balleX: 97, balleY: 47, raquetteGaucheY: 47, raquetteDroiteY: 26 },     // Frame 3
-      { balleX: 41, balleY: 95, raquetteGaucheY: 7, raquetteDroiteY: 69 },      // Frame 4
-      { balleX: 1, balleY: 60, raquetteGaucheY: 60, raquetteDroiteY: 10 },      // Frame 5
-      { balleX: 53, balleY: 0, raquetteGaucheY: 7, raquetteDroiteY: 65 },       // Frame 6
-      { balleX: 97, balleY: 37, raquetteGaucheY: 67, raquetteDroiteY: 32 },     // Frame 7
-      { balleX: 48, balleY: 95, raquetteGaucheY: 7, raquetteDroiteY: 73 }       // Frame 8
-  ];
+// Frames adaptées en pourcentage
+let frames = [
+  { balleX: 1, balleY: 47, raquetteGaucheY: 36.5, raquetteDroiteY: 36.5 },  // Frame 1
+  { balleX: 48, balleY: 0, raquetteGaucheY: 0, raquetteDroiteY: 73 },       // Frame 2
+  { balleX: 97, balleY: 47, raquetteGaucheY: 47, raquetteDroiteY: 26 },     // Frame 3
+  { balleX: 41, balleY: 95, raquetteGaucheY: 7, raquetteDroiteY: 69 },      // Frame 4
+  { balleX: 1, balleY: 60, raquetteGaucheY: 60, raquetteDroiteY: 10 },      // Frame 5
+  { balleX: 53, balleY: 0, raquetteGaucheY: 7, raquetteDroiteY: 65 },       // Frame 6
+  { balleX: 97, balleY: 37, raquetteGaucheY: 67, raquetteDroiteY: 32 },     // Frame 7
+  { balleX: 48, balleY: 95, raquetteGaucheY: 7, raquetteDroiteY: 73 }       // Frame 8
+];
 
-  let currentFrame = 0;
-  let maxFrames = frames.length;
-  let transitionTime = 2200; 
+let currentFrame = 0;
+let maxFrames = frames.length;
+let transitionTime = 2200; 
 
-  function deplacerBalleEtRaquettes() {
-      let frameActuelle = frames[currentFrame];
-      let prochaineFrame = frames[(currentFrame + 1) % maxFrames];
-      let startTime = null;
+function deplacerBalleEtRaquettes() {
+  let frameActuelle = frames[currentFrame];
+  let prochaineFrame = frames[(currentFrame + 1) % maxFrames];
+  let startTime = null;
 
-      function animate(time) {
-          if (!startTime) startTime = time;
-          let progress = (time - startTime) / transitionTime;
+  function animate(time) {
+    if (!startTime) startTime = time;
+    let progress = (time - startTime) / transitionTime;
 
-          if (progress < 1) {
-              // Interpolation linéaire pour les coordonnées X et Y de la balle
-              balle.style.left = frameActuelle.balleX + (prochaineFrame.balleX - frameActuelle.balleX) * progress + '%';
-              balle.style.top = frameActuelle.balleY + (prochaineFrame.balleY - frameActuelle.balleY) * progress + '%';
+    if (progress < 1) {
+      // Interpolation linéaire pour les coordonnées X et Y de la balle
+      balle.style.left = frameActuelle.balleX + (prochaineFrame.balleX - frameActuelle.balleX) * progress + '%';
+      balle.style.top = frameActuelle.balleY + (prochaineFrame.balleY - frameActuelle.balleY) * progress + '%';
 
-              // Interpolation linéaire pour les positions des raquettes
-              traitGauche.style.top = frameActuelle.raquetteGaucheY + (prochaineFrame.raquetteGaucheY - frameActuelle.raquetteGaucheY) * progress + '%';
-              traitDroit.style.top = frameActuelle.raquetteDroiteY + (prochaineFrame.raquetteDroiteY - frameActuelle.raquetteDroiteY) * progress + '%';
-
-              requestAnimationFrame(animate);
-          } else {
-              currentFrame = (currentFrame + 1) % maxFrames;
-              setTimeout(() => requestAnimationFrame(deplacerBalleEtRaquettes), 0);
-          }
-      }
-
-      // Initialisation
-      balle.style.left = frames[0].balleX + '%';
-      balle.style.top = frames[0].balleY + '%';
-      traitGauche.style.top = frames[0].raquetteGaucheY + '%';
-      traitDroit.style.top = frames[0].raquetteDroiteY + '%';
+      // Interpolation linéaire pour les positions des raquettes
+      traitGauche.style.top = frameActuelle.raquetteGaucheY + (prochaineFrame.raquetteGaucheY - frameActuelle.raquetteGaucheY) * progress + '%';
+      traitDroit.style.top = frameActuelle.raquetteDroiteY + (prochaineFrame.raquetteDroiteY - frameActuelle.raquetteDroiteY) * progress + '%';
 
       requestAnimationFrame(animate);
+    } else {
+      currentFrame = (currentFrame + 1) % maxFrames;
+      setTimeout(() => requestAnimationFrame(deplacerBalleEtRaquettes), 0);
+    }
   }
 
-  deplacerBalleEtRaquettes();
+  requestAnimationFrame(animate);
 }
+
+// Initialisation
+balle.style.left = frames[0].balleX + '%';
+balle.style.top = frames[0].balleY + '%';
+traitGauche.style.top = frames[0].raquetteGaucheY + '%';
+traitDroit.style.top = frames[0].raquetteDroiteY + '%';
+
+deplacerBalleEtRaquettes();
+
 
 // Fonction pour ajouter le bouton du menu
 function addMenuButton() {
@@ -137,40 +137,42 @@ $.ajaxSetup({
   }
 });
 
-function loadContent(app, view) { // MODIFICATION 3 : Accepter 'app' et 'view'
-  $.ajax({
-      url: `/views/${app}/${view}/`, // MODIFICATION 3 : URL inclut 'app' et 'view'
-      method: 'GET',
-      success: function(response) {
-          $('#content').html(response);
-          initializeView(app, view); // MODIFICATION 3 : Passer 'app' et 'view'
-      },
-      error: function(error) {
-          console.error("Erreur lors du chargement de la vue :", error);
-          $('#content').html('<p>Une erreur est survenue lors du chargement de la page.</p>');
-      }
-  });
+// Fonction pour charger le contenu basé sur l'application et la vue
+function loadContent(app, view) {
+    $.ajax({
+        url: `/views/${app}/${view}/`,
+        method: 'GET',
+        success: function(response) {
+            $('#content').html(response);
+            initializeView(app, view);
+        },
+        error: function(error) {
+            console.error("Erreur lors du chargement de la vue :", error);
+            $('#content').html('<p>Une erreur est survenue lors du chargement de la page.</p>');
+        }
+    });
 }
 
+// Fonction pour gérer les changements de hachage dans l'URL
 function handleHashChange() {
-  const hash = window.location.hash.substring(1); // Supprime le '#'
-  const [app, view] = hash.split('-'); // Suppose que le format est 'App-View'
+    const hash = window.location.hash.substring(1); // Supprime le '#'
+    const [app, view] = hash.split('-'); // Suppose que le format est 'App-View'
 
-  // MODIFICATION 4 : Vérification de l'existence de 'isAuthenticated'
-  if (typeof isAuthenticated !== 'undefined' && !isAuthenticated) {
-      if (view !== 'home' && view !== 'login' && view !== 'register') {
-          window.location.hash = '#core-home';
-          return;
-      }
-  }
+    // Vérification de l'existence de 'isAuthenticated'
+    if (typeof isAuthenticated !== 'undefined' && !isAuthenticated) {
+        if (view !== 'home' && view !== 'login' && view !== 'register') {
+            window.location.hash = '#core-home';
+            return;
+        }
+    }
 
-  // Vérifier que 'app' et 'view' sont définis, sinon rediriger vers 'core-home'
-  if (!app || !view) {
-      window.location.hash = '#core-home';
-      return;
-  }
+    // Vérifier que 'app' et 'view' sont définis, sinon rediriger vers 'core-home'
+    if (!app || !view) {
+        window.location.hash = '#core-home';
+        return;
+    }
 
-  loadContent(app, view);
+    loadContent(app, view);
 }
 
 function initializeView(app, view) { // MODIFICATION 4 : Accepter 'app' et 'view'
@@ -180,8 +182,10 @@ function initializeView(app, view) { // MODIFICATION 4 : Accepter 'app' et 'view
       initializeLoginView();
   } else if (app === 'User' && view === 'profile') {
       initializeProfileView(); // Vous devrez créer cette fonction
+  } else if (app === 'User' && view === 'register') {
+        initializeRegisterView(); // Appelle la fonction d'initialisation pour l'inscription
   }
-  // Ajouter des conditions pour d'autres applications et vues si nécessaire
+    // Ajouter des conditions pour d'autres applications et vues si nécessaire
 }
 
 function initializeHomeView() {
@@ -200,35 +204,93 @@ function initializeHomeView() {
   animateTextColor();
 }
 
-function initializeLoginView() {
-  // Gestionnaire pour le formulaire de login
-  $(document).on('submit', '#login-form', function(event) {
-      event.preventDefault();
-      const formData = $(this).serialize();
+function initializeRegisterView() {
+    // Gestionnaire pour le formulaire d'inscription
+    $(document).on('submit', '#register-form', function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
 
-      $.ajax({
-          url: '/user/login/',
-          method: 'POST',
-          data: formData,
-          success: function(response) {
-              if (response.success) {
-                  // Mettre à jour l'état d'authentification
-                  isAuthenticated = true;
-                  // Mettre à jour la barre de navigation
-                  addMenuButton();
-                  // Charger la vue du tableau de bord
-                  window.location.hash = '#User-dashboard'; // Exemple de vue pour un utilisateur connecté
-              } else {
-                  // Afficher un message d'erreur
-                  $('#login-error').text(response.error);
-              }
-          },
-          error: function(error) {
-              console.error("Erreur lors de la soumission du formulaire :", error);
-          }
-      });
-  });
+        $.ajax({
+            url: '/User/submit_registration/', // URL correcte
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    // Optionnel : Afficher un message de succès ou rediriger
+                    alert('Inscription réussie !');
+                    window.location.hash = '#User-login'; // Rediriger vers la page de login
+                } else {
+                    // Afficher les erreurs du formulaire
+                    let errors = response.errors;
+                    let errorMessages = '';
+                    for (let field in errors) {
+                        if (errors.hasOwnProperty(field)) {
+                            errorMessages += errors[field].join('<br>') + '<br>';
+                        }
+                    }
+                    $('#register-error').html(errorMessages);
+                }
+            },
+            error: function(error) {
+                console.error("Erreur lors de la soumission du formulaire :", error);
+                $('#register-error').html('<p>Une erreur est survenue lors de l\'inscription. Veuillez réessayer.</p>');
+            }
+        });
+    });
 }
+
+function initializeLoginView() {
+    // Gestionnaire pour le formulaire de login
+    $(document).on('submit', '#login-form', function(event) {
+        event.preventDefault(); // Empêche le comportement par défaut du formulaire
+
+        const formData = $(this).serialize(); // Sérialise les données du formulaire
+
+        // Afficher un indicateur de chargement
+        $('#validate-btn').prop('disabled', true).text('Connexion...');
+
+        $.ajax({
+            url: '/User/submit_login/', // URL de soumission du formulaire
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    // Mettre à jour l'état d'authentification
+                    isAuthenticated = true;
+                    // Mettre à jour la barre de navigation
+                    addMenuButton();
+                    // Charger la vue du tableau de bord ou rediriger l'utilisateur
+                    window.location.hash = '#User-profile'; // Rediriger vers une vue appropriée
+                } else {
+                    // Afficher un message d'erreur
+                    if (response.errors) {
+                        // Si des erreurs de formulaire sont renvoyées
+                        let errors = response.errors;
+                        let errorMessages = '';
+                        for (let field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += errors[field].join('<br>') + '<br>';
+                            }
+                        }
+                        $('#login-error').html(errorMessages);
+                    } else if (response.error) {
+                        // Si un message d'erreur général est renvoyé
+                        $('#login-error').text(response.error);
+                    }
+                }
+                // Réinitialiser l'indicateur de chargement
+                $('#validate-btn').prop('disabled', false).text('Valider');
+            },
+            error: function(error) {
+                console.error("Erreur lors de la soumission du formulaire :", error);
+                $('#login-error').html('<p>Une erreur est survenue lors de la connexion. Veuillez réessayer.</p>');
+                // Réinitialiser l'indicateur de chargement
+                $('#validate-btn').prop('disabled', false).text('Valider');
+            }
+        });
+    });
+}
+
 
 function initializeProfileView() {
   // Initialiser les événements spécifiques à la vue 'profile'

@@ -1,22 +1,30 @@
 <!-- templates/User/register.html -->
+<!-- templates/User/register.html -->
 <div id="register" class="container-fluid d-flex justify-content-center align-items-center" style="height: calc(100vh - 50px);">
-	<div class=" col-8 col-sm-6 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
-		<h1 class="text-center text-white title mb-4">Inscription</h1>
-		<form action="/submit_registration" method="POST">
-			<div class="form-group mb-3">
-				<label for="email" class="w-100">E-mail :</label>
-				<input type="email" class="w-100" id="email" name="email" required>
-			</div>
-			<div class="form-group mb-3">
-				<label for="password" class="w-100">Mot de passe :</label>
-				<input type="password" class="w-100" id="password" name="password" required>
-			</div>
-			<div class="form-group mb-3">
-				<label for="confirm-password">Confirmer le mot de passe :</label>
-				<input type="password" class="w-100" id="confirm-password" name="confirm-password" required>
-			</div>
+    <div class="col-8 col-sm-6 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
+        <h1 class="text-center text-white title mb-4">Inscription</h1>
+        <form id="register-form" method="POST">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="username" class="w-100">Nom d'utilisateur :</label>
+                <input type="text" class="w-100" id="username" name="username" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="email" class="w-100">E-mail :</label>
+                <input type="email" class="w-100" id="email" name="email" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="password" class="w-100">Mot de passe :</label>
+                <input type="password" class="w-100" id="password" name="password" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="confirm-password">Confirmer le mot de passe :</label>
+                <input type="password" class="w-100" id="confirm-password" name="confirm_password" required>
+            </div>
 
-			<button id="submit-btn" type="submit" class="btn register-btn btn-70">S'inscrire</button>
-		</form>
-	</div>
+            <button id="submit-btn" type="submit" class="btn register-btn btn-70">S'inscrire</button>
+            <div id="register-error" class="text-danger mt-2"></div> <!-- Élément pour afficher les erreurs -->
+        </form>
+    </div>
 </div>
+

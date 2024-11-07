@@ -5,9 +5,11 @@ from . import views
 app_name = 'User'
 
 urlpatterns = [
-    path('login/', views.login_view, name='login'),
+    path('login/', views.login_view, name='login'),  # Vue pour rendre le formulaire de connexion
+    path('submit_login/', views.submit_login, name='submit_login'),  # Vue pour traiter la soumission AJAX
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('update-avatar/', views.update_avatar_view, name='update_avatar'),
+    path('submit_registration/', views.submit_registration, name='submit_registration'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('update-profile/', views.update_profile_view, name='update_profile'),
