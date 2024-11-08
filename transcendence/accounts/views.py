@@ -84,7 +84,32 @@ def logout_view(request):
 
 ############ Gestion de profil #############
 
+#Ancien manage_profile_view
 #Renvoie la page gestion de profil + formulaire
+# @csrf_protect
+# @login_required
+# def manage_profile_view(request):
+#     user_id = request.session.get('user_id')
+#     user = get_object_or_404(CustomUser, id=user_id)
+    
+#     if request.method == 'GET':
+#         profile_form = ProfileForm(instance=user)
+#         password_form = PasswordChangeForm()
+#         avatar_form = AvatarUpdateForm(instance=user)
+#         context = {
+#             'profile_form': profile_form,
+#             'password_form': password_form,
+#             'avatar_form': avatar_form,
+#             'profile_user': user,
+#             #Rajouter form pour changement de pseudo
+#         }
+#         print("Profile Form:", profile_form)
+#         print("Password Form:", password_form)
+
+#         return render(request, 'accounts/gestion_profil.html', context)
+#     else:
+#         return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
 @csrf_protect
 @login_required
 def manage_profile_view(request):
@@ -95,17 +120,15 @@ def manage_profile_view(request):
         profile_form = ProfileForm(instance=user)
         password_form = PasswordChangeForm()
         avatar_form = AvatarUpdateForm(instance=user)
-        context = {
+        
+        # Render directly to the template, not through the landing page
+        return render(request, 'accounts/gestion_profil.html', {
             'profile_form': profile_form,
             'password_form': password_form,
             'avatar_form': avatar_form,
             'profile_user': user,
-            #Rajouter form pour changement de pseudo
-        }
-        print("Profile Form:", profile_form)
-        print("Password Form:", password_form)
-
-        return render(request, 'accounts/gestion_profil.html', context)
+            'is_authenticated': True
+        })
     else:
         return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
 
