@@ -102,6 +102,9 @@ def manage_profile_view(request):
             'profile_user': user,
             #Rajouter form pour changement de pseudo
         }
+        print("Profile Form:", profile_form)
+        print("Password Form:", password_form)
+
         return render(request, 'accounts/gestion_profil.html', context)
     else:
         return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)

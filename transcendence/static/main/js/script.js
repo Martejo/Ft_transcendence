@@ -144,6 +144,7 @@ function loadContent(app, view) {
         method: 'GET',
         success: function(response) {
             $('#content').html(response);
+            console.log(response); //Debug
             initializeView(app, view);
         },
         error: function(error) {
