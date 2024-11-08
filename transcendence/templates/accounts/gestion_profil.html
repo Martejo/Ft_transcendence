@@ -1,4 +1,6 @@
-<!-- templates/User/manage_profile.html -->
+<!-- templates/accounts/manage_profile.html -->
+
+
 <div class="container-fluid mt-4" style="height: calc(100vh - 50px);">
     <h1 class="text-center title mb-4">Gestion de Profil</h1>
 
@@ -56,25 +58,25 @@
         </div>
     </div>
 
-	<!-- 2FA Section -->
-	<div class="row d-flex justify-content-center mb-4">
- 		<div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-        	<div class="card w-100">  <!-- Added w-100 like your other cards -->
-            	<div class="card-body">
-                	<h5 class="card-title">Authentification à deux facteurs</h5>
-                	{% if user.is_2fa_enabled %}
-                    	<a href="{% url 'User:disable_2fa' %}" class="btn btn-primary w-90">Désactiver 2FA</a>
-                	{% else %}
-                    	<a href="{% url 'User:enable_2fa' %}" class="btn btn-primary w-90">Activer 2FA</a>
-                	{% endif %}
-            	</div>
-        	</div>
-    	</div>
-	</div>
+    <!-- 2FA Section -->
+    <div class="row d-flex justify-content-center mb-4">
+        <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+            <div class="card w-100">
+                <div class="card-body">
+                    <h5 class="card-title">Authentification à deux facteurs</h5>
+                    {% if user.is_2fa_enabled %}
+                        <a href="{% url 'accounts:disable_2fa' %}" class="btn btn-primary w-90">Désactiver 2FA</a>
+                    {% else %}
+                        <a href="{% url 'accounts:enable_2fa' %}" class="btn btn-primary w-90">Activer 2FA</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
-    .html, body {
+    html, body {
         overflow: scroll;
     }
     .card {
@@ -85,9 +87,9 @@
     h1, .card-title {
         color: #2DB4F3;
     }
-    /* Optional: responsive font sizing */
+    /* Responsive font sizing */
     .form-control, label {
-        font-size: calc(0.9rem + 0.4vw); /* Adjust font size based on viewport width */
+        font-size: calc(0.9rem + 0.4vw); /* Ajuste la taille de la police en fonction de la largeur de la fenêtre */
     }
     .w-90 {
         width: 90%;

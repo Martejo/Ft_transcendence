@@ -113,7 +113,7 @@ function addMenuButton() {
   $(document).on('click', '#menu-btn', function(event) {
       event.preventDefault();
       // Changer le hachage pour charger la vue 'profile'
-      window.location.hash = '#User-profile'; // Exemple : vue 'profile' dans l'app 'User'
+      window.location.hash = '#accounts-profile'; // Exemple : vue 'profile' dans l'app 'accounts'
   });
 }
 
@@ -177,13 +177,13 @@ function handleHashChange() {
 function initializeView(app, view) { // MODIFICATION 4 : Accepter 'app' et 'view'
   if (app === 'core' && view === 'home') {
       initializeHomeView();
-  } else if (app === 'User' && view === 'login') {
+  } else if (app === 'accounts' && view === 'login') {
       initializeLoginView();
-  } else if (app === 'User' && view === 'profile') {
+  } else if (app === 'accounts' && view === 'profile') {
       initializeProfileView(); // Vous devrez créer cette fonction
-  } else if (app === 'User' && view === 'register') {
+  } else if (app === 'accounts' && view === 'register') {
         initializeRegisterView(); // Appelle la fonction d'initialisation pour l'inscription
-  } else if (app === 'User' && view === 'gestion_profil') {
+  } else if (app === 'accounts' && view === 'gestion_profil') {
     initializeGestionProfileView(); // Appelle la fonction d'initialisation pour l'inscription
   }
     // Ajouter des conditions pour d'autres applications et vues si nécessaire
@@ -191,7 +191,7 @@ function initializeView(app, view) { // MODIFICATION 4 : Accepter 'app' et 'view
 
 // Initialiser la vue de gestion de profil
 function initializeGestionProfileView() {
-    console.log("initializeManageProfileView called."); // Débogage
+    console.log("initializeGestionProfileView called."); // Débogage
 
     // Gestionnaire pour le formulaire de changement de pseudo
     $(document).on('submit', '#change-username-form', function(event) {
@@ -200,7 +200,7 @@ function initializeGestionProfileView() {
         console.log("Changement de pseudo soumis via AJAX."); // Débogage
 
         $.ajax({
-            url: '/User/update_profile/',
+            url: '/accounts/update_profile/',
             method: 'POST',
             data: formData,
             success: function(response) {
@@ -241,7 +241,7 @@ function initializeGestionProfileView() {
         console.log("Changement de mot de passe soumis via AJAX."); // Débogage
 
         $.ajax({
-            url: '/User/change_password/',
+            url: '/accounts/change_password/',
             method: 'POST',
             data: formData,
             success: function(response) {
@@ -281,7 +281,7 @@ function initializeGestionProfileView() {
         console.log("Changement d'avatar soumis via AJAX."); // Débogage
 
         $.ajax({
-            url: '/User/update_avatar/',
+            url: '/accounts/update_avatar/',
             method: 'POST',
             data: formData,
             processData: false, // Nécessaire pour les formulaires multipart/form-data
@@ -323,12 +323,12 @@ function initializeHomeView() {
   // MODIFICATION 5 : Utilisation de la délégation d'événements pour les boutons dynamiques
   $(document).on('click', '#login-btn', function(event) {
       event.preventDefault();
-      window.location.hash = '#User-login'; // Charger la vue 'login' de l'app 'User'
+      window.location.hash = '#accounts-login'; // Charger la vue 'login' de l'app 'accounts'
   });
 
   $(document).on('click', '#register-btn', function(event) {
       event.preventDefault();
-      window.location.hash = '#User-register'; // Charger la vue 'register' de l'app 'User'
+      window.location.hash = '#accounts-register'; // Charger la vue 'register' de l'app 'accounts'
   });
 
   // Appeler la fonction pour animer la couleur du texte
@@ -342,14 +342,14 @@ function initializeRegisterView() {
         const formData = $(this).serialize();
 
         $.ajax({
-            url: '/User/submit_registration/', // URL correcte
+            url: '/accounts/submit_registration/', // URL correcte
             method: 'POST',
             data: formData,
             success: function(response) {
                 if (response.success) {
                     // Optionnel : Afficher un message de succès ou rediriger
                     alert('Inscription réussie !');
-                    window.location.hash = '#User-login'; // Rediriger vers la page de login
+                    window.location.hash = '#accounts-login'; // Rediriger vers la page de login
                 } else {
                     // Afficher les erreurs du formulaire
                     let errors = response.errors;
@@ -382,7 +382,7 @@ function initializeLoginView() {
         $('#validate-btn').prop('disabled', true).text('Connexion...');
 
         $.ajax({
-            url: '/User/submit_login/', // URL de soumission du formulaire
+            url: '/accounts/submit_login/', // URL de soumission du formulaire
             method: 'POST',
             data: formData,
             success: function(response) {
@@ -392,7 +392,7 @@ function initializeLoginView() {
                     // Mettre à jour la barre de navigation
                     addMenuButton();
                     // Charger la vue du tableau de bord ou rediriger l'utilisateur
-                    window.location.hash = '#User-profile'; // Rediriger vers une vue appropriée
+                    window.location.hash = '#accounts-profile'; // Rediriger vers une vue appropriée
                 } else {
                     // Afficher un message d'erreur
                     if (response.errors) {
@@ -429,13 +429,13 @@ function initializeProfileView() {
   // Exemple : gestion des clics sur les boutons dans le menu burger
   $(document).on('click', '#profile-btn', function(event) {
       event.preventDefault();
-      window.location.hash = '#User-profile';
+      window.location.hash = '#accounts-profile';
   });
 
   $(document).on('click', '#logout-btn', function(event) {
       event.preventDefault();
       $.ajax({
-          url: '/user/logout/', // Vous devrez créer cette vue
+          url: '/accounts/logout/', // Vous devrez créer cette vue
           method: 'POST',
           success: function(response) {
               if (response.success) {
@@ -460,7 +460,7 @@ function initializeForms() {
       const formData = $(this).serialize();
 
       $.ajax({
-          url: '/user/login/',
+          url: '/accounts/login/',
           method: 'POST',
           data: formData,
           success: function(response) {
@@ -470,7 +470,7 @@ function initializeForms() {
                   // Mettre à jour la barre de navigation
                   addMenuButton();
                   // Charger la vue du tableau de bord
-                  window.location.hash = '#User-dashboard';
+                  window.location.hash = '#accounts-dashboard';
               } else {
                   // Afficher un message d'erreur
                   $('#login-error').text(response.error);

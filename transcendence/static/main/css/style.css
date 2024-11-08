@@ -13,7 +13,7 @@
 
 html, body {
 	height: 100%;
-	overflow: hidden;
+	overflow: auto;
 	background-color: #101A32;
 	margin: 0;
 	padding: 0;

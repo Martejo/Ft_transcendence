@@ -1,8 +1,8 @@
-# User/urls.py
+# accounts/urls.py
 from django.urls import path
 from . import views
 
-app_name = 'User'
+app_name = 'accounts'
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),  # Vue pour rendre le formulaire de connexion
@@ -21,6 +21,8 @@ urlpatterns = [
     path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
 	path('qr-code/', views.enable_2fa, name='show_qr'),
 	path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
+    path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
+
     
     path('match-history/', views.match_history_view, name='match_history'),
     path('send-friend-request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),

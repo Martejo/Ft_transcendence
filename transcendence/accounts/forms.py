@@ -1,6 +1,6 @@
 # User/forms.py
 from django import forms
-from .models import User, UserProfile
+from .models import CustomUser, CustomUserProfile
 from django.core.exceptions import ValidationError
 
 class RegistrationForm(forms.ModelForm):
@@ -8,7 +8,7 @@ class RegistrationForm(forms.ModelForm):
     confirm_password = forms.CharField(widget=forms.PasswordInput, label='Confirmer le mot de passe')
     
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['username', 'email']
     
     def clean(self):
@@ -37,7 +37,7 @@ class Two_factor_login_Form(forms.Form):
 
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['username', 'email']
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom d\'utilisateur'}),
@@ -46,18 +46,18 @@ class ProfileForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        if User.objects.exclude(id=self.instance.id).filter(username=username).exists():
+        if CustomUser.objects.exclude(id=self.instance.id).filter(username=username).exists():
             raise forms.ValidationError("Ce nom d'utilisateur est déjà pris.")
         return username
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.exclude(id=self.instance.id).filter(email=email).exists():
+        if CustomUser.objects.exclude(id=self.instance.id).filter(email=email).exists():
             raise forms.ValidationError("Cet email est déjà utilisé.")
         return email
 
 
-# User/forms.py
+# accounts/forms.py
 
 class PasswordChangeForm(forms.Form):
     old_password = forms.CharField(
@@ -89,7 +89,7 @@ class PasswordChangeForm(forms.Form):
 
 class AvatarUpdateForm(forms.ModelForm):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['avatar']
         widgets = {
             'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),

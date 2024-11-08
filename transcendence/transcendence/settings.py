@@ -31,14 +31,21 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    #'django.contrib.admin', SuperUtilisateur a voir si on en a besoin
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'User',
+    'accounts',
 ]
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.CustomUserBackend',
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'User.middleware.OnlineStatusMiddleware', #Notre middleware
+    'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
 ]
 
 ROOT_URLCONF = 'transcendence.urls'
@@ -146,6 +153,8 @@ SESSION_COOKIE_SECURE = False  # À mettre à True en production avec HTTPS
 CSRF_COOKIE_SECURE = False     # À mettre à True en production avec HTTPS
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
+
+
 
 
 # Authentification
