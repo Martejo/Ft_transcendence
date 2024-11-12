@@ -1,23 +1,24 @@
 # accounts/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse  # Vérifier que HttpResponse est bien importé
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.db.models import Max  # Remplacer models.Max par l'import direct de Max
 from .models import CustomUser, CustomUserProfile, FriendRequest, Game, MatchHistory
-from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm, Two_factor_login_Form  # Ajoutez PasswordChangeForm ici
+from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm, Two_factor_login_Form
 from .utils import hash_password, verify_password
 from .decorators import login_required
-from io import BytesIO
-from datetime import datetime, timedelta
-import hashlib
-import pyotp
-import jwt
-import qrcode
-import base64
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
+import logging
+import pyotp
+import jwt
+import base64
+from datetime import datetime, timedelta
+from io import BytesIO
+import qrcode
 
+logger = logging.getLogger(__name__)
 
 
 # @csrf_protect
@@ -313,24 +314,51 @@ def update_avatar_view(request):
 
 @csrf_protect
 @login_required
-def profile_view(request, username):
-    user = get_object_or_404(CustomUser, username=username)
-    is_2fa_enabled = user.is_2fa_enabled
-    match_count = user.match_histories.count()
-    victories = user.match_histories.filter(result='win').count()
-    defeats = user.match_histories.filter(result='loss').count()
-    best_score = user.games_as_player1.aggregate(models.Max('score_player1'))['score_player1__max'] or 0
-    friends_count = user.profile.friends.count()
+def profile_view(request):
+    user_id = request.session.get('user_id')
+    logger.info(f"Tentative de chargement du profil de l'utilisateur avec user_id: {user_id}")
 
-    return render(request, 'accounts/profile.html', {
-        'profile_user': user,
-        'is_2fa_enabled': is_2fa_enabled,
-        'match_count': match_count,
-        'victories': victories,
-        'defeats': defeats,
-        'best_score': best_score,
-        'friends_count': friends_count,
-    })
+    try:
+        user = get_object_or_404(CustomUser, id=user_id)
+        logger.info(f"Utilisateur trouvé: {user.username}")
+
+        # Calculer des données supplémentaires pour l'utilisateur
+        match_count = user.match_histories.count() if hasattr(user, 'match_histories') else 0
+        victories = user.match_histories.filter(result='win').count() if hasattr(user, 'match_histories') else 0
+        defeats = user.match_histories.filter(result='loss').count() if hasattr(user, 'match_histories') else 0
+        best_score = (
+            user.games_as_player1.aggregate(Max('score_player1'))['score_player1__max']
+            if hasattr(user, 'games_as_player1')
+            else 0
+        )
+
+        if best_score is None:
+            best_score = 0  # S'assurer que best_score est toujours défini
+
+        friends_count = (
+            user.profile.friends.count() if hasattr(user, 'profile') and hasattr(user.profile, 'friends') else 0
+        )
+
+        logger.info(f"Statistiques calculées: match_count={match_count}, victories={victories}, defeats={defeats}, best_score={best_score}, friends_count={friends_count}")
+
+        context = {
+            'profile_user': user,
+            'is_2fa_enabled': user.is_2fa_enabled,
+            'match_count': match_count,
+            'victories': victories,
+            'defeats': defeats,
+            'best_score': best_score,
+            'friends_count': friends_count,
+        }
+
+        return render(request, 'accounts/profile.html', context)
+
+    except Exception as e:
+        # Log l'erreur et retourne un message d'erreur plus clair
+        logger.error(f"Erreur lors du chargement du profil: {e}")
+        return HttpResponse("Erreur lors du chargement du profil utilisateur.", status=500)
+
+
 
 
 @csrf_protect

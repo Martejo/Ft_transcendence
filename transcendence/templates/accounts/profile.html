@@ -1,4 +1,6 @@
 <!-- templates/User/profile.html -->
+{% load static %}
+
 <div class="container-fluid mt-5" style="height: calc(100vh - 50px);">
     <h1 class="text-center title mb-4">Profil Utilisateur</h1>
 
@@ -14,7 +16,7 @@
                     {% endif %}
                     <div>
                         <h3>Pseudo : {{ profile_user.username }}</h3>
-                        <p>Nombre de matchs joués : <strong>{{ match_count }}</strong></p>
+                        <p>Nombre de matchs joués : <strong>{{ match_count|default:"N/A" }}</strong></p>
                     </div>
                 </div>
             </div>
