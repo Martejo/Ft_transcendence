@@ -13,10 +13,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
 
     ###### Gestion de profil ######
-    path('gestion-profil/', views.manage_profile_view, name='gestion_profil'),
+    # path('profile/<str:username>/', views.profile_view, name='profile'),
+    path('gestion_profil/', views.manage_profile_view, name='gestion_profil'),
     path('change_password/', views.change_password_view, name='change_password'),
-    path('update-avatar/', views.update_avatar_view, name='update_avatar'),
-    path('update-profile/', views.update_profile_view, name='update_profile'),
+    path('update_avatar/', views.update_avatar_view, name='update_avatar'),
+    path('update_profile/', views.update_profile_view, name='update_profile'),
 	path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
     path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
 	path('qr-code/', views.enable_2fa, name='show_qr'),

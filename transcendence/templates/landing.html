@@ -14,7 +14,12 @@
     <script>
         let isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
     </script>
-    <script src="{% static 'main/js/script.js' %}" defer></script> 
+    <script src="{% static 'main/js/ajax_utils.js' %}" defer></script>
+    <script src="{% static 'main/js/animations.js' %}" defer></script>
+    <script src="{% static 'main/js/authentication.js' %}" defer></script>
+    <script src="{% static 'main/js/views_init.js' %}" defer></script>
+    <script src="{% static 'main/js/script.js' %}" defer></script>
+    
     <!-- Initialiser isAuthenticated -->
     <!-- Inclure le token CSRF dans une balise meta -->
     <meta name="csrf-token" content="{{ csrf_token }}">

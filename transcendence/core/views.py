@@ -92,6 +92,54 @@ class ViewLoader:
 # Create instance
 loader = ViewLoader()
 
+# def load_view(request, app: str, view_name: str):
+#     """Dynamic view loader that handles both regular and form views"""
+#     try:
+#         # Initialize basic context
+#         context = {
+#             'is_authenticated': bool(request.session.get('user_id')),
+#             'user_id': request.session.get('user_id')
+#         }
+        
+#         print(f"Loading view: {app}/{view_name}")
+        
+#         # Handle AJAX requests
+#         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#             view_func = loader.find_view(app, f'ajax_{view_name}')
+#             if view_func:
+#                 return loader.handle_view(request, view_func)
+            
+#             template_path = loader.find_template(app, view_name)
+#             if template_path:
+#                 template = get_template(template_path)
+#                 return HttpResponse(template.render(context, request))
+            
+#             return JsonResponse({'error': 'View not found'}, status=404)
+        
+#         # Handle regular requests
+#         view_func = loader.find_view(app, view_name)
+#         if view_func:
+#             return loader.handle_view(request, view_func)
+        
+#         # Fall back to template rendering
+#         template_path = loader.find_template(app, view_name)
+#         if template_path:
+#             return render(request, 'landing.html', {
+#                 **context,
+#                 'content_template': template_path
+#             })
+        
+#         raise TemplateDoesNotExist(f"No template or view found for {app}/{view_name}")
+        
+#     except TemplateDoesNotExist as e:
+#         print(f"Template not found: {e}")
+#         return HttpResponseNotFound(f"Page not found: {app}/{view_name}")
+    
+#     except Exception as e:
+#         print(f"Error in load_view: {e}")
+#         return HttpResponse("Internal server error", status=500)
+
+
 def load_view(request, app: str, view_name: str):
     """Dynamic view loader that handles both regular and form views"""
     try:
@@ -107,10 +155,12 @@ def load_view(request, app: str, view_name: str):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             view_func = loader.find_view(app, f'ajax_{view_name}')
             if view_func:
+                print(f"Found AJAX view: {view_name}")
                 return loader.handle_view(request, view_func)
             
             template_path = loader.find_template(app, view_name)
             if template_path:
+                print(f"Found AJAX template: {view_name}")
                 template = get_template(template_path)
                 return HttpResponse(template.render(context, request))
             
@@ -119,11 +169,13 @@ def load_view(request, app: str, view_name: str):
         # Handle regular requests
         view_func = loader.find_view(app, view_name)
         if view_func:
+            print(f"Found regular view: {view_name}")
             return loader.handle_view(request, view_func)
         
         # Fall back to template rendering
         template_path = loader.find_template(app, view_name)
         if template_path:
+            print(f"Found fallback template: {view_name}")
             return render(request, 'landing.html', {
                 **context,
                 'content_template': template_path

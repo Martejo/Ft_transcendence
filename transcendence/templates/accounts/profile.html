@@ -7,7 +7,11 @@
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
             <div class="card p-4">
                 <div class="profile-info">
-                    <img src="{{ profile_user.avatar.url }}" alt="Avatar">
+                    {% if profile_user.avatar %}
+                        <img src="{{ profile_user.avatar.url }}" alt="Avatar">
+                    {% else %}
+                        <img src="{% static 'main/images/default_avatar.png' %}" alt="Avatar"> <!-- Image par défaut si l'avatar n'est pas défini -->
+                    {% endif %}
                     <div>
                         <h3>Pseudo : {{ profile_user.username }}</h3>
                         <p>Nombre de matchs joués : <strong>{{ match_count }}</strong></p>
@@ -50,7 +54,7 @@
 </div>
 
 <style>
-    .html, body {
+    html, body {
         overflow: scroll;
     }
     .card {
