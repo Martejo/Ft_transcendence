@@ -48,7 +48,8 @@ class CustomUserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     bio = models.TextField(max_length=500, blank=True)
-    is_online = models.BooleanField(default=False)
+    is_online = models.BooleanField(default=False) # status du user visible par les amis et lui
+    is_logged_in = models.BooleanField(default=False) # indique si user est login, utile pour le html
     
     def __str__(self):
         return f"Profile de {self.user.username}"

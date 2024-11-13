@@ -11,28 +11,19 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        let isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
-    </script>
     <script src="{% static 'main/js/ajax_utils.js' %}" defer></script>
     <script src="{% static 'main/js/animations.js' %}" defer></script>
     <script src="{% static 'main/js/authentication.js' %}" defer></script>
     <script src="{% static 'main/js/views_init.js' %}" defer></script>
     <script src="{% static 'main/js/script.js' %}" defer></script>
+    <script src="{% static 'main/js/burger_menu.js' %}" defer></script>
+    
     
     <!-- Initialiser isAuthenticated -->
     <!-- Inclure le token CSRF dans une balise meta -->
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
-    <!-- Barre du haut -->
-	<nav id="navbar" class="navbar navbar-expand">
-		<div class="container-fluid">
-			<a id="home-btn" class="navbar-brand text-white" href="#">PONGAME</a>
-			<div class="d-flex ms-auto" id="navbar-right"></div>
-		</div>
-	</nav>
-
     <!-- Conteneur pour l'animation -->
 	<div id="ground-game" class=" backg d-flex justify-content-center align-items-center" style="height: calc(100vh - 50px); ">
 		<div class="terrain position-relative">
@@ -45,7 +36,9 @@
 		</div>
 	</div>
 
+    <div id="navbar">
 
+    </div>
     <div id="content">
         <!-- Le contenu dynamique sera chargé ici -->
    

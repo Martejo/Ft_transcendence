@@ -17,53 +17,7 @@ function initializeHomeView() {
     animateTextColor();
 }
 
-// Fonction d'initialisation de la vue de connexion
-function initializeLoginView() {
-    // Gestionnaire pour le formulaire de connexion
-    $(document).on('submit', '#login-form', function(event) {
-        event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
-        const formData = $(this).serialize(); // Sérialise les données du formulaire
-
-        $('#validate-btn').prop('disabled', true).text('Connexion...');
-
-        $.ajax({
-            url: '/accounts/submit_login/', // URL de soumission du formulaire
-            method: 'POST',
-            data: formData,
-            success: function(response) {
-                if (response.status === 'success') {
-                    if (response.requires_2fa) {
-                        // Redirection vers la page de vérification 2FA si nécessaire
-                        window.location.hash = '#accounts-verify_2fa';
-                    } else {
-                        // Connexion réussie, rediriger vers la page de profil
-                        window.location.hash = '#accounts-profile';
-                    }
-                } else {
-                    if (response.errors) {
-                        let errors = response.errors;
-                        let errorMessages = '';
-                        for (let field in errors) {
-                            if (errors.hasOwnProperty(field)) {
-                                errorMessages += errors[field].join('<br>') + '<br>';
-                            }
-                        }
-                        $('#login-error').html(errorMessages);
-                    } else if (response.message) {
-                        $('#login-error').text(response.message);
-                    }
-                }
-                $('#validate-btn').prop('disabled', false).text('Valider');
-            },
-            error: function(error) {
-                console.error("Erreur lors de la soumission du formulaire :", error);
-                $('#login-error').html('<p>Une erreur est survenue lors de la connexion. Veuillez réessayer.</p>');
-                $('#validate-btn').prop('disabled', false).text('Valider');
-            }
-        });
-    });
-}
 
 // Fonction d'initialisation de la vue d'inscription
 function initializeRegisterView() {
@@ -134,6 +88,8 @@ function initializeRegisterView() {
 function initializeProfileView() {
     // Assurez-vous que les événements pertinents sont attachés correctement
     console.log("initializeProfileView called");
+    
+
 
     // Mettre à jour dynamiquement les informations du profil si nécessaire
     $('#gestion-btn').on('click', function() {

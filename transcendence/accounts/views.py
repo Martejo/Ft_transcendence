@@ -100,9 +100,15 @@ def submit_login(request):
             user = CustomUser.objects.get(username=username)
             if verify_password(user.password_hash, password):
                 request.session['user_id'] = user.id
+                
+                # Mise à jour de l'état `is_logged_in`
+                user.profile.is_logged_in = True
+                user.profile.save()
+
                 if user.is_2fa_enabled:
                     request.session['auth_partial'] = True
                     return JsonResponse({'status': 'success', 'requires_2fa': True})
+                
                 return JsonResponse({'status': 'success', 'requires_2fa': False})
             return JsonResponse({'status': 'error', 'message': 'Mot de passe incorrect'})
         except CustomUser.DoesNotExist:
@@ -113,10 +119,41 @@ def submit_login(request):
 @login_required
 def logout_view(request):
     if 'user_id' in request.session:
+        user_id = request.session['user_id']
+        CustomUserProfile.objects.filter(user_id=user_id).update(is_online=False, is_logged_in=False)
         del request.session['user_id']
     return JsonResponse({'status': 'success', 'message': 'Déconnexion réussie.'})
 
 
+
+
+@login_required
+def get_burger_menu_data(request):
+    user = request.session.get('user_id')
+    try:
+        friends = [
+            {
+                'username': friend.username,
+                'avatar_url': friend.profile.avatar.url if friend.profile.avatar else '/static/main/images/default_avatar.png',
+                'status': 'online' if friend.profile.is_online else 'offline'
+            }
+            for friend in user.profile.friends.all()
+        ]
+
+        response_data = {
+            'username': user.username,
+            'email': user.email,
+            'avatar_url': user.profile.avatar.url if user.profile.avatar else '/static/main/images/default_avatar.png',
+            'friends': friends,
+        }
+
+        return JsonResponse(response_data)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+ #CustomUserProfile.objects.filter(user_id=user_id).update(is_online=False)
 ############ Gestion de profil #############
 
 #Ancien manage_profile_view

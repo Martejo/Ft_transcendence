@@ -25,23 +25,14 @@ $.ajaxSetup({
 $(window).on('hashchange', handleHashChange);
 
 $(document).ready(function() {
-    
+    loadNavbar();
     handleHashChange();
-    // Attacher l'événement hashchange pour surveiller les modifications
-    $(window).on('hashchange', handleHashChange);
 });
 
 function handleHashChange() {
+    console.log("Hash changé : ", window.location.hash);
     const hash = window.location.hash.substring(1); // Supprime le '#'
     const [app, view] = hash.split('-'); // Suppose que le format est 'App-View'
-
-    // Rediriger vers la page d'accueil si l'utilisateur n'est pas authentifié
-    if (typeof isAuthenticated !== 'undefined' && !isAuthenticated) {
-        if (view !== 'home' && view !== 'login' && view !== 'register') {
-            window.location.hash = '#core-home';
-            return;
-        }
-    }
 
     // Charger la vue spécifiée
     if (app && view) {
@@ -50,6 +41,23 @@ function handleHashChange() {
         window.location.hash = '#core-home';
     }
 }
+
+
+function loadNavbar() {
+    $.ajax({
+        url: '/get_navbar/',
+        method: 'GET',
+        success: function(response) {
+            $('#navbar').html(response);
+            // Attachez l'événement burger menu uniquement si l'utilisateur est connecté
+            $('#burger-menu-toggle').on('click', toggleBurgerMenu);
+        },
+        error: function(xhr) {
+            console.error('Erreur lors du chargement de la barre de navigation :', xhr);
+        }
+    });
+}
+
 
 function loadContent(app, view) {
     $.ajax({

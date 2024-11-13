@@ -11,6 +11,8 @@ urlpatterns = [
     path('submit_registration/', views.submit_registration, name='submit_registration'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
+    path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
+
 
     ###### Gestion de profil ######
     # path('profile/<str:username>/', views.profile_view, name='profile'),

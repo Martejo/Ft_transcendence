@@ -12,7 +12,7 @@
                     {% if profile_user.avatar %}
                         <img src="{{ profile_user.avatar.url }}" alt="Avatar">
                     {% else %}
-                        <img src="{% static 'main/images/default_avatar.png' %}" alt="Avatar"> <!-- Image par défaut si l'avatar n'est pas défini -->
+                        <img src="{% static 'media/avatars/default_avatar.png' %}" alt="Avatar"> <!-- Image par défaut si l'avatar n'est pas défini -->
                     {% endif %}
                     <div>
                         <h3>Pseudo : {{ profile_user.username }}</h3>

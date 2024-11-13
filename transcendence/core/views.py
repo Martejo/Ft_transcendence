@@ -1,5 +1,5 @@
 # core/views.py
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.template.loader import get_template
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from django.template import TemplateDoesNotExist
@@ -190,6 +190,16 @@ def load_view(request, app: str, view_name: str):
     except Exception as e:
         print(f"Error in load_view: {e}")
         return HttpResponse("Internal server error", status=500)
+
+def get_navbar(request):
+    is_authenticated = request.session.get('is_authenticated', False)
+    
+    if is_authenticated:
+        # Render the logged-in navbar
+        return render(request, 'core/navbar_logged_in.html', {'user': request.user})
+    else:
+        # Render the public navbar
+        return render(request, 'core/navbar_public.html')
 
 def home_view(request):
     return render(request, 'core/home.html')

@@ -1,46 +1,78 @@
 // authentication.js
 
+function checkAuthentication(callback) {
+    // Vérifier s'il y a déjà un état d'authentification stocké
+    if (localStorage.getItem('is_authenticated') !== null) {
+        const isAuthenticated = localStorage.getItem('is_authenticated') === 'true';
+        callback(isAuthenticated);
+    } else {
+        // Envoyer une requête pour vérifier l'état d'authentification
+        $.ajax({
+            url: '/is_authenticated/',
+            method: 'GET',
+            success: function(response) {
+                localStorage.setItem('is_authenticated', response.is_authenticated);
+                callback(response.is_authenticated);
+            },
+            error: function() {
+                console.error("Erreur lors de la vérification de l'authentification");
+                callback(false);
+            }
+        });
+    }
+}
+
+
 // Fonction d'initialisation de la vue de connexion
 function initializeLoginView() {
+    console.log("initialize login view");
+    // Gestionnaire pour le formulaire de connexion
     $(document).on('submit', '#login-form', function(event) {
-        event.preventDefault();
-        const formData = $(this).serialize();
+        event.preventDefault(); // Empêche le comportement par défaut du formulaire
+
+        const formData = $(this).serialize(); // Sérialise les données du formulaire
 
         $('#validate-btn').prop('disabled', true).text('Connexion...');
 
-        ajaxRequest(
-            '/accounts/submit_login/',
-            'POST',
-            formData,
-            function(response) {
-                if (response.success) {
-                    isAuthenticated = true;
-                    addMenuButton();
-                    window.location.hash = '#accounts-profile';
+        $.ajax({
+            url: '/accounts/submit_login/', // URL de soumission du formulaire
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log("succes avant 2fa");
+                if (response.status === 'success') {
+                    if (response.requires_2fa) {
+                        console.log("succes");
+                        // Redirection vers la page de vérification 2FA si nécessaire
+                        window.location.hash = '#accounts-verify_2fa';
+                    } else {
+                        window.location.hash = '#accounts-profile';
+                        loadNavbar();
+                    }
                 } else {
                     if (response.errors) {
+                        let errors = response.errors;
                         let errorMessages = '';
-                        for (let field in response.errors) {
-                            if (response.errors.hasOwnProperty(field)) {
-                                errorMessages += response.errors[field].join('<br>') + '<br>';
+                        for (let field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += errors[field].join('<br>') + '<br>';
                             }
                         }
                         $('#login-error').html(errorMessages);
-                    } else if (response.error) {
-                        $('#login-error').text(response.error);
+                    } else if (response.message) {
+                        $('#login-error').text(response.message);
                     }
                 }
                 $('#validate-btn').prop('disabled', false).text('Valider');
             },
-            function(error) {
+            error: function(error) {
                 console.error("Erreur lors de la soumission du formulaire :", error);
                 $('#login-error').html('<p>Une erreur est survenue lors de la connexion. Veuillez réessayer.</p>');
                 $('#validate-btn').prop('disabled', false).text('Valider');
             }
-        );
+        });
     });
 }
-
 // Fonction pour ajouter un bouton au menu après connexion
 function addMenuButton() {
     const menuButton = `
