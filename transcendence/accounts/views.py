@@ -105,6 +105,9 @@ def submit_login(request):
                 user.profile.is_logged_in = True
                 user.profile.save()
 
+                # Mise à jour de la session pour `is_authenticated`
+                request.session['is_authenticated'] = True
+
                 if user.is_2fa_enabled:
                     request.session['auth_partial'] = True
                     return JsonResponse({'status': 'success', 'requires_2fa': True})
@@ -122,6 +125,7 @@ def logout_view(request):
         user_id = request.session['user_id']
         CustomUserProfile.objects.filter(user_id=user_id).update(is_online=False, is_logged_in=False)
         del request.session['user_id']
+        request.session['is_authenticated'] = False
     return JsonResponse({'status': 'success', 'message': 'Déconnexion réussie.'})
 
 

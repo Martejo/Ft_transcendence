@@ -1,21 +1,31 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const burgerButton = document.getElementById('burger-menu-toggle');
+    if (burgerButton) {
+        burgerButton.addEventListener('click', function() {
+            toggleBurgerMenu();
+        });
+    }
+});
+
+
+
 function toggleBurgerMenu() {
     const menu = document.getElementById('burger-menu');
     const overlay = document.getElementById('overlay');
-    console.log('toogleBurgerMenu');
 
-    if (menu.style.display === 'block') {
-        // Masquer le menu
-        menu.style.display = 'none';
-        overlay.style.display = 'none';
-    } else {
-        // Afficher le menu
-        menu.style.display = 'block';
-        overlay.style.display = 'block';
-
-        // Charger dynamiquement le contenu du menu (amis, statut, etc.)
-        loadBurgerMenuContent();
+    if (menu && overlay) {
+        if (menu.style.display === 'block') {
+            // Masquer le menu
+            menu.style.display = 'none';
+            overlay.style.display = 'none';
+        } else {
+            // Afficher le menu
+            menu.style.display = 'block';
+            overlay.style.display = 'block';
+        }
     }
 }
+
 
 function loadBurgerMenuContent() {
     $.ajax({

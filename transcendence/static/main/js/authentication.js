@@ -43,11 +43,14 @@ function initializeLoginView() {
                 if (response.status === 'success') {
                     if (response.requires_2fa) {
                         console.log("succes");
-                        // Redirection vers la page de vérification 2FA si nécessaire
                         window.location.hash = '#accounts-verify_2fa';
                     } else {
-                        window.location.hash = '#accounts-profile';
-                        loadNavbar();
+                        // Attendre un petit délai avant de charger la nouvelle barre de navigation
+                        setTimeout(function() {
+                            window.isAuthenticated = true; // L'utilisateur est maintenant connecté
+                            loadNavbar();
+                            window.location.hash = '#accounts-profile';
+                        }, 500); // 500 ms de délai
                     }
                 } else {
                     if (response.errors) {

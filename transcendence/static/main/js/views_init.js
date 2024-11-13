@@ -88,8 +88,6 @@ function initializeRegisterView() {
 function initializeProfileView() {
     // Assurez-vous que les événements pertinents sont attachés correctement
     console.log("initializeProfileView called");
-    
-
 
     // Mettre à jour dynamiquement les informations du profil si nécessaire
     $('#gestion-btn').on('click', function() {
@@ -103,6 +101,7 @@ function initializeProfileView() {
         $('#profile-avatar').attr('src', avatarUrl + '?' + new Date().getTime());
     }
 }
+
 
 
 

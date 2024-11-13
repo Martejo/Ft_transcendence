@@ -33,7 +33,6 @@ function handleHashChange() {
     console.log("Hash changé : ", window.location.hash);
     const hash = window.location.hash.substring(1); // Supprime le '#'
     const [app, view] = hash.split('-'); // Suppose que le format est 'App-View'
-
     // Charger la vue spécifiée
     if (app && view) {
         loadContent(app, view);
@@ -45,12 +44,13 @@ function handleHashChange() {
 
 function loadNavbar() {
     $.ajax({
-        url: '/get_navbar/',
+        url: '/get_navbar/?_=' + new Date().getTime(), // Ajoute un timestamp pour éviter la mise en cache
         method: 'GET',
         success: function(response) {
             $('#navbar').html(response);
             // Attachez l'événement burger menu uniquement si l'utilisateur est connecté
             $('#burger-menu-toggle').on('click', toggleBurgerMenu);
+            console.log("Navbar chargée.");
         },
         error: function(xhr) {
             console.error('Erreur lors du chargement de la barre de navigation :', xhr);
