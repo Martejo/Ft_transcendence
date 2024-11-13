@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>2FA Setup</title>
-</head>
-<body>
-    <h1>Set up 2FA</h1>
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <form method="post">
+{% load static %}
+
+<div class="container-2fa" style="position: relative; z-index: 10;">
+    <h3>Enable 2FA</h3>
+    <p>Scan the QR code below with your authenticator app.</p>
+    <div class="text-center my-4">
+        <img src="{{ qr_code }}" alt="QR Code">
+        <!-- <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code"> -->
+    </div>
+    <p>Your 2FA secret: <strong>{{ secret }}</strong></p>
+    <form id="verify-2fa-form" action="{% url 'accounts:verify_2fa' %}" method="post">
         {% csrf_token %}
-        <button type="submit">Generate QR Code</button>
+        <input type="text" name="otp_code" class="form-control mb-3" placeholder="Enter OTP code here" required>
+        <button type="submit" class="btn btn-primary">Verify Code</button>
     </form>
-</body>
-</html>
+</div>

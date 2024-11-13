@@ -86,6 +86,12 @@ $(document).on('click', '#register-btn', function(event) {
     window.location.hash = '#accounts-register';
 });
 
+$(document).on('click', '#enable-2fa-btn', function(event) {
+    event.preventDefault();
+    console.log("Register button clicked"); // Pour le débogage
+    window.location.hash = '#accounts-enable_2fa';
+});
+
 function initializeView(app, view) {
     if (app === 'core' && view === 'home') {
         initializeHomeView();
@@ -97,5 +103,13 @@ function initializeView(app, view) {
         initializeProfileView();
     } else if (app === 'accounts' && view === 'gestion_profil') {
         initializeProfileFormHandlers(); 
+    } else if (app === 'accounts' && view === 'verify_2fa_login') {
+        initializeLogin2FAView();
+    } else if (app === 'accounts' && view === 'verify_2fa') {
+        initializeVerify2FAView();
+    } else if (app === 'accounts' && view === 'enable_2fa') {
+        initializeEnable2FAView();
+    } else if (app === 'accounts' && view === 'disable_2fa') {
+        initializeDisable2FAView();
     }
 }

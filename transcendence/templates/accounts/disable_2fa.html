@@ -1,35 +1,12 @@
-<!-- templates/User/disable_2fa.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Désactiver 2FA</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-        .message { padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .error { background-color: #f2dede; }
-        .success { background-color: #dff0d8; }
-    </style>
-</head>
-<body>
-    <h1>Disable 2FA</h1>
-    {% if messages %}
-        {% for message in messages %}
-            {% if message.tags == 'error' %}
-                <div class="message error">{{ message }}</div>
-            {% elif message.tags == 'success' %}
-                <div class="message success">{{ message }}</div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    <form method="post">
+<div class="container">
+    <h3>Disable 2FA</h3>
+    <p>To disable 2FA, enter your current 2FA code from the authenticator app.</p>
+    <form id="disable-2fa-form" action="{% url 'accounts:disable_2fa' %}" method="post">
         {% csrf_token %}
-        <input type="text" name="code" required placeholder="Enter 2FA code" pattern="[0-9]{6}">
-        <button type="submit">Disable 2FA</button>
+        <div class="mb-3">
+            <label for="code" class="form-label">Authentication Code</label>
+            <input type="text" id="code" name="code" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-danger">Disable 2FA</button>
     </form>
-</body>
-</html>
+</div>

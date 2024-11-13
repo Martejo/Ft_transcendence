@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse  # Vérifier que HttpResponse est bien importé
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.db.models import Max  # Remplacer models.Max par l'import direct de Max
 from .models import CustomUser, CustomUserProfile, FriendRequest, Game, MatchHistory
@@ -20,24 +21,6 @@ import qrcode
 
 logger = logging.getLogger(__name__)
 
-
-# @csrf_protect
-# @require_POST
-# def submit_registration(request):
-#     if request.method == 'POST':
-#         form = RegistrationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.password_hash = hash_password(form.cleaned_data['password'])
-#             user.save()
-#             CustomUserProfile.objects.create(user=user)  # Crée un profil vide par défaut
-#             return JsonResponse({'success': True})
-#         else:
-#             # Renvoyer les erreurs du formulaire
-#             return JsonResponse({'success': False, 'errors': form.errors})
-#     else:
-#         form = RegistrationForm()
-#     return render(request, 'accounts/register.html', {'form': form})
 
 @csrf_protect
 @require_POST
@@ -63,31 +46,6 @@ def login_view(request):
         form = LoginForm()
         return render(request, 'accounts/login.html', {'form': form})
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
-
-
-# @csrf_protect
-# @require_POST
-# def submit_login(request):
-#     form = LoginForm(request.POST)
-#     if form.is_valid():
-#         username = form.cleaned_data['username']
-#         password = form.cleaned_data['password']
-#         try:
-#             user = CustomUser.objects.get(username=username)
-#             if verify_password(user.password_hash, password):
-#                 request.session['user_id'] = user.id
-#                 if user.is_2fa_enabled:
-#                     request.session['auth_partial'] = True
-#                     return JsonResponse({'success': True, 'requires_2fa': True})
-#                 else:
-#                     return JsonResponse({'success': True, 'requires_2fa': False})
-#             else:
-#                 return JsonResponse({'success': False, 'error': 'Mot de passe incorrect'})
-#         except CustomUser.DoesNotExist:
-#             return JsonResponse({'success': False, 'error': 'Identifiants incorrects'})
-#     else:
-#         # Renvoyer les erreurs du formulaire
-#         return JsonResponse({'success': False, 'errors': form.errors})
 
 @csrf_protect
 @require_POST
@@ -156,35 +114,7 @@ def get_burger_menu_data(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-
- #CustomUserProfile.objects.filter(user_id=user_id).update(is_online=False)
 ############ Gestion de profil #############
-
-#Ancien manage_profile_view
-#Renvoie la page gestion de profil + formulaire
-# @csrf_protect
-# @login_required
-# def manage_profile_view(request):
-#     user_id = request.session.get('user_id')
-#     user = get_object_or_404(CustomUser, id=user_id)
-    
-#     if request.method == 'GET':
-#         profile_form = ProfileForm(instance=user)
-#         password_form = PasswordChangeForm()
-#         avatar_form = AvatarUpdateForm(instance=user)
-#         context = {
-#             'profile_form': profile_form,
-#             'password_form': password_form,
-#             'avatar_form': avatar_form,
-#             'profile_user': user,
-#             #Rajouter form pour changement de pseudo
-#         }
-#         print("Profile Form:", profile_form)
-#         print("Password Form:", password_form)
-
-#         return render(request, 'accounts/gestion_profil.html', context)
-#     else:
-#         return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect
 @login_required
@@ -206,27 +136,6 @@ def manage_profile_view(request):
         })
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
-
-# Met à jour le profil
-# @csrf_protect
-# @login_required
-# def update_profile_view(request):
-#     user_id = request.session.get('user_id')
-#     user = get_object_or_404(CustomUser, id=user_id)
-#     if request.method == 'POST':
-#         form = ProfileForm(request.POST, instance=user)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Votre profil a été mis à jour avec succès.')
-#             return redirect('accounts:profile', username=user.username)
-#         else:
-#             messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
-#     else:
-#         form = ProfileForm(instance=user)
-
-#     return render(request, 'accounts/update_profile.html', {'form': form, 'profile_user': user})
-
-
 @csrf_protect
 @login_required
 def update_profile_view(request):
@@ -241,33 +150,6 @@ def update_profile_view(request):
         return JsonResponse({'status': 'error', 'errors': form.errors})
 
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
-
-
-
-# Changer le mot de passe
-# @csrf_protect
-# @login_required
-# def change_password_view(request):
-#     user_id = request.session.get('user_id')
-#     user = get_object_or_404(CustomUser, id=user_id)
-
-#     if request.method == 'POST':
-#         form = PasswordChangeForm(request.POST)
-#         if form.is_valid():
-#             old_password = form.cleaned_data['old_password']
-#             new_password = form.cleaned_data['new_password']
-
-#             if verify_password(user.password_hash, old_password):
-#                 user.password_hash = hash_password(new_password)
-#                 user.save()
-#                 return JsonResponse({'success': True})
-#             else:
-#                 return JsonResponse({'success': False, 'error': 'L\'ancien mot de passe est incorrect.'})
-#         else:
-#             return JsonResponse({'success': False, 'errors': form.errors})
-#     else:
-#         return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
-
 
 @csrf_protect
 @login_required
@@ -305,53 +187,6 @@ def update_avatar_view(request):
         return JsonResponse({'status': 'error', 'errors': form.errors})
 
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
-
-# @csrf_protect
-# @login_required
-# def enable_2fa(request):
-
-#     user_id = request.session.get('user_id')
-
-#     if not user_id:
-#         messages.error(request, 'No user found')
-#         return redirect('accounts:login')
-
-#     if request.method == 'POST':
-#         # Generate TOTP secret
-#         totp_secret = pyotp.random_base32()
-        
-#         # Create TOTP object
-#         totp = pyotp.TOTP(totp_secret)
-        
-#         # Create JWT with the TOTP secret
-#         token = jwt.encode({
-#             'user_id' : user_id,
-#             'totp_secret': totp_secret,
-#             'exp': datetime.utcnow() + timedelta(minutes=5)  # Give user 5 minutes to set up
-#         }, JWT_SECRET, algorithm='HS256')
-        
-#         # Store token in session
-#         request.session['setup_token'] = token
-        
-#         # Generate QR code
-#         provisioning_uri = totp.provisioning_uri(
-#             name="Transcendence",
-#             issuer_name="ggwp"
-#         )
-#         img = qrcode.make(provisioning_uri)
-        
-#         # Convert QR to display in template
-#         buffered = BytesIO()
-#         img.save(buffered, format="PNG")
-#         qr_code = base64.b64encode(buffered.getvalue()).decode()
-        
-#         # Show QR and secret
-#         return render(request, 'accounts/show_qr.html', {
-#             'qr_code': qr_code,
-#             'secret': totp_secret
-#         })
-    
-#     return render(request, 'accounts/enable_2fa.html')
 
 @csrf_protect
 @login_required
@@ -399,247 +234,6 @@ def profile_view(request):
         logger.error(f"Erreur lors du chargement du profil: {e}")
         return HttpResponse("Erreur lors du chargement du profil utilisateur.", status=500)
 
-
-
-
-@csrf_protect
-@login_required
-def enable_2fa(request):
-    user_id = request.session.get('user_id')
-
-    if request.method == 'POST':
-        totp_secret = pyotp.random_base32()
-        totp = pyotp.TOTP(totp_secret)
-
-        token = jwt.encode(
-            {
-                'user_id': user_id,
-                'totp_secret': totp_secret,
-                'exp': datetime.utcnow() + timedelta(minutes=5)
-            },
-            SECRET_KEY,
-            algorithm='HS256'
-        )
-
-        request.session['setup_token'] = token
-        provisioning_uri = totp.provisioning_uri(name="Transcendence", issuer_name="ggwp")
-        img = qrcode.make(provisioning_uri)
-
-        buffered = BytesIO()
-        img.save(buffered, format="PNG")
-        qr_code = base64.b64encode(buffered.getvalue()).decode()
-
-        return render(request, 'accounts/show_qr.html', {'qr_code': qr_code, 'secret': totp_secret})
-
-    return render(request, 'accounts/enable_2fa.html')
-
-
-# @csrf_protect
-# @login_required
-# def verify_2fa(request):
-#     setup_token = request.session.get('setup_token')
-    
-#     if not setup_token:
-#         messages.error(request, 'No 2FA setup in progress')
-#         return redirect('accounts:register') #redirect vers profile?
-    
-#     try:
-#         # Get TOTP secret from JWT
-#         payload = jwt.decode(setup_token, JWT_SECRET, algorithms=['HS256'])
-#         user_id = payload['user_id']
-#         totp_secret = payload['totp_secret']
-
-#         try:
-#             user = CustomUser.objects.get(id=user_id)
-#         except CustomUser.DoesNotExist:
-#             messages.error(request, 'User not found')
-#             return redirect('accounts:register')
-
-#         if request.method == 'POST':
-#             # Get code from form
-#             entered_code = request.POST.get('code')
-            
-#             # Verify TOTP code
-#             totp = pyotp.TOTP(totp_secret)
-#             if totp.verify(entered_code):
-#                 # Success! Here you would normally save the secret for future use
-#                 user.totp_secret = totp_secret
-#                 user.is_2fa_enabled = True
-#                 user.save()
-
-#                 del request.session['setup_token']
-#                 messages.success(request, '2FA setup successful!')
-#                 return redirect('accounts:profile', username=user.username)
-#             else:
-#                 messages.error(request, 'Invalid code')
-                
-#     except jwt.ExpiredSignatureError:
-#         del request.session['setup_token']
-#         messages.error(request, 'Setup expired. Please try again.')
-#         return redirect('accounts:register')
-#     except jwt.InvalidTokenError:
-#         del request.session['setup_token']
-#         messages.error(request, 'Invalid session. Please try again.')
-#         return redirect('accounts:register')
-    
-#     return render(request, 'accounts/verify_2fa.html')
-
-@csrf_protect
-@login_required
-def verify_2fa(request):
-    setup_token = request.session.get('setup_token')
-
-    if not setup_token:
-        messages.error(request, 'Aucune configuration 2FA en cours')
-        return redirect('accounts:register')
-
-    try:
-        payload = jwt.decode(setup_token, SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
-        totp_secret = payload['totp_secret']
-
-        user = get_object_or_404(CustomUser, id=user_id)
-
-        if request.method == 'POST':
-            entered_code = request.POST.get('code')
-            totp = pyotp.TOTP(totp_secret)
-
-            if totp.verify(entered_code):
-                user.totp_secret = totp_secret
-                user.is_2fa_enabled = True
-                user.save()
-
-                del request.session['setup_token']
-                messages.success(request, 'Configuration 2FA réussie !')
-                return redirect('accounts:profile', username=user.username)
-
-            messages.error(request, 'Code invalide')
-    
-    except jwt.ExpiredSignatureError:
-        del request.session['setup_token']
-        messages.error(request, 'Configuration expirée. Veuillez recommencer.')
-        return redirect('accounts:register')
-    
-    except jwt.InvalidTokenError:
-        del request.session['setup_token']
-        messages.error(request, 'Session invalide. Veuillez recommencer.')
-        return redirect('accounts:register')
-
-    return render(request, 'accounts/verify_2fa.html')
-
-
-# @csrf_protect
-# def verify_2fa_login(request):
-#     user_id = request.session.get('user_id')
-#     auth_partial = request.session.get('auth_partial')
-
-#     if not user_id or not auth_partial:
-#         return redirect('accounts:login')
-
-#     try:
-#         user = CustomUser.objects.get(id=user_id)
-
-#         if not user.totp_secret:
-#             messages.error(request, '2FA non configuré correctement')
-#             return redirect('accounts:login')
-
-#         if request.method == 'POST':
-#             code = request.POST.get('code')
-#             totp = pyotp.TOTP(user.totp_secret)
-
-#             if totp.verify(code):
-#                 del request.session['auth_partial']  # Supprime le flag d'authentification partielle
-#                 messages.success(request, 'Connexion réussie avec 2FA.')
-#                 return redirect('accounts:profile', username=user.username)
-#             else:
-#                 messages.error(request, 'Code 2FA invalide')
-
-#     except CustomUser.DoesNotExist:
-#         request.session.flush()
-#         return redirect('accounts:login')
-
-#     return render(request, 'accounts/verify_2fa_login.html')
-
-@csrf_protect
-def verify_2fa_login(request):
-    user_id = request.session.get('user_id')
-    auth_partial = request.session.get('auth_partial')
-
-    if not user_id or not auth_partial:
-        return redirect('accounts:login')
-
-    user = get_object_or_404(CustomUser, id=user_id)
-
-    if not user.totp_secret:
-        messages.error(request, '2FA non configuré correctement')
-        return redirect('accounts:login')
-
-    if request.method == 'POST':
-        code = request.POST.get('code')
-        totp = pyotp.TOTP(user.totp_secret)
-
-        if totp.verify(code):
-            del request.session['auth_partial']
-            return redirect('accounts:profile', username=user.username)
-
-        messages.error(request, 'Code 2FA invalide')
-
-    return render(request, 'accounts/verify_2fa_login.html')
-
-
-# @csrf_protect
-# @login_required
-# def disable_2fa(request):
-#     user_id = request.session.get('user_id')
-    
-#     # Fetch the user using user_id
-#     user = get_object_or_404(CustomUser, id=user_id)
-    
-#     is_2fa_enabled = user.is_2fa_enabled
-
-#     if not is_2fa_enabled:
-#         messages.error(request, 'Le 2FA n\'est pas activé sur votre compte')
-#         return redirect('accounts:profile', username=user.username)
-    
-#     if request.method == 'POST':
-#         code = request.POST.get('code')
-#         totp = pyotp.TOTP(user.totp_secret)
-        
-#         if totp.verify(code):
-#             user.totp_secret = ''  # Clear the TOTP secret to disable 2FA
-#             user.is_2fa_enabled = False  # Also set is_2fa_enabled to False
-#             user.save()
-#             messages.success(request, 'Le 2FA a été désactivé')
-#             return redirect('accounts:profile', username=user.username)
-#         else:
-#             messages.error(request, 'Code 2FA invalide')
-
-#     return render(request, 'accounts/disable_2fa.html', {'username': user.username})
-
-@csrf_protect
-@login_required
-def disable_2fa(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
-
-    if not user.is_2fa_enabled:
-        messages.error(request, "Le 2FA n'est pas activé sur votre compte")
-        return redirect('accounts:profile', username=user.username)
-
-    if request.method == 'POST':
-        code = request.POST.get('code')
-        totp = pyotp.TOTP(user.totp_secret)
-
-        if totp.verify(code):
-            user.totp_secret = ''
-            user.is_2fa_enabled = False
-            user.save()
-            messages.success(request, 'Le 2FA a été désactivé')
-            return redirect('accounts:profile', username=user.username)
-
-        messages.error(request, 'Code 2FA invalide')
-
-    return render(request, 'accounts/disable_2fa.html', {'username': user.username})
 
 
 ############## Fin de gestion de profil ###############
@@ -706,3 +300,130 @@ def log_guest_view(request):
         return redirect('home')
     return render(request, 'accounts/login.html')
 
+
+# ///////////////////////////----2FA----///////////////////////////////////
+
+@csrf_protect
+@login_required
+def enable_2fa(request):
+    """
+    Handle the 2FA enablement process, generating a TOTP secret and QR code.
+    """
+    if request.method == 'POST':
+        # Generate TOTP secret and JWT token
+        totp_secret = pyotp.random_base32()
+        totp = pyotp.TOTP(totp_secret)
+        token = jwt.encode(
+            {'user_id': request.user.id, 'totp_secret': totp_secret, 'exp': datetime.utcnow() + timedelta(minutes=5)},
+            settings.SECRET_KEY, algorithm='HS256'
+        )
+        request.session['setup_token'] = token
+        provisioning_uri = totp.provisioning_uri(name="Transcendence", issuer_name="ggwp")
+
+        # Generate the QR code
+        img = qrcode.make(provisioning_uri)
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        qr_code = base64.b64encode(buffered.getvalue()).decode()
+
+        # Render the enable_2fa.html template with the QR code and secret
+        context = {
+            'qr_code': '/media/avatars/default_avatar.png',
+            #'qr_code': qr_code,
+            'secret': totp_secret
+        }
+        return render(request, 'accounts/enable_2fa.html', context)
+
+    return render(request, 'accounts/enable_2fa.html')
+
+@csrf_protect
+@login_required
+def verify_2fa(request):
+    """
+    Verify the 2FA setup with the user-provided code.
+    """
+    setup_token = request.session.get('setup_token')
+    if not setup_token:
+        return JsonResponse({'status': 'error', 'message': 'No 2FA setup in progress.'}, status=400)
+
+    try:
+        payload = jwt.decode(setup_token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload['user_id']
+        totp_secret = payload['totp_secret']
+        user = get_object_or_404(CustomUser, id=user_id)
+
+        if request.method == 'POST':
+            entered_code = request.POST.get('code')
+            totp = pyotp.TOTP(totp_secret)
+            if totp.verify(entered_code):
+                user.totp_secret = totp_secret
+                user.is_2fa_enabled = True
+                user.save()
+
+                del request.session['setup_token']
+                return JsonResponse({'status': 'success', 'message': '2FA setup completed successfully.'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid code entered.'}, status=400)
+
+    except jwt.ExpiredSignatureError:
+        del request.session['setup_token']
+        return JsonResponse({'status': 'error', 'message': 'Setup expired. Please try again.'}, status=400)
+    
+    except jwt.InvalidTokenError:
+        del request.session['setup_token']
+        return JsonResponse({'status': 'error', 'message': 'Invalid session. Please try again.'}, status=400)
+
+    return render(request, 'accounts/verify_2fa.html')
+
+
+@csrf_protect
+def verify_2fa_login(request):
+    """
+    Handle 2FA verification on login.
+    """
+    user_id = request.session.get('user_id')
+    auth_partial = request.session.get('auth_partial')
+
+    if not user_id or not auth_partial:
+        return redirect('accounts:login')
+
+    user = get_object_or_404(CustomUser, id=user_id)
+    if not user.totp_secret:
+        return JsonResponse({'status': 'error', 'message': '2FA not properly configured.'}, status=400)
+
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        totp = pyotp.TOTP(user.totp_secret)
+        if totp.verify(code):
+            del request.session['auth_partial']
+            return JsonResponse({'status': 'success', 'message': '2FA verified. Login successful.'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid 2FA code entered.'}, status=400)
+
+    return render(request, 'accounts/verify_2fa_login.html')
+
+
+@csrf_protect
+@login_required
+def disable_2fa(request):
+    """
+    Disable 2FA after verifying the user-provided code.
+    """
+    user = request.user
+    if not user.is_2fa_enabled:
+        return JsonResponse({'status': 'error', 'message': "2FA isn't enabled on your account."}, status=400)
+
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        totp = pyotp.TOTP(user.totp_secret)
+        if totp.verify(code):
+            user.totp_secret = ''
+            user.is_2fa_enabled = False
+            user.save()
+            return JsonResponse({'status': 'success', 'message': '2FA has been disabled.'})
+
+        return JsonResponse({'status': 'error', 'message': 'Invalid 2FA code entered.'}, status=400)
+
+    return render(request, 'accounts/disable_2fa.html', {'username': user.username})
+
+# ///////////////////////////----FIN 2FA----///////////////////////////////////

@@ -124,3 +124,4 @@ class AvatarUpdateForm(forms.ModelForm):
             if not avatar.content_type in ["image/jpeg", "image/png", "image/gif"]:
                 raise forms.ValidationError("Seules les images JPEG, PNG et GIF sont autorisées.")
         return avatar
+

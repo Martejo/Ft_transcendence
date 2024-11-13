@@ -65,15 +65,15 @@
                 <div class="card-body">
                     <h5 class="card-title">Authentification à deux facteurs</h5>
                     {% if user.is_2fa_enabled %}
-                        <a href="{% url 'accounts:disable_2fa' %}" class="btn btn-primary w-90">Désactiver 2FA</a>
+                        <button id="disable-2fa-btn" class="btn btn-primary w-90">Désactiver 2FA</button>
                     {% else %}
-                        <a href="{% url 'accounts:enable_2fa' %}" class="btn btn-primary w-90">Activer 2FA</a>
+                        <button id="enable-2fa-btn" class="btn btn-primary w-90">Activer 2FA</button>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
+
 
 <style>
     html, body {
