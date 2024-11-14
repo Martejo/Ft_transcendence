@@ -1,44 +1,43 @@
-// Fonction d'initialisation pour l'activation de la 2FA
-function initializeEnable2FAView() {
-    console.log("initializeEnable2Fa View called");
-    $(document).on('submit', '#enable-2fa-form', function(e) {
-        e.preventDefault();
-        $.ajax({
-            url: '/accounts/enable_2fa/',
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                if (response.status === 'success') {
-                    $('#qr-code').attr('src', 'data:image/png;base64,' + response.qr_code);
-                    $('#secret').text(response.secret);
-                }
-            },
-            error: function(xhr) {
-                alert(xhr.responseJSON.message);
-            }
-        });
-    });
-}
 
 // Fonction d'initialisation pour la vérification de la 2FA
-function initializeVerify2FAView() {
-    console.log("initializeVerify2FA View called");
+function initializeEnable2FAView() {
+    console.log("initializeEnable2FA View called");
+    
+    // For debugging
+    console.log("Form present:", $('#verify-2fa-form').length > 0);
+    
     $(document).on('submit', '#verify-2fa-form', function(e) {
         e.preventDefault();
+        console.log("Form submitted");
+        
+        const formData = $(this).serialize();
+        console.log("Form data:", formData);
+        
         $.ajax({
             url: '/accounts/verify_2fa/',
             method: 'POST',
-            data: $(this).serialize(),
+            data: formData,
             success: function(response) {
+                console.log("Response:", response);
                 if (response.status === 'success') {
-                    alert(response.message);
-                    window.location.hash = '#accounts-profile';
+                    $('.verification-success')
+                        .text('2FA activé avec succès!')
+                        .show();
+                    setTimeout(() => {
+                        window.location.hash = '#accounts-profile';
+                    }, 2000);
                 } else {
-                    alert(response.message);
+                    $('.verification-error')
+                        .text(response.message || 'Une erreur est survenue')
+                        .show();
+                    $('#code').val('');
                 }
             },
             error: function(xhr) {
-                alert(xhr.responseJSON.message);
+                console.error("Error:", xhr);
+                $('.verification-error')
+                    .text(xhr.responseJSON?.message || 'Une erreur est survenue')
+                    .show();
             }
         });
     });
@@ -55,7 +54,7 @@ function initializeLogin2FAView() {
             data: $(this).serialize(),
             success: function(response) {
                 if (response.status === 'success') {
-                    window.location.href = '/profile';
+                    window.location.href = '#accounts-profile';
                 } else {
                     alert(response.message);
                 }
@@ -70,7 +69,7 @@ function initializeLogin2FAView() {
 // Fonction d'initialisation pour la désactivation de la 2FA
 function initializeDisable2FAView() {
     console.log("initializeDisable2FA View called");
-    $(document).on('submit', '#disable-2fa-form', function(e) {
+    $(document).on('submit', '#disable-2fa', function(e) {
         e.preventDefault();
         $.ajax({
             url: '/accounts/disable_2fa/',
@@ -79,6 +78,7 @@ function initializeDisable2FAView() {
             success: function(response) {
                 if (response.status === 'success') {
                     alert(response.message);
+                    window.location.href = '#accounts-gestion_profil';
                 } else {
                     alert(response.message);
                 }

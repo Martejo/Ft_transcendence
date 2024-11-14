@@ -1,11 +1,11 @@
-<div class="container">
+<div class="container_disable_2fa" style="position: relative; z-index: 10;">
     <h3>Disable 2FA</h3>
     <p>To disable 2FA, enter your current 2FA code from the authenticator app.</p>
-    <form id="disable-2fa-form" action="{% url 'accounts:disable_2fa' %}" method="post">
+    <form id="disable-2fa" method="post">
         {% csrf_token %}
         <div class="mb-3">
             <label for="code" class="form-label">Authentication Code</label>
-            <input type="text" id="code" name="code" class="form-control" required>
+            {{ disable_form.as_p}}
         </div>
         <button type="submit" class="btn btn-danger">Disable 2FA</button>
     </form>

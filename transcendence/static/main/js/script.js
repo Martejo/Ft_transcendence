@@ -88,8 +88,14 @@ $(document).on('click', '#register-btn', function(event) {
 
 $(document).on('click', '#enable-2fa-btn', function(event) {
     event.preventDefault();
-    console.log("Register button clicked"); // Pour le débogage
+    console.log("enable 2fa button clicked"); // Pour le débogage
     window.location.hash = '#accounts-enable_2fa';
+});
+
+$(document).on('click', '#disable-2fa-btn', function(event) {
+    event.preventDefault();
+    console.log("disable 2fa button clicked"); // Pour le débogage
+    window.location.hash = '#accounts-disable_2fa';
 });
 
 function initializeView(app, view) {
@@ -105,8 +111,6 @@ function initializeView(app, view) {
         initializeProfileFormHandlers(); 
     } else if (app === 'accounts' && view === 'verify_2fa_login') {
         initializeLogin2FAView();
-    } else if (app === 'accounts' && view === 'verify_2fa') {
-        initializeVerify2FAView();
     } else if (app === 'accounts' && view === 'enable_2fa') {
         initializeEnable2FAView();
     } else if (app === 'accounts' && view === 'disable_2fa') {

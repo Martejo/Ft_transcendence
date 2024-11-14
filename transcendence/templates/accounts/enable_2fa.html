@@ -1,16 +1,36 @@
-{% load static %}
-
-<div class="container-2fa" style="position: relative; z-index: 10;">
-    <h3>Enable 2FA</h3>
-    <p>Scan the QR code below with your authenticator app.</p>
-    <div class="text-center my-4">
-        <img src="{{ qr_code }}" alt="QR Code">
-        <!-- <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code"> -->
+<div class="flex-form-container">
+    <div class="register-form">
+        <h1 class="title mb-4">Activer l'authentification à deux facteurs</h1>
+        <div class="form-group">
+            <div class="qr-container" style="background: white; padding: 20px; display: inline-block; margin-bottom: 20px; border-radius: 10px;">
+                {% if qr_code %}
+                    <img src="data:image/png;base64,{{ qr_code }}" 
+                         alt="QR Code" 
+                         style="display: block; max-width: 200px; height: auto;">
+                {% else %}
+                    <div style="color: red;">QR Code not available</div>
+                {% endif %}
+            </div>
+            
+            <p style="color: white; font-family: 'Jersey 25'; margin: 20px 0;">
+                Code secret: <strong>{{ secret|default:"N/A" }}</strong>
+            </p>
+            
+            <form id="verify-2fa-form" method="POST">
+                {% csrf_token %}
+                {{ 2FA_form.as_p }}  <!-- This renders your form -->
+                <button type="submit" 
+                        class="btn btn-primary btn-70"
+                        style="background-color: #2DB4F3;
+                               border: none;
+                               padding: 10px 20px;
+                               font-family: 'Jersey 10';
+                               font-size: 18px;">
+                    Vérifier
+                </button>
+                <div class="verification-error text-danger mt-2" style="display: none;"></div>
+                <div class="verification-success text-success mt-2" style="display: none;"></div>
+            </form>
+        </div>
     </div>
-    <p>Your 2FA secret: <strong>{{ secret }}</strong></p>
-    <form id="verify-2fa-form" action="{% url 'accounts:verify_2fa' %}" method="post">
-        {% csrf_token %}
-        <input type="text" name="otp_code" class="form-control mb-3" placeholder="Enter OTP code here" required>
-        <button type="submit" class="btn btn-primary">Verify Code</button>
-    </form>
 </div>

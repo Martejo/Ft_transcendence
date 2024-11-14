@@ -64,7 +64,7 @@
             <div class="card w-100">
                 <div class="card-body">
                     <h5 class="card-title">Authentification à deux facteurs</h5>
-                    {% if user.is_2fa_enabled %}
+                    {% if profile_user.is_2fa_enabled %}
                         <button id="disable-2fa-btn" class="btn btn-primary w-90">Désactiver 2FA</button>
                     {% else %}
                         <button id="enable-2fa-btn" class="btn btn-primary w-90">Activer 2FA</button>

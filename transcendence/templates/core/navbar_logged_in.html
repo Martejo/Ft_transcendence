@@ -1,28 +1,22 @@
-<!-- templates/core/navbar_logged_in.html -->
+<!-- templates/core/navbar_public.html -->
 <nav id="navbar" class="navbar navbar-expand">
     <div class="container-fluid">
         <a id="home-btn" class="navbar-brand text-white" href="#">PONGAME</a>
-        
-        <!-- Bouton burger visible uniquement pour les utilisateurs connectés -->
-        <button id="burger-menu-toggle" class="navbar-toggler" type="button">
-            ☰
-        </button>
-        
 
-        <div class="d-flex ms-auto" id="navbar-right"></div>
+        <div class="d-flex ms-auto" id="navbar-right">
+            <!-- Boutons supplémentaires pour les utilisateurs non connectés, si besoin -->
+            <a href="#accounts-login" class="btn btn-primary me-2">Se connecter</a>
+            <a href="#accounts-register" class="btn btn-secondary">S'inscrire</a>
+        </div>
     </div>
 </nav>
 
-<!-- Inclure le burger-menu -->
-{% include 'accounts/burger_menu.html' %}
-<div id="overlay" style="display: none;" onclick="toggleBurgerMenu()"></div>
-
 <style>
-    #burger-menu-toggle {
-        display: block;
-        width: 50px;
-        height: 50px;
-        background-color: rgba(255, 255, 255, 0.3);
-        border: 2px solid red;
+    #navbar-right a {
+        color: white;
+        text-decoration: none;
+        margin-left: 10px;
     }
 </style>
+
+

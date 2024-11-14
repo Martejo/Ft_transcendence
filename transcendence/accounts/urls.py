@@ -1,6 +1,12 @@
 # accounts/urls.py
 from django.urls import path
 from . import views
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+logger.debug("Rentre dans urls.py de app accounts")
 
 app_name = 'accounts'
 
@@ -20,10 +26,10 @@ urlpatterns = [
     path('change_password/', views.change_password_view, name='change_password'),
     path('update_avatar/', views.update_avatar_view, name='update_avatar'),
     path('update_profile/', views.update_profile_view, name='update_profile'),
-	path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
-    path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
-	path('qr-code/', views.enable_2fa, name='show_qr'),
-	path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
+	path('enable_2fa/', views.enable_2fa, name='enable_2fa'),
+    path('disable_2fa/', views.disable_2fa, name='disable_2fa'),
+	#path('qr-code/', views.enable_2fa, name='show_qr'),
+	path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
     path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
 
     
@@ -33,6 +39,6 @@ urlpatterns = [
     path('reject-friend-request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
     path('update-avatar/', views.update_avatar_view, name='update_avatar'),
     path('log-guest/', views.log_guest_view, name='log_guest'),
-	path('verify-2fa-login/', views.verify_2fa_login, name='verify_2fa_login'),
+	path('verify_2fa_login/', views.verify_2fa_login, name='verify_2fa_login'),
 
 ]

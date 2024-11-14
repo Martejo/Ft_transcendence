@@ -1,12 +1,12 @@
-<div class="container">
+<div class="login_2fa_div" style="position: relative; z-index: 10;">
     <h3>Enter 2FA Code</h3>
     <p>To complete your login, please enter the 2FA code from your authenticator app.</p>
-    <form id="login-2fa-form" action="{% url 'accounts:verify_2fa_login' %}" method="post">
+    <form id="login-2fa-form" method="POST" >
         {% csrf_token %}
         <div class="mb-3">
             <label for="code" class="form-label">Authentication Code</label>
-            <input type="text" id="code" name="code" class="form-control" required>
+            {{ login_2fa_form.as_p}}
         </div>
-        <button type="submit" class="btn btn-primary">Verify Code</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>

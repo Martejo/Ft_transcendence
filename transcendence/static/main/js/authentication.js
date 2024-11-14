@@ -43,7 +43,7 @@ function initializeLoginView() {
                 if (response.status === 'success') {
                     if (response.requires_2fa) {
                         console.log("succes");
-                        window.location.hash = '#accounts-verify_2fa';
+                        window.location.hash = '#accounts-verify_2fa_login';
                     } else {
                         // Attendre un petit délai avant de charger la nouvelle barre de navigation
                         setTimeout(function() {
