@@ -101,8 +101,9 @@ def logout_view(request):
 
 @login_required
 def get_burger_menu_data(request):
-    logger.debug("Entre dans get_burger_menu_data_view")
-    user = request.session.get('user_id')
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(CustomUser, id=user_id)  # Assurez-vous que c'est un objet CustomUser
+
     try:
         friends = [
             {

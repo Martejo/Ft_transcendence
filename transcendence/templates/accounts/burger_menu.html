@@ -1,177 +1,61 @@
 <!-- burger-menu.html -->
+
 <div id="burger-menu" class="position-fixed">
     <!-- Section de profil avec avatar et pastille de statut -->
     <div class="profile-section text-center mt-4 position-relative">
         <div class="position-relative d-inline-block">
-            <img src="png/7.avif" alt="Avatar" class="rounded-circle mb-2" style="width: 80px; height: 80px;">
+            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle mb-2" style="width: 80px; height: 80px;">
             <!-- Pastille de statut -->
-            <span id="status-indicator" class="status-indicator online"></span>
+            <span id="status-indicator" class="status-indicator {% if user.profile.is_online %}online{% else %}offline{% endif %}"></span>
         </div>
-        <h5 class="mb-0">JohnDoe42</h5>
-        <p class="mb-0">johndoe42@outlook.com</p>
+        <h5 class="mb-0">{{ user.username }}</h5>
     </div>
 
     <!-- Sélecteur pour changer le statut -->
-	<div class="status-selector text-center p-3 border-bottom ">
-			<button class="btn btn-success btn-sm me-2" style="width: 100px;" onclick="setStatus('online')">En ligne</button>
-			<button class="btn btn-danger btn-sm" style="width: 100px;" onclick="setStatus('offline')">Hors ligne</button>
-		<button id="profile-btn" class="btn btn-primary mt-3 mb-2" style="width: 80%;">Voir le profil</button>
-	</div>
-
+    <div class="status-selector text-center p-3 border-bottom">
+        <button class="btn btn-success btn-sm me-2" style="width: 100px;" onclick="setStatus('online')">En ligne</button>
+        <button class="btn btn-danger btn-sm" style="width: 100px;" onclick="setStatus('offline')">Hors ligne</button>
+        <button id="profile-btn" class="btn btn-primary mt-3 mb-2" style="width: 80%;">Voir le profil</button>
+    </div>
 
     <div class="nav flex-column border-bottom p-2">
         <a href="#account" class="nav-link" style="color: rgb(153, 148, 148)" id="settings-link">Mon Compte</a>
         <a href="#tournament" class="nav-link" style="color: rgb(153, 148, 148)" id="tournament-link">Tournoi</a>
     </div>
 
-	<!-- Liste d'amis avec avatars -->
-    <div class="friends-list border-bottom p-3" style="color: white">
+    <!-- Liste d'amis avec avatars -->
+     <div class="friends-list border-bottom p-3" style="color: white">
         <h5 class="d-flex justify-content-center">Amis</h5>
-        <ul class="list-unstyled" >
+        <ul class="list-unstyled" id="friends-list-container">
+            {% for friend in friends %}
             <li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend1-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend1')">Friend1</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/2.avif" alt="Friend 2" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend2-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend2')">Friend2</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/3.avif" alt="Friend 3" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend3-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend3')">Friend3</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/4.avif" alt="Friend 4" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend4-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend4')">Friend4</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/5.avif" alt="Friend 5" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend5-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend5')">Friend5</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/6.avif" alt="Friend 6" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend6-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend6')">Friend6</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend1-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend1')">Friend1</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/2.avif" alt="Friend 2" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend2-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend2')">Friend2</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/3.avif" alt="Friend 3" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend3-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend3')">Friend3</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/4.avif" alt="Friend 4" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend4-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend4')">Friend4</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/5.avif" alt="Friend 5" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend5-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend5')">Friend5</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/6.avif" alt="Friend 6" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend6-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend6')">Friend6</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend1-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend1')">Friend1</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/2.avif" alt="Friend 2" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend2-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend2')">Friend2</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/3.avif" alt="Friend 3" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend3-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend3')">Friend3</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/4.avif" alt="Friend 4" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend4-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend4')">Friend4</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/5.avif" alt="Friend 5" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend5-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend5')">Friend5</button>
-			</li>
-			<li class="d-flex align-items-center mb-2 friend-item">
-				<div class="position-relative">
-					<img src="png/6.avif" alt="Friend 6" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend6-status"></span>
-				</div>
-				<button class="friend-btn" onclick="showFriendPopup(event, 'Friend6')">Friend6</button>
-			</li>
+                <div class="position-relative">
+                    <img src="{{ friend.profile.avatar.url }}" alt="Avatar of {{ friend.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                    <span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
+                </div>
+                <button class="friend-btn" onclick="showFriendPopup(event, '{{ friend.username }}')">{{ friend.username }}</button>
+            </li>
+            {% empty %}
+            <p class="text-center">Aucun ami pour le moment.</p>
+            {% endfor %}
         </ul>
     </div>
 
-	<div class="nav flex-column p-3">
+    <div class="nav flex-column p-3">
         <a href="#logout" class="nav-link" style="color: rgb(153, 148, 148)" id="logout-link">Déconnexion</a>
     </div>
 
-	<!-- Popup pour les options d'ami -->
-	<div id="friendPopup" class="friend-popup d-none position-absolute">
-		<p id="popupFriendName" class="fw-bold mb-1 d-flex align-items-center justify-content-center">Options</p>
-		<button class="btn btn-profil mb-2" onclick="handleOption('Voir le profil')">Voir profil</button>
-		<button class="btn btn-invit  mb-2" onclick="handleOption('Inviter à jouer')">Inviter à jouer</button>
-		<button class="btn btn-delete " onclick="handleOption('Supprimer')">Supprimer</button>
-	</div>
-
+    <!-- Popup pour les options d'ami -->
+    <div id="friendPopup" class="friend-popup d-none position-absolute">
+        <p id="popupFriendName" class="fw-bold mb-1 d-flex align-items-center justify-content-center">Options</p>
+        <button class="btn btn-profil mb-2" onclick="handleOption('Voir le profil')">Voir profil</button>
+        <button class="btn btn-invit mb-2" onclick="handleOption('Inviter à jouer')">Inviter à jouer</button>
+        <button class="btn btn-delete" onclick="handleOption('Supprimer')">Supprimer</button>
+    </div>
 </div>
 
 <div id="overlay" style="display: none;"></div>
+
 
 <!-- Styles pour l'indicateur de statut et le positionnement de la pastille -->
 <style>
