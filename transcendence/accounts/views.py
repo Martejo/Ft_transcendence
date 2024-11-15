@@ -118,6 +118,8 @@ def get_burger_menu_data(request):
             'username': user.username,
             'email': user.email,
             'avatar_url': user.profile.avatar.url if user.profile.avatar else '/static/main/images/default_avatar.png',
+            'is_online': user.profile.is_online,  # Ajoute le statut en ligne de l'utilisateur
+            'bio': user.profile.bio,  # Ajoute la bio de l'utilisateur
             'friends': friends,
         }
 
@@ -125,6 +127,22 @@ def get_burger_menu_data(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+
+def get_user_profile_data(request):
+    user = request.user
+    if user.is_authenticated:
+        profile_data = {
+            'username': user.username,
+            'avatar_url': user.profile.avatar.url if user.profile.avatar else '/static/default_avatar.png',
+            'is_online': user.profile.is_online
+        }
+        return JsonResponse(profile_data)
+    else:
+        return JsonResponse({'error': 'Utilisateur non authentifié'}, status=403)
 
 ############ Gestion de profil #############
 

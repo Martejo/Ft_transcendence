@@ -1,6 +1,6 @@
 # core/views.py
 from django.shortcuts import render, get_object_or_404
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from django.template import TemplateDoesNotExist
 from accounts.views import manage_profile_view
@@ -108,53 +108,6 @@ class ViewLoader:
 # Create instance
 loader = ViewLoader()
 
-# def load_view(request, app: str, view_name: str):
-#     """Dynamic view loader that handles both regular and form views"""
-#     try:
-#         # Initialize basic context
-#         context = {
-#             'is_authenticated': bool(request.session.get('user_id')),
-#             'user_id': request.session.get('user_id')
-#         }
-        
-#         logger.debug("Loading view: {app}/{view_name}")
-        
-#         # Handle AJAX requests
-#         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#             view_func = loader.find_view(app, f'ajax_{view_name}')
-#             if view_func:
-#                 return loader.handle_view(request, view_func)
-            
-#             template_path = loader.find_template(app, view_name)
-#             if template_path:
-#                 template = get_template(template_path)
-#                 return HttpResponse(template.render(context, request))
-            
-#             return JsonResponse({'error': 'View not found'}, status=404)
-        
-#         # Handle regular requests
-#         view_func = loader.find_view(app, view_name)
-#         if view_func:
-#             return loader.handle_view(request, view_func)
-        
-#         # Fall back to template rendering
-#         template_path = loader.find_template(app, view_name)
-#         if template_path:
-#             return render(request, 'landing.html', {
-#                 **context,
-#                 'content_template': template_path
-#             })
-        
-#         raise TemplateDoesNotExist(f"No template or view found for {app}/{view_name}")
-        
-#     except TemplateDoesNotExist as e:
-#         logger.debug("Template not found: {e}")
-#         return HttpResponseNotFound(f"Page not found: {app}/{view_name}")
-    
-#     except Exception as e:
-#         logger.debug("Error in load_view: {e}")
-#         return HttpResponse("Internal server error", status=500)
-
 
 def load_view(request, app: str, view_name: str):
     logger.debug("Entre dans load view")
@@ -215,12 +168,15 @@ def load_view(request, app: str, view_name: str):
 def get_navbar(request):
     logger.debug("Entre dans get_navbar_view")
     is_authenticated = request.session.get('is_authenticated', False)
-    
+
     if is_authenticated:
-        # Render the logged-in navbar
-        return render(request, 'core/navbar_logged_in.html', {'user': request.user})
+        # Génère le HTML du burger-menu sans appeler la vue `burger_menu_view`
+        burger_menu_html = render_to_string('accounts/burger_menu.html')
+        return render(request, 'core/navbar_logged_in.html', {
+            'if_burger': True,
+            'burger_menu': burger_menu_html
+        })
     else:
-        # Render the public navbar
         return render(request, 'core/navbar_public.html')
 
 def home_view(request):

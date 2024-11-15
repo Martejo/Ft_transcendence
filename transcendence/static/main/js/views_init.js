@@ -62,29 +62,6 @@ function initializeRegisterView() {
 }
 
 
-// Fonction d'initialisation de la vue de profil
-// function initializeProfileView() {
-//     // Initialiser les événements spécifiques à la vue 'profile'
-//     $(document).on('click', '#logout-btn', function(event) {
-//         event.preventDefault();
-//         $.ajax({
-//             url: '/accounts/logout/',
-//             method: 'POST',
-//             success: function(response) {
-//                 if (response.success) {
-//                     isAuthenticated = false;
-//                     window.location.hash = '#core-home';
-//                 } else {
-//                     alert('Erreur lors de la déconnexion.');
-//                 }
-//             },
-//             error: function(error) {
-//                 console.error("Erreur lors de la déconnexion :", error);
-//             }
-//         });
-//     });
-// }
-
 function initializeProfileView() {
     // Assurez-vous que les événements pertinents sont attachés correctement
     console.log("initializeProfileView called");

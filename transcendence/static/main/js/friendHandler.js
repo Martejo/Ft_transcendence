@@ -101,7 +101,6 @@ function refreshFriendsList() {
 
 
 //**** Au lieu de rafraichir periodiquement, essayer de rafraichir si gestion profil est appelle*/
-
 //***Pour les amis je pense qu' il faut rester comme ca car nous ne savons pas quand les amis peuvent se supprimer ****/
 // Appel initial et mise à jour périodique
 refreshFriendsList();

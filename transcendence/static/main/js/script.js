@@ -43,13 +43,20 @@ function handleHashChange() {
 
 
 function loadNavbar() {
+    console.log("Rentre dans loadnavbar");
     $.ajax({
         url: '/get_navbar/?_=' + new Date().getTime(), // Ajoute un timestamp pour éviter la mise en cache
         method: 'GET',
         success: function(response) {
             $('#navbar').html(response);
+
             // Attachez l'événement burger menu uniquement si l'utilisateur est connecté
-            $('#burger-menu-toggle').on('click', toggleBurgerMenu);
+            // Vérifiez si la réponse contient 'if_burger' et qu'il est `True`
+            if (response.if_burger === true) {
+                console.log("Rentre dans if burger");
+                loadBurgerMenuData();
+                $('#burger-menu-toggle').on('click', toggleBurgerMenu);
+            }
             console.log("Navbar chargée.");
         },
         error: function(xhr) {

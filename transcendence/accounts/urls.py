@@ -32,6 +32,7 @@ urlpatterns = [
 	path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
     path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
 
+	path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
     
     path('match-history/', views.match_history_view, name='match_history'),
     path('send-friend-request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),
