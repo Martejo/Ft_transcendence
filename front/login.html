@@ -1,5 +1,5 @@
 <!-- Conteneur pour les boutons -->
-<div id="guest" class=" container-fluid d-flex justify-content-center align-items-center" style="height: var(--sin-nav-height);">
+<div id="guest" class=" container-fluid d-flex flex-column align-items-center text-center" style="height: 100%; padding-top: 20px;">
 	<div class="col-8 col-sm-6 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
 		<h1 class="text-center text-white title mb-3">Connexion</h1>
 		<form action="/submit_login" method="POST">
@@ -23,38 +23,12 @@
 </script>
 
 <style>
-	 html, body {
-	
+	html, body {
 		overflow-y: auto;
-	 }
+	}
 	
-	 .btn-primary {
+	.btn-primary {
 		min-width: 100px;
-	 }
-	@media (max-height: 450px) {
-		#guest {
-			top : 50px;
-		}
-		
 	}
-	@media (max-height: 350px) {
-		#guest {
-			top : 75px;
-		}
-		
-	}
-	@media (max-height: 260px) {
-		#guest {
-			top : 100px;
-		}
-		
-	}
-	@media (max-height: 220px) {
-		#guest {
-			top : 130px;
-		}
-		
-	}
-
 
 </style>

@@ -8,7 +8,7 @@
                 <h5 class="card-title">Type de Partie</h5>
                 <div class="d-flex flex-column gap-2">
                     <button class="btn btn-primary w-100" onclick="chooseLocalGame()">Partie Locale</button>
-                    <button class="btn btn-primary w-100" onclick="inviteFriend()">Inviter un Ami</button>
+                    <button id="invite-game" class="btn btn-primary w-100">Inviter un Ami</button>
                 </div>
             </div>
         </div>
@@ -75,13 +75,18 @@
 
 <style>
 	.html, body {
-		overflow-y : auto;
+		overflow : auto;
 	}
     .game-menu * {
         color: rgb(223, 216, 216) !important;
     }
 	.mask{
 		display: none;
+	}
+	.card {
+		background-color: #101A32 !important;
+		border: 2px solid rgb(153, 148, 148);
+		min-width: 200px;
 	}
 </style>
 
@@ -90,13 +95,6 @@
     function chooseLocalGame() {
         document.getElementById('game-modes').classList.remove('d-none');
         document.getElementById('customization-menu').classList.add('d-none');
-    }
-
-    // Affiche la section d'invitation à un ami pour une partie en ligne
-    function inviteFriend() {
-        // Simuler une requête AJAX vers la liste d'amis ou la recherche
-        document.getElementById('invitation-status').classList.remove('d-none');
-        document.getElementById('status-text').innerText = "En attente d'acceptation...";
     }
 
     // Met à jour l'affichage de la valeur de la vitesse de la balle

@@ -1,5 +1,5 @@
 <!-- Conteneur pour les boutons -->
-<div id="register" class="container-fluid d-flex justify-content-center align-items-center " style="height: var(--sin-nav-height);">
+<div id="register" class="container-fluid d-flex flex-column align-items-center " style="height: 100%; padding-top: 20px;">
 	<div class=" col-8 col-sm-6 col-md-6 col-lg-4 col-xl-3 col-xxl-3">
 		<h1 class="text-center text-white title mb-3">Inscription</h1>
 		<form action="/submit_registration" method="POST">
@@ -22,37 +22,6 @@
 	<style>
 		html, body {
 			overflow-y: auto;
-		}
-		/* les médias query sont la pour gerer la hauteur du block selon la hauteur de l'ecran pour eviter que le haut ne passe sous la navbar */
-		@media (max-height: 500px) {
-			#register {
-				top : 80px;
-			}
-			
-		}
-		@media (max-height: 400px) {
-			#register {
-				top : 105px;
-			}
-			
-		}
-		@media (max-height: 300px) {
-			#register {
-				top : 130px;
-			}
-			
-		}
-		@media (max-height: 250px) {
-			#register {
-				top : 155px;
-			}
-			
-		}
-		@media (max-height: 20px) {
-			#register {
-				top : 180px;
-			}
-			
 		}
 	</style>
 </div>

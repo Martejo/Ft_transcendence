@@ -126,6 +126,224 @@ traitDroit.style.top = frames[0].raquetteDroiteY + '%';
 // Lancement de l'animation
 deplacerBalleEtRaquettes();
 
+function adjustContainer(ContainerId) {
+	const container = document.getElementById(ContainerId);
+	if (!container) return;
+	const threshold = 50; // Seuil de hauteur pour activer le centrage
+	// Si le contenu dépasse la hauteur de l'écran, on enlève `center-content`
+	if (container.scrollHeight > window.innerHeight - threshold) {
+		container.classList.remove('center-content');
+		container.classList.add('normal-content');
+	} else {
+		container.classList.add('center-content');
+		container.classList.remove('normal-content');
+	}
+}
+
+// Appeler la fonction au chargement et lors du redimensionnement de la fenêtre
+window.addEventListener('load',function() {
+    adjustContainer('invite-container'); // Remplacez 'invite-container' par l'ID voulu
+	adjustContainer('guest');
+	adjustContainer('register');
+});
+window.addEventListener('resize',function() {
+    adjustContainer('invite-container'); // Remplacez 'invite-container' par l'ID voulu
+	adjustContainer('guest');
+	adjustContainer('register');
+});
+
+// Gestion des options de tournoi (4 ou 8 participants)
+function initializeTournamentOptions() {
+	// Ecoute pour les boutons de sélection de tournoi (par exemple #four-player-tournament et #eight-player-tournament)
+	$("#tournament-4").click(() => setupTournament(4));
+	$("#tournament-8").click(() => setupTournament(8));
+}
+
+// Configurer le tournoi pour le nombre de participants choisi
+function setupTournament(participantCount) {
+	// Charger la liste d'amis pour les invitations
+	$.ajax({
+		url: 'invite_tournament.html', // Charger la liste d'amis
+		method: 'GET',
+		success: function(response) {
+			$('#home').html(response); // Afficher la liste des amis
+			initializeFriendInvitation(participantCount); // Initialiser l'invitation des amis
+			adjustContainer('invite-container');
+			resetScrollPosition(); // Réinitialiser le scroll
+		},
+		error: function(error) {
+			console.log("Erreur lors du chargement de la liste d'amis :", error);
+		}
+	});
+}
+
+// Initialisation de l'invitation des amis
+function initializeFriendInvitation(participantCount) {
+	let invitedFriends = 0;
+
+	// Recherche d'amis avec saisie d'au moins 3 lettres
+	$('#friend-search').on('input', function() {
+		let searchQuery = $(this).val();
+		if (searchQuery.length >= 3) {
+			// Requête AJAX pour récupérer les amis correspondants
+			$.ajax({
+				url: 'search_friends',
+				method: 'POST',
+				data: { query: searchQuery },
+				success: function(data) {
+					// Afficher les amis filtrés
+					$('#friend-list').html(data);
+				}
+			});
+		}
+	});
+
+	// Gestion de l'invitation avec le bouton
+	$('.invite-button').click(function() {
+		const $button = $(this);
+		
+		if (!$button.hasClass('sent')) {
+			// Ajouter le texte "Envoyé" avec la croix
+			$button.html('Envoyé <span class="cancel-icon">&times;</span>');
+			$button.addClass('sent'); // Ajouter une classe indiquant que le bouton est en état "Envoyé"
+
+			invitedFriends++;
+		}
+		if (invitedFriends >= participantCount) { //ici la condition sera si le nombre de bouton avec état "accepté" a atteint le nombre de participant
+			if (participantCount === 1)
+				$('#start-game-btn').removeAttr('disabled'); 
+			else
+				$('#start-tournament-btn').removeAttr('disabled'); // Activer le bouton "Commencer"
+			$('.invite-button').not('.sent').addClass('disabled');
+		}
+
+		// Gestion de l'annulation via la croix
+		$button.find('.cancel-icon').off('click').on('click', function(event) {
+			event.stopPropagation(); // Empêcher l'événement de se propager au bouton
+			cancelInvitation($button);
+		});
+		console.log("invited : ",invitedFriends);
+	});
+
+	// Fonction pour annuler une invitation
+	function cancelInvitation(button) {
+		button.html('Inviter'); // Remettre le texte à "Inviter"
+		button.removeClass('sent'); // Retirer l'état "Envoyé"
+		invitedFriends--;
+
+		// Si le nombre d'invitations est inférieur au maximum, désactiver "Commencer" et réactiver les boutons d'invitation
+		if (invitedFriends < participantCount) {
+			if (participantCount === 1)
+				$('#start-game-btn').attr('disabled', true);
+			else
+				$('#start-tournament-btn').attr('disabled', true);
+			$('.invite-button').removeClass('disabled');
+		}
+	}
+
+	// Ecoute pour le bouton "Commencer" du tournoi si participantCount != 1
+	$('#start-tournament-btn, #start-game-btn').click(function() {
+		startLoading(participantCount); // Charger la page d'attente
+	});
+}
+
+
+
+
+// Page de chargement avant le tournoi
+function startLoading(participantCount) {
+	// Charger la page de chargement personnalisée avec AJAX
+    $.ajax({
+        url: 'loading.html', // Chemin vers votre fichier HTML de chargement
+        method: 'GET',
+        success: function(response) {
+            $('#home').html(response); // Injecter le contenu de loading.html dans #home
+			animateLoadingText();
+			initializeControls();
+			initializeGame(); // Initialiser le jeu
+			initializeNavigation(); 
+            // Définir le timeout pour charger soit le jeu, soit le tournoi
+            setTimeout(function() {
+                if (participantCount === 1) {
+                    displayGame(); // Charger le jeu
+                } else {
+                    displayTournamentBracket(participantCount); // Charger le tableau de tournoi
+                }
+            }, 20000); // Attendre 5 seconde avant de charger le jeu ou le tournoi (jeu animation js pour le chargement)
+        },
+        error: function(error) {
+            console.log("Erreur lors du chargement de la page de chargement :", error);
+        }
+    });
+}
+
+function animateLoadingText() {
+    const loadingText = document.getElementById('loading-text');
+    const loadingDots = document.getElementById('loading-dots');
+    let dotCount = 0;
+
+    // Crée trois éléments de point pour l'animation
+    for (let i = 0; i < 3; i++) {
+        const dot = document.createElement('span');
+        dot.innerText = '.';
+        dot.style.display = 'inline-block';
+		dot.style.fontSize = '1.7em';
+        dot.style.transition = 'transform 0.3s ease';
+        loadingDots.appendChild(dot);
+    }
+
+    const dots = loadingDots.children;
+
+    setInterval(() => {
+        // Réinitialise la transformation de tous les points
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].style.transform = 'translateY(0)';
+        }
+
+        // Applique un effet de rebond au point actuel
+        dots[dotCount].style.transform = 'translateY(-10px)';
+        
+        // Passe au point suivant ou revient au début
+        dotCount = (dotCount + 1) % dots.length;
+    }, 300); // Intervalle de 300 ms pour un rebond fluide
+}
+
+
+// Affichage du jeu
+function displayGame() {
+	$.ajax({
+		url: 'game.html', // La page à charger pour le jeu
+		method: 'GET',
+		success: function(response) {
+			$('#home').html(response); // Charger le contenu dans #home
+			if ($('#ground-game').length) {
+				groundGameContent = $('#ground-game').detach();
+			} // Cache le terrain de jeu
+			addMenuButton();
+			initializeNavigation(); // Réinitialise les écouteurs d’événements
+			resetScrollPosition(); // Réinitialiser le scroll
+		},
+		error: function(error) {
+			console.log("Erreur lors du chargement de la page du jeu :", error);
+		}
+	});
+}
+
+// Affichage du tableau du tournoi
+function displayTournamentBracket(_participantCount) {
+	$.ajax({
+		url: _participantCount === 4 ? 'bracket_4.html' : 'bracket_8.html', // La page avec le tableau du tournoi
+		method: 'GET',
+		success: function(response) {
+			$('#home').html(response); // Afficher le tableau
+			resetScrollPosition(); // Réinitialiser le scroll
+		},
+		error: function(error) {
+			console.log("Erreur lors du chargement du tableau du tournoi :", error);
+		}
+	});
+}
+
 function resetScrollPosition() {
     // Défilement en haut avec scrollTo, qui fonctionne de manière générale
     window.scrollTo(0, 0);
@@ -167,7 +385,7 @@ function addMenuButton() {
                 $("#overlay").show(); // Affiche l'overlay
 
 				// Gestion des clics pour cacher le menu lorsqu'on clique sur les boutons
-				$("#profile-btn, #logout-btn").click(function() {
+				$("#profile-btn, #logout-btn, #tournament-link, #settings-link, #play-btn").click(function() {
 					$("#burger-menu, #overlay").hide();
 					
 				});
@@ -175,48 +393,110 @@ function addMenuButton() {
 				$("#profile-btn").click(function(event) {
 					event.preventDefault();
 					$.ajax({
-					url: 'profil.html',
-					method: 'GET',
-					success: function(response) {
-						$('#home').html(response); // Remplace le contenu de #home
-						if ($('#ground-game').length) {
-							groundGameContent = $('#ground-game').detach();
-						} // Cache le terrain de jeu
-						addMenuButton();
-						initializeNavigation(); // Réinitialise les écouteurs d’événements
-						resetScrollPosition();
-						
-					},
-					error: function(error) {
-						console.log("Erreur lors du chargement de la page :", error);
-					}
+						url: 'profil.html',
+						method: 'GET',
+						success: function(response) {
+							$('#home').html(response); // Remplace le contenu de #home
+							if ($('#ground-game').length) {
+								groundGameContent = $('#ground-game').detach();
+							} // Cache le terrain de jeu
+							addMenuButton();
+							initializeNavigation(); // Réinitialise les écouteurs d’événements
+							resetScrollPosition();
+							
+						},
+						error: function(error) {
+							console.log("Erreur lors du chargement de la page :", error);
+						}
+					});
+				});
+
+				$("#settings-link").click(function(event) {
+					event.preventDefault();
+					$.ajax({
+						url: 'gestion_profil.html',
+						method: 'GET',
+						success: function(response) {
+							$('#home').html(response); // Remplace le contenu de #home
+							if ($('#ground-game').length) {
+								groundGameContent = $('#ground-game').detach();
+							} // Cache le terrain de jeu
+							addMenuButton();
+							initializeNavigation(); // Réinitialise les écouteurs d’événements
+							resetScrollPosition();
+							
+						},
+						error: function(error) {
+							console.log("Erreur lors du chargement de la page :", error);
+						}
+					});
+				});
+
+				$("#tournament-link").click(function(event) {
+					event.preventDefault();
+					$.ajax({
+						url: 'tournament.html', // La page à charger pour le tournoi
+						method: 'GET',
+						success: function(response) {
+							$('#home').html(response); // Charger le contenu dans #home
+							// if ($('#ground-game').length) {
+							// 	groundGameContent = $('#ground-game').detach();
+							// } // Cache le terrain de jeu
+							initializeTournamentOptions(); // Initialiser les options de tournoi
+							initializeNavigation(); // Réinitialise les écouteurs d’événements
+							resetScrollPosition(); // Réinitialiser le scroll
+						},
+						error: function(error) {
+							console.log("Erreur lors du chargement de la page du tournoi :", error);
+						}
+					});
+				});
+
+				$("#play-btn").click(function(event) {
+					event.preventDefault();
+					$.ajax({
+						url: 'game-menu.html',
+						method: 'GET',
+						success: function(response) {
+							$('#home').html(response); // Remplace le contenu de #home
+							if ($('#ground-game').length) {
+								groundGameContent = $('#ground-game').detach();
+							} // Cache le terrain de jeu
+							addMenuButton();
+							initializeNavigation();
+							resetScrollPosition();
+						},
+						error: function(error) {
+							console.log("Erreur lors du chargement de la page :", error);
+						}
 					});
 				});
 
 				$("#logout-link").click(function(event) {
 					event.preventDefault();
 					$.ajax({
-					url: 'home.html',
-					method: 'GET',
-					success: function(response) {
-						const homeContent = $('<div>').append($.parseHTML(response)).find('#home').html();
-						$('#home').html(homeContent); // Remplace le contenu de #home par accueil
-						if (!$('#ground-game').length) {
-							$('#home').before(groundGameContent);
-						}
-						$('#navbar-right').html(''); // Supprime le bouton de menu
-						
-						initializeNavigation(); // Réinitialise les écouteurs d’événements
-						resetScrollPosition();
+						url: 'home.html',
+						method: 'GET',
+						success: function(response) {
+							const homeContent = $('<div>').append($.parseHTML(response)).find('#home').html();
+							$('#home').html(homeContent); // Remplace le contenu de #home par accueil
+							if (!$('#ground-game').length) {
+								$('#home').before(groundGameContent);
+							}
+							$('#navbar-right').html(''); // Supprime le bouton de menu
+							
+							initializeNavigation(); // Réinitialise les écouteurs d’événements
+							resetScrollPosition();
 
-						$("#burger-menu, #overlay").hide();
-						
-					},
-					error: function(error) {
-						console.log("Erreur lors du chargement de la page :", error);
-					}
+							$("#burger-menu, #overlay").hide();
+							
+						},
+						error: function(error) {
+							console.log("Erreur lors du chargement de la page :", error);
+						}
 					});
 				});
+
             },
             error: function(error) {
                 console.log("Erreur lors du chargement du menu burger :", error);
@@ -248,7 +528,8 @@ $("#home-btn").click(function(event) {
 		if (!$('#ground-game').length) {
             $('#home').before(groundGameContent);
         } // Ajoute le terrain de jeu
-		$('#navbar-right').html(''); // Supprime le bouton de menu
+		// $('#navbar-right').html(''); // Supprime le bouton de menu
+		addMenuButton();
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 		resetScrollPosition();
 	},
@@ -270,6 +551,7 @@ $("#login-btn").click(function(event) {
             $('#home').before(groundGameContent);
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
+		adjustContainer('guest');
         initializeNavigation(); // Réinitialise les écouteurs d’événements
 		resetScrollPosition();
       },
@@ -291,6 +573,7 @@ $("#submit-btn").click(function(event) {
             $('#home').before(groundGameContent);
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
+		adjustContainer('guest');
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 		resetScrollPosition();
 	},
@@ -311,6 +594,7 @@ $("#register-btn").click(function(event) {
             $('#home').before(groundGameContent);
         } // Ajoute le terrain de jeu
 		$('#navbar-right').html(''); // Supprime le bouton de menu
+		adjustContainer('register');
 		initializeNavigation(); // Réinitialise les écouteurs d’événements
 		resetScrollPosition();
 	},
@@ -380,9 +664,28 @@ $("#gestion-btn").click(function(event) {
 	});
 });
 
+$("#invite-game").click(function(event) {
+    event.preventDefault();
+    $.ajax({
+        url: 'invite_game.html',
+        method: 'GET',
+        success: function(response) {
+            $('#home').html(response); // Remplace le contenu de #home par le contenu de invite_game.html
+			addMenuButton();
+            adjustContainer('invite-container'); // Ajuste le conteneur si nécessaire
+			initializeFriendInvitation(1); 
+            initializeNavigation(); // Réinitialise les écouteurs d’événements pour le nouveau contenu chargé
+            resetScrollPosition(); // Réinitialise la position de défilement
+        },
+        error: function(error) {
+            console.log("Erreur lors du chargement de la page d'invitation :", error);
+        }
+    });
+});
+
 }
 
 // Initialiser la navigation au chargement de la page
 $(document).ready(function() {
-initializeNavigation();
+	initializeNavigation();
 });

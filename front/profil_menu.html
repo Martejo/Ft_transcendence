@@ -20,8 +20,9 @@
 
 
     <div class="nav flex-column border-bottom p-2">
-        <a href="#account" class="nav-link" style="color: rgb(153, 148, 148)" id="settings-link">Mon Compte</a>
-        <a href="#tournament" class="nav-link" style="color: rgb(153, 148, 148)" id="tournament-link">Tournoi</a>
+		<a href="#game" class="nav-link" style="color: rgb(153, 148, 148)" id="play-btn">Jouer</a>
+		<a href="#tournament" class="nav-link" style="color: rgb(153, 148, 148)" id="tournament-link">Tournoi</a>
+        <a href="#account" class="nav-link" style="color: rgb(153, 148, 148)" id="settings-link">Gestion du compte</a>
     </div>
 
 	<!-- Liste d'amis avec avatars -->
@@ -180,21 +181,21 @@
     }
     .status-indicator {
         position: absolute;
-        bottom: 10px; /* Ajuste pour positionner la pastille sur le bord du cercle */
+        bottom: 10px;
         right: 5px;
         width: 15px;
         height: 15px;
         border-radius: 50%;
-        border: 2px solid white; /* Bordure blanche pour la pastille */
+        border: 2px solid white; 
     }
 	.status-indicator-friend {
 		position: absolute;
-		bottom: 0px; /* Ajuste pour positionner la pastille sur le bord du cercle */
+		bottom: 0px;
 		right: 20px;
 		width: 10px;
 		height: 10px;
 		border-radius: 50%;
-		border: 2px solid white; /* Bordure blanche pour la pastille */
+		border: 2px solid white;
 	}
     .online {
         background-color: #28a745; /* Vert pour 'en ligne' */
@@ -218,7 +219,7 @@
 		background-color: rgba(255, 255, 255, 0.1);
 	}
 
-	.friend-btn {
+	/* .friend-btn {
         border: 2px solid rgb(153, 148, 148);
         background: none;
 		width: 100%;
@@ -229,7 +230,7 @@
     }
     .friend-btn:hover {
         background-color: rgba(255, 255, 255, 0.1);
-    }
+    } */
 
 	.friend-popup {
         width: 150px;

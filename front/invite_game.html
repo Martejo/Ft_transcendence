@@ -1,0 +1,134 @@
+<div id="invite-container" class="container-fluid text-center d-flex flex-column align-items-center col-12" style="height: 100%; padding-top: 20px; z-index: 2;">
+		<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez un ami</h2>
+
+		<!-- Champ de recherche -->
+		<div class="mb-4 col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<input type="text" id="friend-search" class="form-control" placeholder="Rechercher un ami...">
+		</div>
+
+		<!-- Liste d'amis -->
+		<div id="friend-list" class="list-group mb-4 col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
+			<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
+				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
+					<div class="position-relative">
+						<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+						<span class="status-indicator-friend online" id="friend1-status"></span>
+					</div>
+					<button class="friend-btn me-2">Friend1</button>
+					<button class="btn invite-button">Inviter
+						<span class="cancel-icon d-none">&times;</span>
+					</button>
+				</div>
+				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
+					<div class="position-relative"></div>
+					<div class="position-relative">
+						<img src="png/2.avif" alt="Friend 2" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+						<span class="status-indicator-friend online" id="friend2-status"></span>
+					</div>
+					<button class="friend-btn me-2">Friend2</button>
+					<button class="btn invite-button">Inviter
+						<span class="cancel-icon d-none">&times;</span>
+					</button>
+				</div>
+				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
+					<div class="position-relative">
+						<img src="png/3.avif" alt="Friend 3" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+						<span class="status-indicator-friend online" id="friend3-status"></span>
+					</div>
+					<button class="friend-btn me-2">Friend3</button>
+					<button class="btn invite-button">Inviter
+						<span class="cancel-icon d-none">&times;</span>
+					</button>
+				</div>
+				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
+					<div class="position-relative">
+						<img src="png/4.avif" alt="Friend 4" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+						<span class="status-indicator-friend online" id="friend4-status"></span>
+					</div>
+					<button class="friend-btn me-2">Friend4</button>
+					<button class="btn invite-button">Inviter
+						<span class="cancel-icon d-none">&times;</span>
+					</button>
+				</div>
+				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
+					<div class="position-relative">
+						<img src="png/7.avif" alt="Friend 7" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+						<span class="status-indicator-friend online" id="friend7-status"></span>
+					</div>
+					<button class="friend-btn me-2">Friend7</button>
+					<button class="btn invite-button">Inviter
+						<span class="cancel-icon d-none">&times;</span>
+					</button>
+				</div>
+			</div>
+			
+		</div>
+
+		<!-- Bouton pour commencer le tournoi -->
+		 <div class=" col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<button id="start-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">Commencer</button>
+		 </div>
+</div>
+<style>
+	body, html {
+		overflow: auto;
+	}
+	#friend-search, .invite-button, .friend-btn{
+		border: 2px solid rgb(153, 148, 148);
+		border-radius: 10px;
+		font-size: 1.25em !important;
+		overflow: hidden;
+	}
+	.list-group-item, .friend-btn{
+		background-color:  #101A32;
+		/* overflow: hidden; */
+		
+	}
+	#friend-search, .list-group-item, .btn-primary{
+		min-width: 300px;
+	}
+
+	.status-indicator-friend {
+		right: 15px !important;
+	}
+	.btn-primary{
+		font-size: 1.25em !important;
+	} 
+
+    .invite-button {
+    /* width: 150px; Définir la largeur fixe du bouton */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgb(153, 148, 148);
+    border-radius: 10px;
+    background: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+	min-width: 5em;
+    /* overflow: hidden; */
+}
+	.invite-button:hover {
+		border: 2px solid rgb(153, 148, 148);
+	}
+	.cancel-icon {
+		color: #ff5c5c; /* Rouge pour la croix */
+		cursor: pointer;
+		margin-left: 10px; /* Espace entre "Envoyé" et la croix */
+		margin-right: -5px;
+	}
+	.cancel-icon.d-none {
+		display: none; /* Masquer l'icône de croix par défaut */
+	}
+	
+	.invite-button.sent:active {
+		border-color: rgb(153, 148, 148); /* Force la couleur de bordure en état actif */
+		outline: none;
+		box-shadow: none; /* Assure qu'il n'y a pas d'ombre ou d'effet de clic */
+	}
+
+</style>
