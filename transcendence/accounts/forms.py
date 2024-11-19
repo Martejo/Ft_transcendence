@@ -110,7 +110,7 @@ class PasswordChangeForm(forms.Form):
 
 class AvatarUpdateForm(forms.ModelForm):
     class Meta:
-        model = CustomUser
+        model = CustomUserProfile
         fields = ['avatar']
         widgets = {
             'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),

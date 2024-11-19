@@ -87,6 +87,8 @@ def submit_login(request):
 
 
 @login_required
+@require_POST
+@csrf_protect
 def logout_view(request):
     logger.debug("Entre dans logout_view")
     if 'user_id' in request.session:
@@ -99,17 +101,63 @@ def logout_view(request):
 
 
 
+# @login_required
+# def get_burger_menu_data(request):
+#     user_id = request.session.get('user_id')
+#     user = get_object_or_404(CustomUser, id=user_id)  # Assurez-vous que c'est un objet CustomUser
+#     logger.debug("Coucou je suis dans get_burger-menu_data")
+#     try:
+#         friends = [
+#             {
+#                 'username': friend.username,
+#                 'avatar_url': friend.profile.avatar.url if hasattr(friend, 'profile') and friend.profile.avatar else '/static/main/images/default_avatar.png',
+#                 'status': 'online' if hasattr(friend, 'profile') and friend.profile.is_online else 'offline'
+#             }
+#             for friend in user.profile.friends.all()
+# ]
+
+
+#         # response_data = {
+#         #     'username': user.username,
+#         #     'email': user.email,
+#         #     'avatar_url': user.profile.avatar if user.profile.avatar else '/static/main/images/default_avatar.png',
+#         #     'is_online': user.profile.is_online,  # Ajoute le statut en ligne de l'utilisateur
+#         #     'bio': user.profile.bio,  # Ajoute la bio de l'utilisateur
+#         #     'friends': friends,
+#         # }
+#         logger.debug("Coucou j'ai passé la collecte de friends")
+#         return render(request, {
+#             'username': user.username,
+#             'email': user.email,
+#             'avatar_url': user.profile.avatar.url if user.profile.avatar.url else '/static/main/images/default_avatar.png',
+#             'is_online': user.profile.is_online,  # Ajoute le statut en ligne de l'utilisateur
+#             'bio': user.profile.bio,  # Ajoute la bio de l'utilisateur
+#             'friends': friends,
+#             }
+#         )
+#         # return JsonResponse(response_data)
+
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=500)
+
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=500)
+    
+
 @login_required
 def get_burger_menu_data(request):
     user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)  # Assurez-vous que c'est un objet CustomUser
-
+    user = get_object_or_404(CustomUser, id=user_id)
+    logger.debug(f"User ID: {user_id}")
+    logger.debug(f"User avatar in DB: {CustomUserProfile.objects.get(user=user).avatar}")
+    logger.debug(f"User avatar from relation: {user.profile.avatar}")
     try:
+        default_avatar = '/media/avatars/default_avatar.png'
         friends = [
             {
                 'username': friend.username,
-                'avatar_url': friend.profile.avatar.url if friend.profile.avatar else '/static/main/images/default_avatar.png',
-                'status': 'online' if friend.profile.is_online else 'offline'
+                'avatar_url': friend.profile.avatar.url if hasattr(friend, 'profile') and friend.profile.avatar else default_avatar,
+                'status': 'online' if hasattr(friend, 'profile') and friend.profile.is_online else 'offline'
             }
             for friend in user.profile.friends.all()
         ]
@@ -117,9 +165,9 @@ def get_burger_menu_data(request):
         response_data = {
             'username': user.username,
             'email': user.email,
-            'avatar_url': user.profile.avatar.url if user.profile.avatar else '/static/main/images/default_avatar.png',
-            'is_online': user.profile.is_online,  # Ajoute le statut en ligne de l'utilisateur
-            'bio': user.profile.bio,  # Ajoute la bio de l'utilisateur
+            'avatar_url': user.profile.avatar.url if user.profile.avatar else default_avatar,
+            'is_online': user.profile.is_online,
+            'bio': user.profile.bio,
             'friends': friends,
         }
 
@@ -128,16 +176,14 @@ def get_burger_menu_data(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    
+
 
 def get_user_profile_data(request):
     user = request.user
     if user.is_authenticated:
         profile_data = {
             'username': user.username,
-            'avatar_url': user.profile.avatar.url if user.profile.avatar else '/static/default_avatar.png',
+            'avatar_url': user.profile.avatar.url if user.profile.avatar else '/media/avatars/default_avatar.png',
             'is_online': user.profile.is_online
         }
         return JsonResponse(profile_data)
@@ -213,9 +259,11 @@ def update_avatar_view(request):
     user = get_object_or_404(CustomUser, id=user_id)
 
     if request.method == 'POST':
-        form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
+        form = AvatarUpdateForm(request.POST, request.FILES, instance=user.profile)
         if form.is_valid():
             form.save()
+            logger.debug(f"Avatar after save: {user.profile.avatar}")  # Debug print
+            logger.debug(f"Avatar URL: {user.profile.avatar.url}")
             return JsonResponse({'status': 'success', 'message': 'Avatar mis à jour avec succès.'})
         return JsonResponse({'status': 'error', 'errors': form.errors})
 
@@ -252,6 +300,7 @@ def profile_view(request):
 
         context = {
             'profile_user': user,
+            'avatar_url': user.profile.avatar.url,
             'is_2fa_enabled': user.is_2fa_enabled,
             'match_count': match_count,
             'victories': victories,

@@ -1,11 +1,14 @@
+<!-- burger-menu.html -->
+
 <div id="burger-menu" class="position-fixed">
     <!-- Section de profil avec avatar et pastille de statut -->
     <div class="profile-section text-center mt-4 position-relative">
         <div class="position-relative d-inline-block">
-            <img id="profile-avatar" src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle mb-2" style="width: 80px; height: 80px;">
+            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle mb-2" style="width: 80px; height: 80px;">
+            <!-- Pastille de statut -->
             <span id="status-indicator" class="status-indicator {% if user.profile.is_online %}online{% else %}offline{% endif %}"></span>
         </div>
-        <h5 id="profile-username" class="mb-0">{{ user.username }}</h5>
+        <h5 class="mb-0">{{ user.username }}</h5>
     </div>
 
     <!-- Sélecteur pour changer le statut -->
@@ -21,7 +24,7 @@
     </div>
 
     <!-- Liste d'amis avec avatars -->
-    <div class="friends-list border-bottom p-3" style="color: white">
+     <div class="friends-list border-bottom p-3" style="color: white">
         <h5 class="d-flex justify-content-center">Amis</h5>
         <ul class="list-unstyled" id="friends-list-container">
             {% for friend in friends %}
@@ -39,10 +42,7 @@
     </div>
 
     <div class="nav flex-column p-3">
-        <form id="logout-form" method="POST">
-            {% csrf_token %}
-            <button id="logout-btn" type="button" class="nav-link" style="color: rgb(153, 148, 148)">Déconnexion</button>
-        </form>
+        <a href="#logout" class="nav-link" style="color: rgb(153, 148, 148)" id="logout-link">Déconnexion</a>
     </div>
 
     <!-- Popup pour les options d'ami -->
@@ -55,6 +55,7 @@
 </div>
 
 <div id="overlay" style="display: none;"></div>
+
 
 <!-- Styles pour l'indicateur de statut et le positionnement de la pastille -->
 <style>
@@ -70,15 +71,15 @@
         border-radius: 50%;
         border: 2px solid white; /* Bordure blanche pour la pastille */
     }
-    .status-indicator-friend {
-        position: absolute;
-        bottom: 0px; /* Ajuste pour positionner la pastille sur le bord du cercle */
-        right: 20px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        border: 2px solid white; /* Bordure blanche pour la pastille */
-    }
+	.status-indicator-friend {
+		position: absolute;
+		bottom: 0px; /* Ajuste pour positionner la pastille sur le bord du cercle */
+		right: 20px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		border: 2px solid white; /* Bordure blanche pour la pastille */
+	}
     .online {
         background-color: #28a745; /* Vert pour 'en ligne' */
     }
@@ -86,25 +87,25 @@
         background-color: #dc3545; /* Rouge pour 'hors ligne' */
     }
 
-    .btn-profil, .btn-invit, .btn-delete {
-        background-color: #4da9d4;
-        color: white;
-        border: 1px solid rgb(153, 148, 148);
-        width: 100%;
-        border-radius: 50px;
-        padding: 5px 10px;
-        cursor: pointer;
-    }
+	.btn-profil, .btn-invit, .btn-delete {
+		background-color: #4da9d4;
+		color: white;
+		border: 1px solid rgb(153, 148, 148);
+		width: 100%;
+		border-radius: 50px;
+		padding: 5px 10px;
+		cursor: pointer;
+	}
 
-    .btn-profil:hover, .btn-invit:hover, .btn-delete:hover {
-        outline: 1px solid rgb(153, 148, 148);
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+	.btn-profil:hover, .btn-invit:hover, .btn-delete:hover{
+		outline: 1px solid rgb(153, 148, 148);
+		background-color: rgba(255, 255, 255, 0.1);
+	}
 
-    .friend-btn {
+	.friend-btn {
         border: 2px solid rgb(153, 148, 148);
         background: none;
-        width: 100%;
+		width: 100%;
         color: white;
         padding: 5px 10px;
         border-radius: 50px;
@@ -114,7 +115,7 @@
         background-color: rgba(255, 255, 255, 0.1);
     }
 
-    .friend-popup {
+	.friend-popup {
         width: 150px;
         padding: 10px;
         background-color: #141b2e;
@@ -122,8 +123,8 @@
         border-radius: 8px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 1000;
-        outline: 1px solid rgb(255, 255, 255);
-        transform: translate(-50%, -100%);
+		outline: 1px solid rgb(255, 255, 255);
+		transform: translate(-50%, -100%)
     }
     .friend-item:hover {
         cursor: pointer;
@@ -132,7 +133,8 @@
 
 <!-- Script pour changer la couleur de la pastille -->
 <script>
-    function setStatus(status) {
+
+	function setStatus(status) {
         const statusIndicator = document.getElementById('status-indicator');
         if (status === 'online') {
             statusIndicator.classList.add('online');
@@ -144,66 +146,71 @@
     }
 
     function showFriendPopup(event, friendName) {
-        event.stopPropagation(); // Empêche la propagation pour éviter les déclenchements accidentels
+    event.stopPropagation(); // Empêche la propagation pour éviter les déclenchements accidentels
 
-        const popup = document.getElementById('friendPopup');
-        document.getElementById('popupFriendName').innerText = friendName;
+    const popup = document.getElementById('friendPopup');
+    document.getElementById('popupFriendName').innerText = friendName;
 
-        // Rendre la popup visible pour obtenir ses dimensions
-        popup.classList.remove('d-none');
-        const popupWidth = popup.offsetWidth;
-        const popupHeight = popup.offsetHeight;
+    // Rendre la popup visible pour obtenir ses dimensions
+    popup.classList.remove('d-none');
+    const popupWidth = popup.offsetWidth;
+    const popupHeight = popup.offsetHeight;
 
-        // Récupère la position du clic par rapport au menu burger
-        const menu = document.getElementById('burger-menu');
-        const menuRect = menu.getBoundingClientRect();
-        const X = event.clientX;
-        const Y = event.clientY;
-        const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
-        const mouseY = event.clientY - menuRect.top + menu.scrollTop;
+    // Récupère la position du clic par rapport au menu burger
+    const menu = document.getElementById('burger-menu');
+    const menuRect = menu.getBoundingClientRect();
+	const screenWidth = window.innerWidth;
+	const screenHeight = window.innerHeight;
+	const X = event.clientX;
+	const Y = event.clientY;
+    const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
+    const mouseY = event.clientY - menuRect.top + menu.scrollTop;
 
-        // Variables pour positionner la popup
-        let top, left;
+    // Variables pour positionner la popup
+    let top, left;
 
-        // Logique pour coller la popup en fonction de la position du clic
-        if (Y < 250 && window.innerWidth - X < 175) {
-            // Si le clic est en haut a droite, afficher en bas à gauche du clic
-            top = mouseY + popupHeight;
-            left = mouseX - (popupWidth / 2);
-        } else if (Y < 250 && window.innerWidth - X >= 175) {
-            // Si le clic est en haut a gauche, afficher en bas à droite du clic
-            top = mouseY + popupHeight;
-            left = mouseX + (popupWidth / 2);
-        } else if (Y >= 250 && window.innerWidth - X >= 175) {
-            // Si le clic est sur tout le coté gauche sauf en haut, afficher en haut à droite du clic
-            top = mouseY;
-            left = mouseX + (popupWidth / 2);
-        } else {
-            // Par défaut, afficher en haut à gauche du clic
-            top = mouseY;
-            left = mouseX - (popupWidth / 2);
-        }
+    // Logique pour coller la popup en fonction de la position du clic
+    if (Y < 250 && screenWidth - X < 175) {
+        // Si le clic est en haut a droite, afficher en bas à gauche du clic
+		top = mouseY + popupHeight;
+        left = mouseX - (popupWidth / 2);
+	} else if (Y < 250 && screenWidth - X >= 175) {
+        // Si le clic est en haut a gauche, afficher en bas à droite du clic
+		top = mouseY + popupHeight;
+		left = mouseX + (popupWidth / 2);
+	} else if (Y >= 250 && screenWidth - X >= 175) {
+        // Si le clic est sur tout le coté gauche sauf en haut, afficher en haut à droite du clic
+		top = mouseY ;
+		left = mouseX + (popupWidth / 2);
+	}
+	else {
+        // Par défaut, afficher en haut à gauche du clic
+        top = mouseY ;
+        left = mouseX - (popupWidth / 2);
+	}
 
-        // Appliquer les styles calculés pour coller la popup au clic
-        popup.style.top = `${top}px`;
-        popup.style.left = `${left}px`;
 
-        // Fermer la popup si on clique en dehors
-        document.addEventListener('click', closePopupOnClickOutside);
+    // Appliquer les styles calculés pour coller la popup au clic
+    popup.style.top = `${top}px`;
+    popup.style.left = `${left}px`;
+
+    // Fermer la popup si on clique en dehors
+    document.addEventListener('click', closePopupOnClickOutside);
+}
+
+function closePopupOnClickOutside(event) {
+    const popup = document.getElementById('friendPopup');
+
+    // Vérifie si le clic est en dehors du popup ou du déclencheur (amis)
+    if (!popup.contains(event.target) && !event.target.closest('.friend-item')) {
+        popup.classList.add('d-none'); // Cache la popup
+        document.removeEventListener('click', closePopupOnClickOutside);
     }
+}
 
-    function closePopupOnClickOutside(event) {
-        const popup = document.getElementById('friendPopup');
+function handleOption(option) {
+    alert(option + " sélectionné");
+    document.getElementById('friendPopup').classList.add('d-none');
+}
 
-        // Vérifie si le clic est en dehors du popup ou du déclencheur (amis)
-        if (!popup.contains(event.target) && !event.target.closest('.friend-item')) {
-            popup.classList.add('d-none'); // Cache la popup
-            document.removeEventListener('click', closePopupOnClickOutside);
-        }
-    }
-
-    function handleOption(option) {
-        alert(option + " sélectionné");
-        document.getElementById('friendPopup').classList.add('d-none');
-    }
 </script>

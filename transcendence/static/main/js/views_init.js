@@ -71,12 +71,12 @@ function initializeProfileView() {
         window.location.hash = '#accounts-gestion_profil';
     });
 
-    // Charge l'avatar après modification
-    if ($('#profile-avatar')) {
-        // Recharger l'avatar si changé
-        let avatarUrl = $('#profile-avatar').attr('src');
-        $('#profile-avatar').attr('src', avatarUrl + '?' + new Date().getTime());
-    }
+    // // Charge l'avatar après modification
+    // if ($('#profile-avatar')) {
+    //     // Recharger l'avatar si changé
+    //     let avatarUrl = $('#profile-avatar').attr('src');
+    //     $('#profile-avatar').attr('src', avatarUrl + '?' + new Date().getTime());
+    // }
 }
 
 

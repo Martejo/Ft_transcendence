@@ -9,6 +9,7 @@ function getCSRFToken() {
             return cookie.trim().substring('csrftoken='.length);
         }
     }
+    console.log("Je sors sans token");
     return '';
 }
 
@@ -35,7 +36,10 @@ function handleHashChange() {
     const [app, view] = hash.split('-'); // Suppose que le format est 'App-View'
     // Charger la vue spécifiée
     if (app && view) {
-        loadContent(app, view);
+        if (view === 'logout')
+            logoutUser();
+        else
+            loadContent(app, view);
     } else {
         window.location.hash = '#core-home';
     }
@@ -45,14 +49,14 @@ function handleHashChange() {
 function loadNavbar() {
     console.log("Rentre dans loadnavbar");
     $.ajax({
-        url: '/get_navbar/?_=' + new Date().getTime(), // Ajoute un timestamp pour éviter la mise en cache
+        url: '/core/get_navbar/',  //?_=' + new Date().getTime(), // Ajoute un timestamp pour éviter la mise en cache
         method: 'GET',
         success: function(response) {
             $('#navbar').html(response);
 
             // Attachez l'événement burger menu uniquement si l'utilisateur est connecté
-            // Vérifiez si la réponse contient 'if_burger' et qu'il est `True`
-            if (response.if_burger === true) {
+            // Vérifiez si l'élément `burger-menu-toggle` est présent dans la réponse
+            if ($('#burger-menu-toggle').length > 0) {
                 console.log("Rentre dans if burger");
                 loadBurgerMenuData();
                 $('#burger-menu-toggle').on('click', toggleBurgerMenu);
@@ -85,6 +89,12 @@ $(document).on('click', '#login-btn', function(event) {
     event.preventDefault();
     console.log("Login button clicked"); // Pour le débogage
     window.location.hash = '#accounts-login';
+});
+
+$(document).on('click', '#logout-btn', function(event) {
+    event.preventDefault();
+    console.log("Login button clicked"); // Pour le débogage
+    window.location.hash = '#accounts-logout';
 });
 
 $(document).on('click', '#register-btn', function(event) {

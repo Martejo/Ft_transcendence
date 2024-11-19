@@ -173,7 +173,6 @@ def get_navbar(request):
         # Génère le HTML du burger-menu sans appeler la vue `burger_menu_view`
         burger_menu_html = render_to_string('accounts/burger_menu.html')
         return render(request, 'core/navbar_logged_in.html', {
-            'if_burger': True,
             'burger_menu': burger_menu_html
         })
     else:

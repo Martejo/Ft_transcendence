@@ -1,28 +1,5 @@
 // authentication.js
 
-function checkAuthentication(callback) {
-    // Vérifier s'il y a déjà un état d'authentification stocké
-    if (localStorage.getItem('is_authenticated') !== null) {
-        const isAuthenticated = localStorage.getItem('is_authenticated') === 'true';
-        callback(isAuthenticated);
-    } else {
-        // Envoyer une requête pour vérifier l'état d'authentification
-        $.ajax({
-            url: '/is_authenticated/',
-            method: 'GET',
-            success: function(response) {
-                localStorage.setItem('is_authenticated', response.is_authenticated);
-                callback(response.is_authenticated);
-            },
-            error: function() {
-                console.error("Erreur lors de la vérification de l'authentification");
-                callback(false);
-            }
-        });
-    }
-}
-
-
 // Fonction d'initialisation de la vue de connexion
 function initializeLoginView() {
     console.log("initialize login view");
@@ -76,6 +53,31 @@ function initializeLoginView() {
         });
     });
 }
+
+
+function logoutUser() {
+    $.ajax({
+        url: '/accounts/logout/',  // URL de la vue logout
+        type: 'POST',  // Utilisez POST pour déconnecter
+        success: function(response) {
+            if (response.status === 'success') {
+                console.log('Déconnexion réussie');
+                 // Optionnel : Réinitialiser les éléments spécifiques à l'utilisateur
+                 $('#navbar').html(''); // Vide la barre de navigation
+                 $('#burger-menu').html(''); // Vide le menu burger
+                 $('#content').html(''); // Vide le contenu principal si nécessaire
+                window.location.href = '/';  // Redirige vers la page d'accueil ou une autre page
+            }
+        },
+        error: function(error) {
+            console.error('Erreur lors de la déconnexion :', error);
+        }
+    });
+}
+
+
+
+
 // Fonction pour ajouter un bouton au menu après connexion
 function addMenuButton() {
     const menuButton = `
