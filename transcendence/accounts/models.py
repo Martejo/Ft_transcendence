@@ -14,12 +14,6 @@ class CustomUser(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_2fa_enabled = models.BooleanField(default=False)
     totp_secret = models.CharField(max_length=32, null=True, blank=True)
-    avatar = models.ImageField(
-        upload_to='avatars/',
-        null=True,
-        blank=True,
-        default='avatars/default_avatar.png'  # Chemin vers l'image par défaut
-    )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # Nécessaire pour l'administration
     is_superuser = models.BooleanField(default=False)  # Nécessaire pour les permissions
@@ -46,7 +40,12 @@ class CustomUser(models.Model):
 
 class CustomUserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        null=True,
+        blank=True,
+        default='avatars/default_avatar.png'  # Chemin vers l'image par défaut
+    )
     bio = models.TextField(max_length=500, blank=True)
     is_online = models.BooleanField(default=False) # status du user visible par les amis et lui
     is_logged_in = models.BooleanField(default=False) # indique si user est login, utile pour le html

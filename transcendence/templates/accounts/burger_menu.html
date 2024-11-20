@@ -20,6 +20,19 @@
         <a href="#tournament" class="nav-link" style="color: rgb(153, 148, 148)" id="tournament-link">Tournoi</a>
     </div>
 
+    <!-- Formulaire pour ajouter un ami -->
+    <div class="add-friend-section p-3 border-bottom">
+        <h5 class="text-center">Ajouter un ami</h5>
+        <form id="add-friend-form" method="POST">
+            {% csrf_token %}
+            <input type="text" id="friend-username" name="friend_username" class="form-control mb-2" placeholder="Nom d'utilisateur">
+            <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+        </form>
+        <div id="add-friend-error" class="text-danger mt-2"></div>
+        <div id="add-friend-success" class="text-success mt-2"></div>
+    </div>
+
+
     <!-- Liste d'amis avec avatars -->
     <div class="friends-list border-bottom p-3" style="color: white">
         <h5 class="d-flex justify-content-center">Amis</h5>
@@ -38,12 +51,38 @@
         </ul>
     </div>
 
+    <!-- Invitations d'amis -->
+    <div class="friend-requests-list border-bottom p-3" style="color: white">
+        <h5 class="d-flex justify-content-center">Invitations d'amis</h5>
+        <ul class="list-unstyled" id="friend-requests-list-container">
+            {% for request in friend_requests %}
+            <li class="d-flex align-items-center mb-2 request-item">
+                <div class="position-relative">
+                    <img src="{{ request.from_user.profile.avatar.url }}" alt="Avatar of {{ request.from_user.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                </div>
+                <div class="d-flex flex-column">
+                    <p>{{ request.from_user.username }}</p>
+                    <div class="d-flex">
+                        <button class="btn btn-success btn-sm me-2" onclick="handleFriendRequest('{{ request.id }}', 'accept')">Accepter</button>
+                        <button class="btn btn-danger btn-sm" onclick="handleFriendRequest('{{ request.id }}', 'decline')">Refuser</button>
+                    </div>
+                </div>
+            </li>
+            {% empty %}
+            <p class="text-center">Aucune invitation pour le moment.</p>
+            {% endfor %}
+        </ul>
+    </div>
+
+
     <div class="nav flex-column p-3">
         <form id="logout-form" method="POST">
             {% csrf_token %}
             <button id="logout-btn" type="button" class="nav-link" style="color: rgb(153, 148, 148)">Déconnexion</button>
         </form>
     </div>
+
+
 
     <!-- Popup pour les options d'ami -->
     <div id="friendPopup" class="friend-popup d-none position-absolute">

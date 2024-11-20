@@ -103,9 +103,3 @@ function refreshFriendsList() {
 //**** Au lieu de rafraichir periodiquement, essayer de rafraichir si gestion profil est appelle*/
 //***Pour les amis je pense qu' il faut rester comme ca car nous ne savons pas quand les amis peuvent se supprimer ****/
 // Appel initial et mise à jour périodique
-refreshFriendsList();
-setInterval(refreshFriendsList, 30000); // Rafraîchissement toutes les 30 secondes
-
-// Appel initial et mise à jour périodique
-refreshUserProfile();
-setInterval(refreshUserProfile, 60000); // Rafraîchissement toutes les 60 secondes

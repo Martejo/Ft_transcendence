@@ -134,3 +134,68 @@ function initializeView(app, view) {
         initializeDisable2FAView();
     }
 }
+
+$(document).on('submit', '#add-friend-form', function(event) {
+    event.preventDefault();
+    const formData = $(this).serialize(); // Sérialise les données du formulaire
+
+    // Désactiver le bouton pendant le traitement de la requête
+    $('#add-friend-form button').prop('disabled', true).text('Ajout en cours...');
+
+    $.ajax({
+        url: '/accounts/add_friend/', // URL de soumission du formulaire pour ajouter un ami
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+            if (response.status === 'success') {
+                // Afficher un message de succès
+                $('#add-friend-success').text(response.message).show();
+                $('#add-friend-error').hide();
+
+                // Réinitialiser le formulaire
+                document.getElementById('add-friend-form').reset();
+
+                // Masquer le message de succès après 3 secondes
+                setTimeout(function() {
+                    $('#add-friend-success').fadeOut();
+                }, 3000);
+            } else if (response.status === 'error') {
+                // Afficher un message d'erreur
+                $('#add-friend-error').text(response.message).show();
+                $('#add-friend-success').hide();
+            }
+            $('#add-friend-form button').prop('disabled', false).text('Ajouter');
+        },
+        error: function(xhr, status, error) {
+            // Gérer les erreurs inattendues
+            $('#add-friend-error').html('<p>Une erreur est survenue. Veuillez réessayer.</p>').show();
+            $('#add-friend-success').hide();
+            $('#add-friend-form button').prop('disabled', false).text('Ajouter');
+        }
+    });
+});
+
+
+function handleFriendRequest(requestId, action) {
+    $.ajax({
+        url: '/accounts/handle_friend_request/',
+        method: 'POST',
+        data: {
+            request_id: requestId,
+            action: action,
+            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                alert(`Invitation ${action}ée avec succès.`);
+                // Recharger la liste des invitations d'amis
+                loadBurgerMenuData();
+            } else {
+                console.error("Erreur lors du traitement de la requête :", response.error);
+            }
+        },
+        error: function(error) {
+            console.error("Erreur lors du traitement de la requête :", error);
+        }
+    });
+}

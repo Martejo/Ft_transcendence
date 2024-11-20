@@ -57,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
+	# 'django.template.context_processors.csrf',  # Assurez-vous que celui-ci est présent
+
 ]
 
 ROOT_URLCONF = 'transcendence.urls'
@@ -153,12 +155,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_SECURE = False  # À mettre à True en production avec HTTPS
 CSRF_COOKIE_SECURE = False     # À mettre à True en production avec HTTPS
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 31536000  # Active HSTS pour un an
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_REFERRER_POLICY = "same-origin"
 
+# Content Security Policy (CSP) – Recommandé pour prévenir les attaques XSS
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://ajax.googleapis.com')  # Ajustez selon vos besoins
+CSP_STYLE_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com')  # Ajustez selon vos besoins
 
 
 # Authentification
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+# ]

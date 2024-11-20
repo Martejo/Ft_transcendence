@@ -151,6 +151,7 @@ def get_burger_menu_data(request):
     logger.debug(f"User ID: {user_id}")
     logger.debug(f"User avatar in DB: {CustomUserProfile.objects.get(user=user).avatar}")
     logger.debug(f"User avatar from relation: {user.profile.avatar}")
+
     try:
         default_avatar = '/media/avatars/default_avatar.png'
         friends = [
@@ -162,6 +163,16 @@ def get_burger_menu_data(request):
             for friend in user.profile.friends.all()
         ]
 
+        # Ajouter les invitations d'amis
+        friend_requests = [
+            {
+                'id': request.id,
+                'from_user': request.from_user.username,
+                'avatar_url': request.from_user.profile.avatar.url if request.from_user.profile.avatar else default_avatar
+            }
+            for request in FriendRequest.objects.filter(to_user=user)
+        ]
+    
         response_data = {
             'username': user.username,
             'email': user.email,
@@ -169,12 +180,15 @@ def get_burger_menu_data(request):
             'is_online': user.profile.is_online,
             'bio': user.profile.bio,
             'friends': friends,
+            'friend_requests': friend_requests,  # Ajout des invitations d'amis
         }
 
-        return JsonResponse(response_data)
+        return JsonResponse({'status': 'success', 'data': response_data})
 
     except Exception as e:
+        logger.error(f"Erreur lors de la récupération des données du menu burger: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
 
 
 
@@ -297,10 +311,10 @@ def profile_view(request):
         )
 
         logger.info(f"Statistiques calculées: match_count={match_count}, victories={victories}, defeats={defeats}, best_score={best_score}, friends_count={friends_count}")
-
+        default_avatar = '/media/avatars/default_avatar.png'
         context = {
             'profile_user': user,
-            'avatar_url': user.profile.avatar.url,
+            'avatar_url': user.profile.avatar.url if user.profile.avatar else default_avatar,
             'is_2fa_enabled': user.is_2fa_enabled,
             'match_count': match_count,
             'victories': victories,
@@ -320,6 +334,64 @@ def profile_view(request):
 
 ############## Fin de gestion de profil ###############
 
+
+@login_required
+def add_friend(request):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return JsonResponse({'status': 'error', 'message': 'Utilisateur non connecté'}, status=400)
+
+        from_user = get_object_or_404(CustomUser, id=user_id)
+
+        # Ici, utilisez l'ID de l'utilisateur pour obtenir l'instance d'utilisateur et continuer
+        friend_username = request.POST.get('friend_username')
+        if not friend_username:
+            return JsonResponse({'status': 'error', 'message': 'Nom d\'utilisateur de l\'ami manquant'}, status=400)
+
+        friend = get_object_or_404(CustomUser, username=friend_username)
+
+        # Vérifier s'il existe déjà une demande d'ami
+        if FriendRequest.objects.filter(from_user=from_user, to_user=friend).exists():
+            return JsonResponse({'status': 'error', 'message': 'Demande d\'ami déjà envoyée'}, status=400)
+
+        # Créer une demande d'ami
+        FriendRequest.objects.create(from_user=from_user, to_user=friend)
+        return JsonResponse({'status': 'success', 'message': 'Demande d\'ami envoyée'})
+
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi d'une demande d'ami: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Erreur lors de l\'envoi de la demande d\'ami'}, status=500)
+    
+@login_required
+def handle_friend_request(request):
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+
+        try:
+            friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
+
+            if action == 'accept':
+                # Ajouter l'utilisateur aux amis et supprimer la demande
+                friend_request.from_user.profile.friends.add(request.user.profile)
+                request.user.profile.friends.add(friend_request.from_user.profile)
+                friend_request.delete()
+                return JsonResponse({'status': 'success', 'message': 'Demande d\'ami acceptée'})
+
+            elif action == 'decline':
+                # Supprimer la demande
+                friend_request.delete()
+                return JsonResponse({'status': 'success', 'message': 'Demande d\'ami refusée'})
+
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Action non valide'}, status=400)
+
+        except Exception as e:
+            logger.error(f"Erreur lors de la gestion de la demande d'ami: {e}")
+            return JsonResponse({'status': 'error', 'message': 'Erreur lors de la gestion de la demande d\'ami'}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
 
 @login_required
 def match_history_view(request):

@@ -31,6 +31,10 @@ urlpatterns = [
 	#path('qr-code/', views.enable_2fa, name='show_qr'),
 	path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
     path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
+	
+    path('add_friend/', views.add_friend, name='add_friend'),
+
+
 
 	path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
     
