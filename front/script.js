@@ -247,11 +247,14 @@ function initializeFriendInvitation(participantCount) {
 	});
 }
 
-
+let loadingTimeout;
 
 
 // Page de chargement avant le tournoi
 function startLoading(participantCount) {
+	if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+    }
 	// Charger la page de chargement personnalisée avec AJAX
     $.ajax({
         url: 'loading.html', // Chemin vers votre fichier HTML de chargement
@@ -259,17 +262,23 @@ function startLoading(participantCount) {
         success: function(response) {
             $('#home').html(response); // Injecter le contenu de loading.html dans #home
 			animateLoadingText();
-			initializeControls();
-			initializeGame(); // Initialiser le jeu
+			if (isTouchDevice()) {
+                console.log('Appareil tactile détecté. Activation des contrôles tactiles.');
+                initializeGameControls('touch'); // Active les contrôles tactiles
+            }
+			else {
+				console.log('Pas un appareil tactile. Aucun contrôle tactile activé.');
+				initializeGameControls('keyboard'); // Active les contrôles clavier
+			}
 			initializeNavigation(); 
             // Définir le timeout pour charger soit le jeu, soit le tournoi
-            setTimeout(function() {
+			loadingTimeout = setTimeout(function() {
                 if (participantCount === 1) {
                     displayGame(); // Charger le jeu
                 } else {
                     displayTournamentBracket(participantCount); // Charger le tableau de tournoi
                 }
-            }, 20000); // Attendre 5 seconde avant de charger le jeu ou le tournoi (jeu animation js pour le chargement)
+            }, 20000); // Attendre 20 seconde avant de charger le jeu ou le tournoi (jeu animation js pour le chargement)
         },
         error: function(error) {
             console.log("Erreur lors du chargement de la page de chargement :", error);
@@ -688,4 +697,5 @@ $("#invite-game").click(function(event) {
 // Initialiser la navigation au chargement de la page
 $(document).ready(function() {
 	initializeNavigation();
+	
 });
