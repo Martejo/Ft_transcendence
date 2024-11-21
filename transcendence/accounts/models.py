@@ -50,7 +50,7 @@ class CustomUserProfile(models.Model):
     is_online = models.BooleanField(default=False) # status du user visible par les amis et lui
     is_logged_in = models.BooleanField(default=False) # indique si user est login, utile pour le html
     # ManyToMany type de champ Django qui permet de créer une relation de plusieurs à plusieurs entre les objets.
-    friends = models.ManyToManyField('self', symmetrical=True, blank=True)  
+    friends = models.ManyToManyField(CustomUser, symmetrical=True, blank=True)  
 
     
     def __str__(self):

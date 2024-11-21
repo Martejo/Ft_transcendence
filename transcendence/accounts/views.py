@@ -149,11 +149,12 @@ def get_burger_menu_data(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(CustomUser, id=user_id)
     logger.debug(f"User ID: {user_id}")
-    logger.debug(f"User avatar in DB: {CustomUserProfile.objects.get(user=user).avatar}")
     logger.debug(f"User avatar from relation: {user.profile.avatar}")
 
     try:
         default_avatar = '/media/avatars/default_avatar.png'
+        
+        # Construction de la liste des amis
         friends = [
             {
                 'username': friend.username,
@@ -163,16 +164,17 @@ def get_burger_menu_data(request):
             for friend in user.profile.friends.all()
         ]
 
-        # Ajouter les invitations d'amis
+        # Construction de la liste des invitations d'amis
         friend_requests = [
             {
-                'id': request.id,
-                'from_user': request.from_user.username,
-                'avatar_url': request.from_user.profile.avatar.url if request.from_user.profile.avatar else default_avatar
+                'id': friend_request.id,
+                'from_user': friend_request.from_user.username,  # Utilisation correcte de `from_user`
+                'avatar_url': friend_request.from_user.profile.avatar.url if hasattr(friend_request.from_user, 'profile') and friend_request.from_user.profile.avatar else default_avatar
             }
-            for request in FriendRequest.objects.filter(to_user=user)
+            for friend_request in FriendRequest.objects.filter(to_user=user)
         ]
-    
+
+        # Construction des données de la réponse
         response_data = {
             'username': user.username,
             'email': user.email,
@@ -180,7 +182,7 @@ def get_burger_menu_data(request):
             'is_online': user.profile.is_online,
             'bio': user.profile.bio,
             'friends': friends,
-            'friend_requests': friend_requests,  # Ajout des invitations d'amis
+            'friend_requests': friend_requests,
         }
 
         return JsonResponse({'status': 'success', 'data': response_data})
@@ -190,7 +192,81 @@ def get_burger_menu_data(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+@login_required
+@csrf_protect
+def friend_profile_view(request, friend_username):
+    logger.debug("Entre dans friend_profile_view")
+    logger.debug(f"Friend_username = {friend_username}")
+    try:
+        # Rechercher l'ami par son nom d'utilisateur
+        friend = get_object_or_404(CustomUser, username=friend_username)
+        logger.info(f"Ami trouvé: {friend.username}")
 
+        # Calculer les statistiques de l'ami
+        match_count = friend.match_histories.count() if hasattr(friend, 'match_histories') else 0
+        victories = friend.match_histories.filter(result='win').count() if hasattr(friend, 'match_histories') else 0
+        defeats = friend.match_histories.filter(result='loss').count() if hasattr(friend, 'match_histories') else 0
+        best_score = (
+            friend.games_as_player1.aggregate(Max('score_player1'))['score_player1__max']
+            if hasattr(friend, 'games_as_player1')
+            else 0
+        )
+
+        if best_score is None:
+            best_score = 0  # S'assurer que best_score est toujours défini
+
+        friends_count = (
+            friend.profile.friends.count() if hasattr(friend, 'profile') and hasattr(friend.profile, 'friends') else 0
+        )
+
+        logger.info(f"Statistiques calculées: match_count={match_count}, victories={victories}, defeats={defeats}, best_score={best_score}, friends_count={friends_count}")
+        default_avatar = '/media/avatars/default_avatar.png'
+        context = {
+            'profile_user': friend,
+            'avatar_url': friend.profile.avatar.url if friend.profile.avatar else default_avatar,
+            'match_count': match_count,
+            'victories': victories,
+            'defeats': defeats,
+            'best_score': best_score,
+            'friends_count': friends_count,
+        }
+
+        return render(request, 'accounts/friend_profile.html', context)
+
+    except Exception as e:
+        # Log l'erreur et retourne un message d'erreur plus clair
+        logger.error(f"Erreur lors du chargement du profil de l'ami: {e}")
+        return HttpResponse("Erreur lors du chargement du profil de l'ami.", status=500)
+
+@login_required
+def remove_friend_view(request):
+    if request.method == 'POST':
+        try:
+            user_id = request.session.get('user_id')
+            if not user_id:
+                return JsonResponse({'status': 'error', 'message': 'Utilisateur non connecté'}, status=400)
+            
+            user = get_object_or_404(CustomUser, id=user_id)
+            friend_username = request.POST.get('friend_username')
+            logger.debug(f"friend_username = {friend_username}")
+            if not friend_username:
+                return JsonResponse({'status': 'error', 'message': 'Nom d\'utilisateur de l\'ami manquant'}, status=400)
+
+            friend = get_object_or_404(CustomUser, username=friend_username)
+
+            # Supprimer l'ami des listes d'amis de chaque utilisateur
+            if hasattr(user, 'profile') and hasattr(friend, 'profile'):
+                # On utilise la relation 'friends' qui contient des instances de CustomUser, et non de CustomUserProfile
+                user.profile.friends.remove(friend)  # Utilise directement l'instance de l'utilisateur
+                friend.profile.friends.remove(user)  # Utilise directement l'instance de l'utilisateur
+
+            return JsonResponse({'status': 'success', 'message': 'Ami supprimé avec succès'})
+
+        except Exception as e:
+            logger.error(f"Erreur lors de la suppression de l'ami: {e}")
+            return JsonResponse({'status': 'error', 'message': 'Erreur lors de la suppression de l\'ami'}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
 
 def get_user_profile_data(request):
     user = request.user
@@ -364,19 +440,38 @@ def add_friend(request):
         return JsonResponse({'status': 'error', 'message': 'Erreur lors de l\'envoi de la demande d\'ami'}, status=500)
     
 @login_required
+@csrf_protect
 def handle_friend_request(request):
     if request.method == 'POST':
-        request_id = request.POST.get('request_id')
-        action = request.POST.get('action')
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return JsonResponse({'status': 'error', 'message': 'Utilisateur non authentifié'}, status=403)
 
         try:
-            friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
+            # Récupérer l'utilisateur courant et son profil
+            user = get_object_or_404(CustomUser, id=user_id)
+            if not hasattr(user, 'profile'):
+                return JsonResponse({'status': 'error', 'message': 'Utilisateur sans profil valide.'}, status=400)
+
+            request_id = request.POST.get('request_id')
+            action = request.POST.get('action')
+            logger.debug(f"Request ID reçu : {request_id}")
+            logger.debug(f"Utilisateur {user.username} avec ID : {user_id}")
+
+            # Récupérer la demande d'ami
+            friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=user)
 
             if action == 'accept':
-                # Ajouter l'utilisateur aux amis et supprimer la demande
-                friend_request.from_user.profile.friends.add(request.user.profile)
-                request.user.profile.friends.add(friend_request.from_user.profile)
+                # Ajouter les deux utilisateurs comme amis (profil à profil)
+                user_profile = user.profile
+                from_user_profile = friend_request.from_user.profile
+
+                user_profile.friends.add(friend_request.from_user)
+                from_user_profile.friends.add(friend_request.to_user)
+
+                # Supprimer la demande d'ami
                 friend_request.delete()
+
                 return JsonResponse({'status': 'success', 'message': 'Demande d\'ami acceptée'})
 
             elif action == 'decline':
@@ -392,6 +487,8 @@ def handle_friend_request(request):
             return JsonResponse({'status': 'error', 'message': 'Erreur lors de la gestion de la demande d\'ami'}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
+
+
 
 @login_required
 def match_history_view(request):

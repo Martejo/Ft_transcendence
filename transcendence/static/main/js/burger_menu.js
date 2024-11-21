@@ -5,9 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleBurgerMenu();
         });
     }
+
+    // Initialiser les boutons des amis
+    initializeFriendButtons();
 });
-
-
 
 function toggleBurgerMenu() {
     const menu = document.getElementById('burger-menu');
@@ -15,11 +16,9 @@ function toggleBurgerMenu() {
 
     if (menu && overlay) {
         if (menu.style.display === 'block') {
-            // Masquer le menu
             menu.style.display = 'none';
             overlay.style.display = 'none';
         } else {
-            // Afficher le menu
             menu.style.display = 'block';
             overlay.style.display = 'block';
         }
@@ -27,43 +26,52 @@ function toggleBurgerMenu() {
 }
 
 function loadBurgerMenuData() {
+    console.log("Appel à loadBurgerMenuData"); // 1. Vérifier si la fonction est bien appelée
+
     $.ajax({
         url: '/accounts/get_burger_menu_data/',
         method: 'GET',
         success: function(data) {
-            console.log(data);
+            console.log("Réponse reçue de l'API :", data); // 2. Vérifier ce que l'API renvoie
+
             if (data.error) {
                 console.error('Erreur :', data.error);
                 return;
             }
-    
+
             // Mise à jour du nom d'utilisateur et de l'avatar
-            $('#profile-avatar').attr('src', data.avatar_url);
-            $('#profile-username').text(data.username);
+            $('#profile-avatar').attr('src', data.data.avatar_url);
+            $('#profile-username').text(data.data.username);
 
             // Mise à jour de la liste des amis
             const friendsListContainer = $('#friends-list-container');
             friendsListContainer.empty();
 
-            if (data.friends && data.friends.length > 0) {
-                data.friends.forEach(function(friend) {
+            console.log("Amis récupérés :", data.data.friends);
+
+            if (data.data.friends && data.data.friends.length > 0) {
+                data.data.friends.forEach(function(friend) {
                     const friendItem = `
                         <li class="d-flex align-items-center mb-2 friend-item">
                             <div class="position-relative">
                                 <img src="${friend.avatar_url}" alt="Avatar of ${friend.username}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
                                 <span class="status-indicator-friend ${friend.status === 'online' ? 'online' : 'offline'}"></span>
                             </div>
-                            <button class="friend-btn" onclick="showFriendPopup(event, '${friend.username}')">${friend.username}</button>
+                            <button class="friend-btn" data-username="${friend.username}">${friend.username}</button>
                         </li>
                     `;
                     friendsListContainer.append(friendItem);
                 });
             } else {
+                console.log("Aucun ami trouvé.");
                 friendsListContainer.html('<p class="text-center">Aucun ami pour le moment.</p>');
-            };
-              // Mise à jour des invitations d'amis
-              const friendRequests = data.data.friend_requests; // Assurez-vous d'accéder correctement aux donnée
-              updateFriendRequestsList(friendRequests);
+            }
+
+            // Mise à jour des invitations d'amis
+            updateFriendRequestsList(data.data.friend_requests);
+
+            // Réinitialiser les boutons des amis après mise à jour
+            initializeFriendButtons();
         },
         error: function(xhr, status, error) {
             console.error('Erreur lors du chargement des données du burger-menu :', error);
@@ -72,14 +80,14 @@ function loadBurgerMenuData() {
 }
 
 function updateFriendRequestsList(friendRequests) {
-    console.log('friendRequests reçu :', friendRequests); // Ajoutez ceci pour vérifier ce qui est reçu
+    console.log('friendRequests reçu :', friendRequests);
     if (!Array.isArray(friendRequests)) {
-        console.error('Les invitations d\'amis sont mal définies ou ne sont pas un tableau:', friendRequests);
-        friendRequests = []; // Définir un tableau vide par défaut
+        console.log("Les invitations d'amis sont mal définies ou ne sont pas un tableau:", friendRequests);
+        friendRequests = [];
     }
 
     const friendRequestsListElement = document.getElementById('friend-requests-list-container');
-    friendRequestsListElement.innerHTML = ''; // Vider la liste actuelle
+    friendRequestsListElement.innerHTML = '';
 
     if (friendRequests.length === 0) {
         friendRequestsListElement.innerHTML = '<p class="text-center">Aucune invitation pour le moment.</p>';
@@ -104,5 +112,101 @@ function updateFriendRequestsList(friendRequests) {
     }
 }
 
+function setStatus(status) {
+    const statusIndicator = document.getElementById('status-indicator');
+    if (status === 'online') {
+        statusIndicator.classList.add('online');
+        statusIndicator.classList.remove('offline');
+    } else if (status === 'offline') {
+        statusIndicator.classList.add('offline');
+        statusIndicator.classList.remove('online');
+    }
+}
 
+function showFriendPopup(event, friendName) {
+    event.stopPropagation();
+    const popup = document.getElementById('friendPopup');
+    document.getElementById('popupFriendName').innerText = friendName;
+
+    popup.classList.remove('d-none');
+    const popupWidth = popup.offsetWidth;
+    const popupHeight = popup.offsetHeight;
+
+    const menu = document.getElementById('burger-menu');
+    const menuRect = menu.getBoundingClientRect();
+    const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
+    const mouseY = event.clientY - menuRect.top + menu.scrollTop;
+
+    let top, left;
+
+    if (mouseY < 250 && window.innerWidth - mouseX < 175) {
+        top = mouseY + popupHeight;
+        left = mouseX - (popupWidth / 2);
+    } else if (mouseY < 250 && window.innerWidth - mouseX >= 175) {
+        top = mouseY + popupHeight;
+        left = mouseX + (popupWidth / 2);
+    } else if (mouseY >= 250 && window.innerWidth - mouseX >= 175) {
+        top = mouseY;
+        left = mouseX + (popupWidth / 2);
+    } else {
+        top = mouseY;
+        left = mouseX - (popupWidth / 2);
+    }
+
+    popup.style.top = `${top}px`;
+    popup.style.left = `${left}px`;
+
+    document.addEventListener('click', closePopupOnClickOutside);
+}
+
+function closePopupOnClickOutside(event) {
+    const popup = document.getElementById('friendPopup');
+    if (!popup.contains(event.target) && !event.target.closest('.friend-item')) {
+        popup.classList.add('d-none');
+        document.removeEventListener('click', closePopupOnClickOutside);
+    }
+}
+
+function handleOption(option) {
+    const friendName = document.getElementById('popupFriendName').innerText;
+
+    if (option === 'Voir le profil') {
+        loadContent('accounts', `friend_profile/${friendName}`);
+    } else {
+        alert(`${option} sélectionné`);
+    }
+
+    document.getElementById('friendPopup').classList.add('d-none');
+}
+
+function initializeFriendButtons() {
+    document.querySelectorAll('.friend-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            showFriendPopup(event, this.dataset.username);
+        });
+    });
+}
+
+function handleRemoveFriend(friendUsername) {
+    $.ajax({
+        url: '/accounts/remove_friend/',
+        method: 'POST',
+        data: {
+            'friend_username': friendUsername,
+            'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                alert(response.message);
+                // Recharger la liste des amis après suppression
+                loadBurgerMenuData();
+            } else {
+                console.error('Erreur lors de la suppression de l\'ami :', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erreur lors de la suppression de l\'ami :', error);
+        }
+    });
+}
 

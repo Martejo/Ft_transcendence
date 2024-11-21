@@ -33,6 +33,9 @@ urlpatterns = [
     path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
 	
     path('add_friend/', views.add_friend, name='add_friend'),
+    path('handle_friend_request/', views.handle_friend_request, name='handle_friend_request'),
+	path('friend_profile/<str:friend_username>/', views.friend_profile_view, name='friend_profile'),
+    path('remove_friend/', views.remove_friend_view, name='remove_friend'),
 
 
 

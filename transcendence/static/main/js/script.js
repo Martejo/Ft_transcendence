@@ -177,13 +177,13 @@ $(document).on('submit', '#add-friend-form', function(event) {
 
 
 function handleFriendRequest(requestId, action) {
+    console.log('Handlefriendrequest request id = ', requestId);
     $.ajax({
         url: '/accounts/handle_friend_request/',
         method: 'POST',
         data: {
             request_id: requestId,
             action: action,
-            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
         },
         success: function(response) {
             if (response.status === 'success') {

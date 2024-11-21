@@ -89,7 +89,8 @@
         <p id="popupFriendName" class="fw-bold mb-1 d-flex align-items-center justify-content-center">Options</p>
         <button class="btn btn-profil mb-2" onclick="handleOption('Voir le profil')">Voir profil</button>
         <button class="btn btn-invit mb-2" onclick="handleOption('Inviter à jouer')">Inviter à jouer</button>
-        <button class="btn btn-delete" onclick="handleOption('Supprimer')">Supprimer</button>
+        <button class="btn btn-delete" onclick="handleRemoveFriend(document.getElementById('popupFriendName').innerText)">Supprimer</button>
+
     </div>
 </div>
 
@@ -168,81 +169,3 @@
         cursor: pointer;
     }
 </style>
-
-<!-- Script pour changer la couleur de la pastille -->
-<script>
-    function setStatus(status) {
-        const statusIndicator = document.getElementById('status-indicator');
-        if (status === 'online') {
-            statusIndicator.classList.add('online');
-            statusIndicator.classList.remove('offline');
-        } else if (status === 'offline') {
-            statusIndicator.classList.add('offline');
-            statusIndicator.classList.remove('online');
-        }
-    }
-
-    function showFriendPopup(event, friendName) {
-        event.stopPropagation(); // Empêche la propagation pour éviter les déclenchements accidentels
-
-        const popup = document.getElementById('friendPopup');
-        document.getElementById('popupFriendName').innerText = friendName;
-
-        // Rendre la popup visible pour obtenir ses dimensions
-        popup.classList.remove('d-none');
-        const popupWidth = popup.offsetWidth;
-        const popupHeight = popup.offsetHeight;
-
-        // Récupère la position du clic par rapport au menu burger
-        const menu = document.getElementById('burger-menu');
-        const menuRect = menu.getBoundingClientRect();
-        const X = event.clientX;
-        const Y = event.clientY;
-        const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
-        const mouseY = event.clientY - menuRect.top + menu.scrollTop;
-
-        // Variables pour positionner la popup
-        let top, left;
-
-        // Logique pour coller la popup en fonction de la position du clic
-        if (Y < 250 && window.innerWidth - X < 175) {
-            // Si le clic est en haut a droite, afficher en bas à gauche du clic
-            top = mouseY + popupHeight;
-            left = mouseX - (popupWidth / 2);
-        } else if (Y < 250 && window.innerWidth - X >= 175) {
-            // Si le clic est en haut a gauche, afficher en bas à droite du clic
-            top = mouseY + popupHeight;
-            left = mouseX + (popupWidth / 2);
-        } else if (Y >= 250 && window.innerWidth - X >= 175) {
-            // Si le clic est sur tout le coté gauche sauf en haut, afficher en haut à droite du clic
-            top = mouseY;
-            left = mouseX + (popupWidth / 2);
-        } else {
-            // Par défaut, afficher en haut à gauche du clic
-            top = mouseY;
-            left = mouseX - (popupWidth / 2);
-        }
-
-        // Appliquer les styles calculés pour coller la popup au clic
-        popup.style.top = `${top}px`;
-        popup.style.left = `${left}px`;
-
-        // Fermer la popup si on clique en dehors
-        document.addEventListener('click', closePopupOnClickOutside);
-    }
-
-    function closePopupOnClickOutside(event) {
-        const popup = document.getElementById('friendPopup');
-
-        // Vérifie si le clic est en dehors du popup ou du déclencheur (amis)
-        if (!popup.contains(event.target) && !event.target.closest('.friend-item')) {
-            popup.classList.add('d-none'); // Cache la popup
-            document.removeEventListener('click', closePopupOnClickOutside);
-        }
-    }
-
-    function handleOption(option) {
-        alert(option + " sélectionné");
-        document.getElementById('friendPopup').classList.add('d-none');
-    }
-</script>
