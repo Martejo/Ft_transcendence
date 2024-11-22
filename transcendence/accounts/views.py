@@ -11,6 +11,11 @@ from .utils import hash_password, verify_password
 from .decorators import login_required
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 import pyotp
 import jwt
@@ -73,12 +78,21 @@ def submit_login(request):
                     return JsonResponse({'status': 'success', 'requires_2fa': True})
                 
                 # Mise à jour de la session pour `is_authenticated`
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
+
                 request.session['is_authenticated'] = True
                 user.profile.is_online = True
                 user.profile.is_logged_in = True
                 user.profile.save()
-                return JsonResponse({'status': 'success', 'requires_2fa': False})
-            
+                return JsonResponse({
+                    'status': 'success',
+                    'access': access_token,
+                    'refresh': refresh_token,
+                    'requires_2fa': False
+                })
+
             return JsonResponse({'status': 'error', 'message': 'Mot de passe incorrect'})
         except CustomUser.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Identifiants incorrects'})
@@ -98,57 +112,15 @@ def logout_view(request):
     return JsonResponse({'status': 'success', 'message': 'Déconnexion réussie.'})
 
 
-
-
-# @login_required
-# def get_burger_menu_data(request):
-#     user_id = request.session.get('user_id')
-#     user = get_object_or_404(CustomUser, id=user_id)  # Assurez-vous que c'est un objet CustomUser
-#     logger.debug("Coucou je suis dans get_burger-menu_data")
-#     try:
-#         friends = [
-#             {
-#                 'username': friend.username,
-#                 'avatar_url': friend.profile.avatar.url if hasattr(friend, 'profile') and friend.profile.avatar else '/static/main/images/default_avatar.png',
-#                 'status': 'online' if hasattr(friend, 'profile') and friend.profile.is_online else 'offline'
-#             }
-#             for friend in user.profile.friends.all()
-# ]
-
-
-#         # response_data = {
-#         #     'username': user.username,
-#         #     'email': user.email,
-#         #     'avatar_url': user.profile.avatar if user.profile.avatar else '/static/main/images/default_avatar.png',
-#         #     'is_online': user.profile.is_online,  # Ajoute le statut en ligne de l'utilisateur
-#         #     'bio': user.profile.bio,  # Ajoute la bio de l'utilisateur
-#         #     'friends': friends,
-#         # }
-#         logger.debug("Coucou j'ai passé la collecte de friends")
-#         return render(request, {
-#             'username': user.username,
-#             'email': user.email,
-#             'avatar_url': user.profile.avatar.url if user.profile.avatar.url else '/static/main/images/default_avatar.png',
-#             'is_online': user.profile.is_online,  # Ajoute le statut en ligne de l'utilisateur
-#             'bio': user.profile.bio,  # Ajoute la bio de l'utilisateur
-#             'friends': friends,
-#             }
-#         )
-#         # return JsonResponse(response_data)
-
-#     except Exception as e:
-#         return JsonResponse({'error': str(e)}, status=500)
-
-#     except Exception as e:
-#         return JsonResponse({'error': str(e)}, status=500)
-    
-
-@login_required
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def get_burger_menu_data(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(CustomUser, id=user_id)
+    user = request.user  # Récupérer l'utilisateur directement du JWT
     user.profile.refresh_from_db()  # Recharge l'objet utilisateur de la base de données
-    logger.debug(f"User ID: {user_id}")
+    # logger.debug(f"User ID: {user_id}")
     logger.debug(f"User avatar from relation: {user.profile.avatar}")
     logger.debug(f"Statut après refresh_from_db pour {user.username}: {user.profile.is_online}")
 
@@ -195,7 +167,9 @@ def get_burger_menu_data(request):
         logger.error(f"Erreur lors de la récupération des données du menu burger: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_protect
 def update_status(request):
     if request.method == 'POST':
@@ -225,7 +199,9 @@ def update_status(request):
 
 
 
-@login_required
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_protect
 def friend_profile_view(request, friend_username):
     logger.debug("Entre dans friend_profile_view")
@@ -271,7 +247,10 @@ def friend_profile_view(request, friend_username):
         logger.error(f"Erreur lors du chargement du profil de l'ami: {e}")
         return HttpResponse("Erreur lors du chargement du profil de l'ami.", status=500)
 
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+@csrf_protect
 def remove_friend_view(request):
     if request.method == 'POST':
         try:
@@ -316,7 +295,9 @@ def get_user_profile_data(request):
 ############ Gestion de profil #############
 
 @csrf_protect
-@login_required
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def manage_profile_view(request):
     logger.debug("Entre dans manage_profile_view")
     user_id = request.session.get('user_id')
@@ -336,7 +317,9 @@ def manage_profile_view(request):
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def update_profile_view(request):
     logger.debug("Entre dans update_profile_view")
     user_id = request.session.get('user_id')
@@ -352,7 +335,9 @@ def update_profile_view(request):
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def change_password_view(request):
     logger.debug("Entre dans change_password_view")
     user_id = request.session.get('user_id')
@@ -375,7 +360,9 @@ def change_password_view(request):
 
 
 @csrf_protect
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def update_avatar_view(request):
     logger.debug("Entre dans update_avatar_view")
     user_id = request.session.get('user_id')
@@ -393,13 +380,16 @@ def update_avatar_view(request):
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect
-@login_required
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def profile_view(request):
     logger.debug("Entre dans profile_view")
-    user_id = request.session.get('user_id')
-    logger.info(f"Tentative de chargement du profil de l'utilisateur avec user_id: {user_id}")
+    #user_id = request.session.get('user_id')
+    #logger.info(f"Tentative de chargement du profil de l'utilisateur avec user_id: {user_id}")
     try:
-        user = get_object_or_404(CustomUser, id=user_id)
+        #user = get_object_or_404(CustomUser, id=user_id)
+        user = request.user  # Récupérer l'utilisateur directement du JWT
         logger.info(f"Utilisateur trouvé: {user.username}")
 
         # Calculer des données supplémentaires pour l'utilisateur
@@ -444,7 +434,9 @@ def profile_view(request):
 ############## Fin de gestion de profil ###############
 
 
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def add_friend(request):
     try:
         user_id = request.session.get('user_id')
@@ -472,7 +464,9 @@ def add_friend(request):
         logger.error(f"Erreur lors de l'envoi d'une demande d'ami: {e}")
         return JsonResponse({'status': 'error', 'message': 'Erreur lors de l\'envoi de la demande d\'ami'}, status=500)
     
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_protect
 def handle_friend_request(request):
     if request.method == 'POST':
@@ -523,7 +517,10 @@ def handle_friend_request(request):
 
 
 
-@login_required
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def match_history_view(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(CustomUser, id=user_id)

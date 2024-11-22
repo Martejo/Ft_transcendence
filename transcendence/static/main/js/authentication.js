@@ -22,6 +22,10 @@ function initializeLoginView() {
                         console.log("succes");
                         window.location.hash = '#accounts-verify_2fa_login';
                     } else {
+                        // Stocker les tokens dans `sessionStorage`
+                        sessionStorage.setItem('accessToken', response.access);
+                        sessionStorage.setItem('refreshToken', response.refresh);
+
                         // Attendre un petit délai avant de charger la nouvelle barre de navigation
                         setTimeout(function() {
                             window.isAuthenticated = true; // L'utilisateur est maintenant connecté

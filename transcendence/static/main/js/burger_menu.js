@@ -25,6 +25,32 @@ function toggleBurgerMenu() {
     }
 }
 
+function refreshAccessToken() {
+    const refreshToken = sessionStorage.getItem('refreshToken');
+    if (!refreshToken) {
+        console.error('Refresh token manquant. Impossible de rafraîchir le token JWT.');
+        return;
+    }
+
+    $.ajax({
+        url: '/api/token/refresh/',
+        method: 'POST',
+        data: {
+            'refresh': refreshToken
+        },
+        success: function(response) {
+            console.log('Nouveau token JWT obtenu');
+            sessionStorage.setItem('accessToken', response.access);
+        },
+        error: function(xhr, status, error) {
+            console.error('Erreur lors de la tentative de rafraîchissement du token JWT :', error);
+            // Rediriger vers la page de connexion
+            window.location.hash = '#accounts-login';
+        }
+    });
+}
+
+
 function loadBurgerMenuData() {
     console.log("Appel à loadBurgerMenuData");
 

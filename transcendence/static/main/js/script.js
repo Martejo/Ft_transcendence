@@ -13,14 +13,22 @@ function getCSRFToken() {
     return '';
 }
 
-// Configurer les requêtes AJAX pour inclure le token CSRF
+// Configurer les requêtes AJAX pour inclure le token CSRF et le JWT si disponible
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
+        // Ajouter le token CSRF pour les requêtes autres que GET, HEAD, OPTIONS, TRACE
         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
             xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
         }
+
+        // Ajouter l'en-tête `Authorization` si un accessToken est disponible
+        const accessToken = sessionStorage.getItem('accessToken');
+        if (accessToken) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        }
     }
 });
+
 
 // Charger les modules en fonction des vues
 $(window).on('hashchange', handleHashChange);
@@ -82,18 +90,18 @@ function loadNavbar() {
 }
 
 function loadContent(app, view) {
-    $.ajax({
-        url: `/${app}/${view}/`,
-        method: 'GET',
-        success: function(response) {
-            $('#content').html(response);
-            initializeView(app, view);
-        },
-        error: function(error) {
-            console.error("Erreur lors du chargement de la vue :", error);
-            $('#content').html('<p>Une erreur est survenue lors du chargement de la page.</p>');
-        }
-    });
+        $.ajax({
+            url: `/${app}/${view}/`,
+            method: 'GET',
+            success: function(response) {
+                $('#content').html(response);
+                initializeView(app, view);
+            },
+            error: function(error) {
+                console.error("Erreur lors du chargement de la vue :", error);
+                $('#content').html('<p>Une erreur est survenue lors du chargement de la page.</p>');
+            }
+        });
 }
 
 $(document).on('click', '#login-btn', function(event) {

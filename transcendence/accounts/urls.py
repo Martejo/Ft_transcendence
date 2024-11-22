@@ -2,6 +2,10 @@
 from django.urls import path
 from . import views
 import logging
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -49,5 +53,10 @@ urlpatterns = [
     path('update-avatar/', views.update_avatar_view, name='update_avatar'),
     path('log-guest/', views.log_guest_view, name='log_guest'),
 	path('verify_2fa_login/', views.verify_2fa_login, name='verify_2fa_login'),
+	
+
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 ]
