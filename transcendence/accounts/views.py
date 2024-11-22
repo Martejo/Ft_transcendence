@@ -68,18 +68,17 @@ def submit_login(request):
             if verify_password(user.password_hash, password):
                 request.session['user_id'] = user.id
                 
-                # Mise à jour de l'état `is_logged_in`
-                user.profile.is_logged_in = True
-                user.profile.save()
-
-                # Mise à jour de la session pour `is_authenticated`
-                request.session['is_authenticated'] = True
-
                 if user.is_2fa_enabled:
                     request.session['auth_partial'] = True
                     return JsonResponse({'status': 'success', 'requires_2fa': True})
                 
+                # Mise à jour de la session pour `is_authenticated`
+                request.session['is_authenticated'] = True
+                user.profile.is_online = True
+                user.profile.is_logged_in = True
+                user.profile.save()
                 return JsonResponse({'status': 'success', 'requires_2fa': False})
+            
             return JsonResponse({'status': 'error', 'message': 'Mot de passe incorrect'})
         except CustomUser.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Identifiants incorrects'})
@@ -148,12 +147,14 @@ def logout_view(request):
 def get_burger_menu_data(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(CustomUser, id=user_id)
+    user.profile.refresh_from_db()  # Recharge l'objet utilisateur de la base de données
     logger.debug(f"User ID: {user_id}")
     logger.debug(f"User avatar from relation: {user.profile.avatar}")
+    logger.debug(f"Statut après refresh_from_db pour {user.username}: {user.profile.is_online}")
 
     try:
         default_avatar = '/media/avatars/default_avatar.png'
-        
+
         # Construction de la liste des amis
         friends = [
             {
@@ -168,7 +169,7 @@ def get_burger_menu_data(request):
         friend_requests = [
             {
                 'id': friend_request.id,
-                'from_user': friend_request.from_user.username,  # Utilisation correcte de `from_user`
+                'from_user': friend_request.from_user.username,
                 'avatar_url': friend_request.from_user.profile.avatar.url if hasattr(friend_request.from_user, 'profile') and friend_request.from_user.profile.avatar else default_avatar
             }
             for friend_request in FriendRequest.objects.filter(to_user=user)
@@ -185,11 +186,43 @@ def get_burger_menu_data(request):
             'friend_requests': friend_requests,
         }
 
-        return JsonResponse({'status': 'success', 'data': response_data})
+        response = JsonResponse({'status': 'success', 'data': response_data})
+        response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response['Pragma'] = 'no-cache'
+        return response
 
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des données du menu burger: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+@csrf_protect
+def update_status(request):
+    if request.method == 'POST':
+        try:
+            user_id = request.session.get('user_id')
+            user = get_object_or_404(CustomUser, id=user_id)
+            status = request.POST.get('status')
+            
+            if status == 'online':
+                user.profile.is_online = True
+            elif status == 'offline':
+                user.profile.is_online = False
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Statut non valide'}, status=400)
+            
+            user.profile.save()
+            user.profile.refresh_from_db()  # Recharge l'objet de la base de données après la sauvegarde
+
+            logger.info(f"Statut mis à jour pour {user.username}: {user.profile.is_online}")
+            return JsonResponse({'status': 'success', 'message': 'Statut mis à jour avec succès', 'is_online': user.profile.is_online})
+        
+        except Exception as e:
+            logger.error(f"Erreur lors de la mise à jour du statut : {e}")
+            return JsonResponse({'status': 'error', 'message': 'Erreur lors de la mise à jour du statut'}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
+
 
 
 @login_required

@@ -27,6 +27,17 @@ $(window).on('hashchange', handleHashChange);
 
 $(document).ready(function() {
     loadNavbar();
+    
+    $(document).on('navbarLoaded', function() {
+        // Vérifie si le bouton burger est présent pour un utilisateur connecté
+        if ($('#burger-menu-toggle').length > 0) {
+            console.log("Utilisateur connecté - initialisation du rafraîchissement du menu burger.");
+            loadBurgerMenuData();
+
+            // Rafraîchit toutes les 10 secondes si l'utilisateur est connecté
+            setInterval(loadBurgerMenuData, 10000);
+        }
+    });
     handleHashChange();
 });
 
@@ -47,28 +58,28 @@ function handleHashChange() {
 
 
 function loadNavbar() {
-    console.log("Rentre dans loadnavbar");
+    console.log("Rentre dans loadNavbar");
     $.ajax({
-        url: '/core/get_navbar/',  //?_=' + new Date().getTime(), // Ajoute un timestamp pour éviter la mise en cache
+        url: '/core/get_navbar/',
         method: 'GET',
         success: function(response) {
             $('#navbar').html(response);
 
-            // Attachez l'événement burger menu uniquement si l'utilisateur est connecté
-            // Vérifiez si l'élément `burger-menu-toggle` est présent dans la réponse
+            // Vérifie si l'élément `burger-menu-toggle` est présent
             if ($('#burger-menu-toggle').length > 0) {
                 console.log("Rentre dans if burger");
                 loadBurgerMenuData();
                 $('#burger-menu-toggle').on('click', toggleBurgerMenu);
             }
+
             console.log("Navbar chargée.");
+            $(document).trigger('navbarLoaded'); // Déclenche un événement personnalisé lorsque la navbar est chargée
         },
         error: function(xhr) {
             console.error('Erreur lors du chargement de la barre de navigation :', xhr);
         }
     });
 }
-
 
 function loadContent(app, view) {
     $.ajax({

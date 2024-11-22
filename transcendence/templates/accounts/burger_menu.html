@@ -3,7 +3,7 @@
     <div class="profile-section text-center mt-4 position-relative">
         <div class="position-relative d-inline-block">
             <img id="profile-avatar" src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle mb-2" style="width: 80px; height: 80px;">
-            <span id="status-indicator" class="status-indicator {% if user.profile.is_online %}online{% else %}offline{% endif %}"></span>
+            <span id="status-indicator" class="status-indicator {% if is_online %}online{% else %}offline{% endif %}"></span>
         </div>
         <h5 id="profile-username" class="mb-0">{{ user.username }}</h5>
     </div>

@@ -26,13 +26,14 @@ function toggleBurgerMenu() {
 }
 
 function loadBurgerMenuData() {
-    console.log("Appel à loadBurgerMenuData"); // 1. Vérifier si la fonction est bien appelée
+    console.log("Appel à loadBurgerMenuData");
 
     $.ajax({
         url: '/accounts/get_burger_menu_data/',
         method: 'GET',
+        cache: false,  // Empêche la mise en cache
         success: function(data) {
-            console.log("Réponse reçue de l'API :", data); // 2. Vérifier ce que l'API renvoie
+            console.log("Réponse reçue de l'API :", data);
 
             if (data.error) {
                 console.error('Erreur :', data.error);
@@ -42,6 +43,14 @@ function loadBurgerMenuData() {
             // Mise à jour du nom d'utilisateur et de l'avatar
             $('#profile-avatar').attr('src', data.data.avatar_url);
             $('#profile-username').text(data.data.username);
+
+            // Mise à jour du statut en ligne du profil
+            const statusIndicator = $('#status-indicator');
+            if (data.data.is_online) {
+                statusIndicator.addClass('online').removeClass('offline');
+            } else {
+                statusIndicator.addClass('offline').removeClass('online');
+            }
 
             // Mise à jour de la liste des amis
             const friendsListContainer = $('#friends-list-container');
@@ -79,6 +88,13 @@ function loadBurgerMenuData() {
     });
 }
 
+function initializeFriendButtons() {
+    $('.friend-btn').off('click').on('click', function(event) {
+        const friendName = $(this).data('username');
+        showFriendPopup(event, friendName);
+    });
+}
+
 function updateFriendRequestsList(friendRequests) {
     console.log('friendRequests reçu :', friendRequests);
     if (!Array.isArray(friendRequests)) {
@@ -113,15 +129,36 @@ function updateFriendRequestsList(friendRequests) {
 }
 
 function setStatus(status) {
-    const statusIndicator = document.getElementById('status-indicator');
-    if (status === 'online') {
-        statusIndicator.classList.add('online');
-        statusIndicator.classList.remove('offline');
-    } else if (status === 'offline') {
-        statusIndicator.classList.add('offline');
-        statusIndicator.classList.remove('online');
-    }
+    // Envoi de la requête AJAX pour mettre à jour le statut dans la base de données
+    $.ajax({
+        url: '/accounts/update_status/',
+        method: 'POST',
+        data: {
+            status: status,
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                console.log('Statut mis à jour avec succès');
+
+                // Utiliser la réponse du serveur pour mettre à jour l'indicateur de statut
+                const statusIndicator = $('#status-indicator');
+                if (statusIndicator) {
+                    if (response.is_online) {
+                        statusIndicator.addClass('online').removeClass('offline');
+                    } else {
+                        statusIndicator.addClass('offline').removeClass('online');
+                    }
+                }
+            } else {
+                console.error('Erreur lors de la mise à jour du statut :', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erreur lors de l\'envoi de la requête AJAX :', error);
+        }
+    });
 }
+
 
 function showFriendPopup(event, friendName) {
     event.stopPropagation();
@@ -177,14 +214,6 @@ function handleOption(option) {
     }
 
     document.getElementById('friendPopup').classList.add('d-none');
-}
-
-function initializeFriendButtons() {
-    document.querySelectorAll('.friend-btn').forEach(button => {
-        button.addEventListener('click', function(event) {
-            showFriendPopup(event, this.dataset.username);
-        });
-    });
 }
 
 function handleRemoveFriend(friendUsername) {
