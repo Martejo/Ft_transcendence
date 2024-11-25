@@ -54,7 +54,14 @@ function initializeLogin2FAView() {
             data: $(this).serialize(),
             success: function(response) {
                 if (response.status === 'success') {
-                    window.location.href = '#accounts-profile';
+                    sessionStorage.setItem('accessToken', response.access);
+                    sessionStorage.setItem('refreshToken', response.refresh);
+                    // Attendre un petit délai avant de charger la nouvelle barre de navigation
+                    setTimeout(function() {
+                    window.isAuthenticated = true; // L'utilisateur est maintenant connecté
+                    loadNavbar();
+                    window.location.hash = '#accounts-profile';
+                }, 500); // 500 ms de délai
                 } else {
                     alert(response.message);
                 }

@@ -585,7 +585,9 @@ def log_guest_view(request):
 # ///////////////////////////----2FA----///////////////////////////////////
 
 @csrf_protect
-@login_required
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def enable_2fa(request):
     logger.debug("Entre dans enable2FA_view")
     """
@@ -628,7 +630,10 @@ def enable_2fa(request):
 
 
 @csrf_protect
-@login_required
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def verify_2fa(request):
     logger.debug("Entre dans verify_2fa")
 
@@ -718,7 +723,21 @@ def verify_2fa_login(request):
             if totp.verify(code):
                 logger.debug("2FA vérifié avec succès pour l'utilisateur ID: %d", user.id)
                 del request.session['auth_partial']
-                return JsonResponse({'status': 'success', 'message': '2FA verified. Login successful.'})
+                
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
+
+                request.session['is_authenticated'] = True
+                user.profile.is_online = True
+                user.profile.is_logged_in = True
+                user.profile.save()
+                return JsonResponse({
+                    'status': 'success',
+                    'access': access_token,
+                    'refresh': refresh_token,
+                    'message': '2FA verified. Login successful.'
+                })
             else:
                 logger.warning("Code 2FA invalide pour l'utilisateur ID: %d", user.id)
                 form.add_error('code', "Invalid 2FA code entered.")
@@ -734,7 +753,8 @@ def verify_2fa_login(request):
 
 
 @csrf_protect
-@login_required
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def disable_2fa(request):
     logger.debug("Entre dans disable_2fa")
 

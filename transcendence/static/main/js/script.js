@@ -138,8 +138,10 @@ function initializeView(app, view) {
     if (app === 'core' && view === 'home') {
         initializeHomeView();
     } else if (app === 'accounts' && view === 'login') {
+        adjustContainer('login');
         initializeLoginView();
     } else if (app === 'accounts' && view === 'register') {
+        adjustContainer('register');
         initializeRegisterView();
     } else if (app === 'accounts' && view === 'profile') {
         initializeProfileView();

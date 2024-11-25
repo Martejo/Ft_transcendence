@@ -31,7 +31,8 @@
 </head>
 <body>
     <!-- Conteneur pour l'animation -->
-	<div id="ground-game" class=" backg d-flex justify-content-center align-items-center" style="height: calc(100vh - 50px); ">
+	<!-- Conteneur pour l'animation -->
+	<div id="ground-game" class=" backg d-flex justify-content-center align-items-center position-fixed" style="height: var(--sin-nav-height); width: 100%; ">
 		<div class="terrain position-relative">
 			<div class="balle position-absolute"></div>
 			<div class="ligne-centrale position-absolute"></div>
@@ -42,13 +43,30 @@
 		</div>
 	</div>
 
-    <div id="navbar">
 
+    <div class="mask"></div>
+    
+    <div id="navbar">
+            <!--Injection navbar et menu-->
     </div>
-    <div id="content">
+    <div id="content" class=" d-flex justify-content-center align-items-center" style="min-height: 100vh; z-index: 2;">
         <!-- Le contenu dynamique sera chargé ici -->
-   
     </div>
+
+    <style>
+		.mask {
+			position: fixed; /* Couvrir la zone de .terrain */
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 1; /* S’assurer que le masque est au-dessus du contenu .terrain */
+			-webkit-backdrop-filter: blur(10px);
+			backdrop-filter: blur(10px);
+			pointer-events: none; /* Ignorer les clics */
+		}
+	</style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
