@@ -22,6 +22,7 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
+    path('delete_account/', views.delete_account, name='delete_account'),
 
 
     ###### Gestion de profil ######

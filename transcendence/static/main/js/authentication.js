@@ -91,3 +91,28 @@ function addMenuButton() {
     `;
     document.getElementById("navbar-right").innerHTML = menuButton;
 }
+
+$(document).on('click', '#delete-account-btn', function(event) {
+    event.preventDefault();
+
+    // Demande de confirmation à l'utilisateur
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
+        $.ajax({
+            url: '/accounts/delete_account/', 
+            method: 'DELETE', // Utilisation de la méthode DELETE
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Rediriger l'utilisateur vers la page d'accueil après la suppression
+                    window.location.href = '/';
+                } else {
+                    // Afficher un message d'erreur en cas de problème
+                    alert('Une erreur est survenue : ' + response.message);
+                }
+            },
+            error: function(error) {
+                // Gérer les erreurs inattendues
+                alert('Une erreur est survenue. Veuillez réessayer.');
+            }
+        });
+    }
+});

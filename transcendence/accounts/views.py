@@ -334,6 +334,22 @@ def update_profile_view(request):
 
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
+@login_required
+@csrf_exempt  # Nécessaire car on fait une requête DELETE
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    logger.debug("Entre dans delete account")
+    if request.method == 'DELETE':
+        user_id = request.session.get('user_id')
+        user = get_object_or_404(CustomUser, id=user_id)        
+        # Supprime l'utilisateur et tous les objets liés
+        user.delete()
+
+        return JsonResponse({'status': 'success', 'message': 'Votre compte a été supprimé avec succès.'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Requête invalide.'}, status=400)
+
 @csrf_protect
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])

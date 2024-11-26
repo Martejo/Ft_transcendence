@@ -82,10 +82,11 @@
 			<div class="card">
 				<div class="card-body p-4">
 					<h5 class="card-title mb-2 text-danger">Supprimer le compte</h5>
-					<form action="/delete-account" method="POST"> <!--A FAIRE-->
-						<p class="text-white info mb-3">Cette action est irréversible. Votre compte sera définitivement supprimé.</p>
-						<button type="submit" class="btn btn-danger delete w-90 mt-2 mb-1">Supprimer mon compte</button>
-					</form>
+					<form id="delete-account-form">
+                        <p class="text-white info mb-3">Cette action est irréversible. Votre compte sera définitivement supprimé.</p>
+                        <button type="button" id="delete-account-btn" class="btn btn-danger delete w-90 mt-2 mb-1">Supprimer mon compte</button>
+                    </form>
+                    
 				</div>
 			</div>
 		</div>
