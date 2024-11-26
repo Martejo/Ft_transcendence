@@ -28,7 +28,7 @@ def game_menu_view(request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def invite_game_view(request):
+def invite_tournament_view(request):
     if request.method == 'GET':
         try:
             user = request.user
@@ -44,6 +44,31 @@ def invite_game_view(request):
 
             # Construction des données de la réponse
             return render(request, 'game/invite_game.html', {'friends':friends})
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération des données de invite game: {e}")
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def invite_game_view(request):
+    if request.method == 'GET':
+        try:
+            user = request.user
+            default_avatar = '/media/avatars/default_avatar.png'
+            friends = [
+                {
+                    'username': friend.username,
+                    'avatar_url': friend.profile.avatar.url if hasattr(friend, 'profile') and friend.profile.avatar else default_avatar,
+                    'status': 'online' if hasattr(friend, 'profile') and friend.profile.is_online else 'offline'
+                }
+                for friend in user.profile.friends.all()
+            ]
+
+            # Construction des données de la réponse
+            return render(request, 'game/invite_tournament.html', {'friends':friends})
         except Exception as e:
             logger.error(f"Erreur lors de la récupération des données de invite game: {e}")
             return JsonResponse({'error': str(e)}, status=500)

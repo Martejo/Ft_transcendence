@@ -12,13 +12,13 @@
     <div class="status-selector text-center p-3 border-bottom">
         <button class="btn btn-success btn-sm me-2" style="width: 100px;" onclick="setStatus('online')">En ligne</button>
         <button class="btn btn-danger btn-sm" style="width: 100px;" onclick="setStatus('offline')">Hors ligne</button>
-        <button id="profile-btn" class="btn btn-primary mt-3 mb-2" style="width: 80%;">Voir le profil</button>
+        <button id="profile-btn" class="btn btn-primary mt-3 mb-2" style="width: 80%;" onclick="window.location.hash='#accounts-profile'">Voir le profil</button>
     </div>
 
     <div class="nav flex-column border-bottom p-2">
-		<a href="#game" class="nav-link" style="color: rgb(153, 148, 148)" id="play-btn">Jouer</a>
-		<a href="#tournament" class="nav-link" style="color: rgb(153, 148, 148)" id="tournament-link">Tournoi</a>
-        <a href="#account" class="nav-link" style="color: rgb(153, 148, 148)" id="settings-link">Gestion du compte</a>
+		<button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="play-btn" onclick="window.location.hash='#game-game_menu'">Jouer</button>
+		<button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="tournament-link" onclick="window.location.hash='#game-invite_tournament'">Tournoi</button>
+        <button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="settings-link"  onclick="window.location.hash='#accounts-gestion_profil'">Gestion du compte</button>
     </div>
 
     <!-- Formulaire pour ajouter un ami -->

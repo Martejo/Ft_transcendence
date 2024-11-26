@@ -30,7 +30,7 @@ function initializeLoginView() {
                         setTimeout(function() {
                             window.isAuthenticated = true; // L'utilisateur est maintenant connecté
                             loadNavbar();
-                            window.location.hash = '#accounts-profile';
+                            window.location.hash = '#game-play';
                         }, 500); // 500 ms de délai
                     }
                 } else {

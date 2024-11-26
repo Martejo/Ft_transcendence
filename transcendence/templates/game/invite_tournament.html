@@ -1,23 +1,9 @@
 <div id="invite-container" class="container-fluid text-center d-flex flex-column align-items-center col-12" style="height: 100%; padding-top: 20px; z-index: 2;">
-		<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez un ami</h2>
+		<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez vos amis</h2>
 
 
 		<!-- Liste d'amis -->
-		<div id="friend-list" class="list-group mb-4 col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-			<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
-			<!-- <div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
-				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
-					<div class="position-relative">
-						<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-2" style="width: 50px; height: 50px;">
-						<span class="status-indicator-friend online" id="friend1-status"></span>
-					</div>
-					<button class="friend-btn me-2">Friend1</button>
-					<button class="btn invite-button">Inviter
-						<span class="cancel-icon d-none">&times;</span>
-					</button>
-				</div> -->
-
-		<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
+		<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2"></div>
 			<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
 				<div class="position-relative">
 					<ul class="list-unstyled" id="friends-list-container">
@@ -41,9 +27,10 @@
 
 			<!-- Bouton pour commencer le tournoi -->
 			<div class=" col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-				<button id="start-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">Commencer</button>
+				<button id="start-tournament-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">Commencer</button>
 			</div>
 		</div>
+</div>
 <style>
 	body, html {
 		overflow: auto;
@@ -58,6 +45,9 @@
 		background-color:  #101A32;
 		/* overflow: hidden; */
 		
+	}
+	.list-group-item, .btn-primary{
+		min-width: 300px;
 	}
 
 	.status-indicator-friend {

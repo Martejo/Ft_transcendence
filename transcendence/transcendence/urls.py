@@ -27,6 +27,7 @@ logger.debug("Rentre dnas urls.py de app transcendence")
 urlpatterns = [
     #path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
+    path('game/', include('game.urls', namespace='game')),
     path('', include('core.urls')),  #landing page
 ]
 

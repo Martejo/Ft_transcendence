@@ -18,5 +18,6 @@ urlpatterns = [
     path('play/', views.play_view, name='play'),
     path('game_menu/', views.game_menu_view, name='game_menu'),
     path('invite_game/', views.invite_game_view, name='invite_game'),
+    path('invite_tournament/', views.invite_tournament_view, name='invite_tournament'),
 
 ]
