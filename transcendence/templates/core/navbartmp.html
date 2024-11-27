@@ -3,13 +3,12 @@
     <div class="container-fluid">
         <a id="home-btn" class="navbar-brand text-white" href="#">PONGAME</a>
         
-        <!-- Bouton burger visible uniquement pour les utilisateurs connectés -->
-        <button id="burger-menu-toggle" class="navbar-toggler" type="button">
-            ☰
-        </button>
-        
-
-        <div class="d-flex ms-auto" id="navbar-right"></div>
+        <div class="d-flex ms-auto" id="navbar-right">
+            <!-- Bouton burger visible uniquement pour les utilisateurs connectés -->
+            <button id="burger-menu-toggle" class="navbar-toggler rounded-circle" type="button" src="{{ user.profile.avatar.url }}" alt="Avatar" style="width: 40px; height: 40px;">
+               
+            </button>
+        </div>
     </div>
 </nav>
 
