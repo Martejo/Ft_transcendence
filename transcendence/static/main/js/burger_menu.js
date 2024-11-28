@@ -31,11 +31,20 @@ function toggleBurgerMenu() {
                     });
                 });
 
-            // Gestion du clic en dehors du menu
-            overlay.addEventListener('click', function () {
-                menu.style.display = 'none';
-                overlay.style.display = 'none';
-            });
+            // Ajouter un gestionnaire global pour cacher le menu en cas de clic à l'extérieur
+            document.addEventListener('click', handleOutsideClick);
+        }
+    }
+
+    // Fonction pour gérer le clic en dehors du menu
+    function handleOutsideClick(event) {
+        if (!menu.contains(event.target) && !document.getElementById('burger-menu-toggle').contains(event.target)) {
+            // Si le clic n'est pas dans le menu ni sur le bouton burger, on cache le menu
+            menu.style.display = 'none';
+            overlay.style.display = 'none';
+
+            // Retirer ce gestionnaire après avoir fermé le menu
+            document.removeEventListener('click', handleOutsideClick);
         }
     }
 }
