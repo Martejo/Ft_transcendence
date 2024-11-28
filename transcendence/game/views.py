@@ -43,7 +43,7 @@ def invite_tournament_view(request):
             ]
 
             # Construction des données de la réponse
-            return render(request, 'game/invite_game.html', {'friends':friends})
+            return render(request, 'game/invite_tournament.html', {'friends':friends})
         except Exception as e:
             logger.error(f"Erreur lors de la récupération des données de invite game: {e}")
             return JsonResponse({'error': str(e)}, status=500)
@@ -68,7 +68,7 @@ def invite_game_view(request):
             ]
 
             # Construction des données de la réponse
-            return render(request, 'game/invite_tournament.html', {'friends':friends})
+            return render(request, 'game/invite_game.html', {'friends':friends})
         except Exception as e:
             logger.error(f"Erreur lors de la récupération des données de invite game: {e}")
             return JsonResponse({'error': str(e)}, status=500)

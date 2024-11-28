@@ -1,29 +1,43 @@
 <div id="invite-container" class="container-fluid text-center d-flex flex-column align-items-center col-12" style="height: 100%; padding-top: 20px; z-index: 2;">
-		<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez vos amis</h2>
+	<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez vos amis</h2>
 
 
-		<!-- Liste d'amis -->
-		<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2"></div>
+	<!-- Liste d'amis -->
+	<div id="friend-list" class="list-group mb-4 col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+		<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
+		<!-- <div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
 			<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
 				<div class="position-relative">
-					<ul class="list-unstyled" id="friends-list-container">
-						{% for friend in friends %}
-						<li class="d-flex align-items-center mb-2">
-							<div class="position-relative">
-								<img src="{{ friend.avatar.url }}" alt="Avatar of {{ friend.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-								<span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
-							</div>
-							<button class="friend-btn" onclick="showFriendPopup(event, '{{ friend.username }}')">{{ friend.username }}</button>
-							<button class="btn invite-button">Inviter
-								<span class="cancel-icon d-none">&times;</span>
-							</button>
-						</li>
-						{% empty %}
-						<p class="text-center">Aucun ami pour le moment.</p>
-						{% endfor %}
-					</ul>
+					<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+					<span class="status-indicator-friend online" id="friend1-status"></span>
 				</div>
+				<button class="friend-btn me-2">Friend1</button>
+				<button class="btn invite-button">Inviter
+					<span class="cancel-icon d-none">&times;</span>
+				</button>
+			</div> -->
+
+	<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
+		<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
+			<div class="position-relative">
+				<ul class="list-unstyled" id="friends-list-container">
+					{% for friend in friends %}
+					<li class="d-flex align-items-center mb-2">
+						<div class="position-relative">
+							<img src="{{ friend.avatar.url }}" alt="Avatar of {{ friend.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+							<span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
+						</div>
+						<button class="friend-btn" onclick="showFriendPopup(event, '{{ friend.username }}')">{{ friend.username }}</button>
+						<button class="btn invite-button">Inviter
+							<span class="cancel-icon d-none">&times;</span>
+						</button>
+					</li>
+					{% empty %}
+					<p class="text-center">Aucun ami pour le moment.</p>
+					{% endfor %}
+				</ul>
 			</div>
+		</div>
 
 			<!-- Bouton pour commencer le tournoi -->
 			<div class=" col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
