@@ -21,6 +21,21 @@ function toggleBurgerMenu() {
         } else {
             menu.style.display = 'block';
             overlay.style.display = 'block';
+
+            // Ajouter des gestionnaires de clics pour cacher le menu
+            document.querySelectorAll('#profile-btn, #logout-btn, #tournament-link, #settings-link, #play-btn')
+                .forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        menu.style.display = 'none';
+                        overlay.style.display = 'none';
+                    });
+                });
+
+            // Gestion du clic en dehors du menu
+            overlay.addEventListener('click', function () {
+                menu.style.display = 'none';
+                overlay.style.display = 'none';
+            });
         }
     }
 }
@@ -60,7 +75,7 @@ function loadBurgerMenuData() {
         cache: false,  // Empêche la mise en cache
         success: function(data) {
             console.log("Réponse reçue de l'API :", data);
-
+            
             if (data.error) {
                 console.error('Erreur :', data.error);
                 return;
