@@ -74,7 +74,6 @@ function refreshAccessToken() {
     });
 }
 
-
 function loadBurgerMenuData() {
     console.log("Appel à loadBurgerMenuData");
 
@@ -90,9 +89,23 @@ function loadBurgerMenuData() {
                 return;
             }
 
+            // Sauvegarde de l'URL de l'avatar pour une utilisation ultérieure
+            const avatarUrl = data.data.avatar_url;
+
             // Mise à jour du nom d'utilisateur et de l'avatar
-            $('#profile-avatar').attr('src', data.data.avatar_url);
+            $('#profile-avatar').attr('src', avatarUrl);
             $('#profile-username').text(data.data.username);
+
+            // Mise à jour du bouton du menu burger avec l'avatar
+            const burgerButton = $('#burger-menu-toggle');
+            if (burgerButton.length) {
+                // Utiliser l'avatar comme arrière-plan du bouton
+                burgerButton.css({
+                    'background-image': `url('${avatarUrl}')`,
+                    'background-size': 'cover',
+                    'background-position': 'center'
+                });
+            }
 
             // Mise à jour du statut en ligne du profil
             const statusIndicator = $('#status-indicator');
@@ -137,6 +150,7 @@ function loadBurgerMenuData() {
         }
     });
 }
+
 
 function initializeFriendButtons() {
     $('.friend-btn').off('click').on('click', function(event) {

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 class CustomUser(models.Model):
     username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True, blank=True)
+    email = models.EmailField(unique=True)
     password_hash = models.CharField(max_length=256)  # Hachage du mot de passe
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
