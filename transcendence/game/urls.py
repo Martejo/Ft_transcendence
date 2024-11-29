@@ -17,7 +17,11 @@ app_name = 'game'
 urlpatterns = [
     path('play/', views.play_view, name='play'),
     path('game_menu/', views.game_menu_view, name='game_menu'),
+    path('loading/', views.loading_view, name='loading'),
     path('invite_game/', views.invite_game_view, name='invite_game'),
     path('invite_tournament/', views.invite_tournament_view, name='invite_tournament'),
+    path('send_invitation/', views.send_invitation_view, name='send_invitation'),
+    path('cancel_invitation/', views.cancel_invitation_view, name='cancel_invitation'),
+    path('select_tournament/', views.select_tournament_view, name='select_tournament'),
 
 ]

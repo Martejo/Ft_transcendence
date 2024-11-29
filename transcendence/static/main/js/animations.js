@@ -85,12 +85,24 @@ let currentFrame = 0;
 let maxFrames = frames.length;
 let transitionTime = 2200; 
 
+// Fonction pour arrêter l'animation de la balle et des raquettes
+let animationRunning = true;  // Flag pour suivre l'état de l'animation
+
+function stopPongAnimation() {
+    animationRunning = false;  // Indiquer que l'animation ne doit plus tourner
+}
+
 function deplacerBalleEtRaquettes() {
+
+  if (!animationRunning) return;  // Arrêter l'animation si le flag est à false
   let frameActuelle = frames[currentFrame];
   let prochaineFrame = frames[(currentFrame + 1) % maxFrames];
   let startTime = null;
 
   function animate(time) {
+
+    if (!animationRunning) return;  // Stopper immédiatement si l'animation est arrêtée
+
     if (!startTime) startTime = time;
     let progress = (time - startTime) / transitionTime;
 

@@ -3,23 +3,6 @@ from django import forms
 from .models import CustomUser, CustomUserProfile
 from django.core.exceptions import ValidationError
 
-# class RegistrationForm(forms.ModelForm):
-#     password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
-#     confirm_password = forms.CharField(widget=forms.PasswordInput, label='Confirmer le mot de passe')
-    
-#     class Meta:
-#         model = CustomUser
-#         fields = ['username', 'email']
-    
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         password = cleaned_data.get("password")
-#         confirm_password = cleaned_data.get("confirm_password")
-        
-#         if password != confirm_password:
-#             raise ValidationError("Les mots de passe ne correspondent pas.")
-        
-#         return cleaned_data
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')

@@ -10,6 +10,9 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
+from .models import GameInvitation
+from accounts.models import CustomUser
+from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -22,6 +25,18 @@ def play_view(request):
 def game_menu_view(request):
     if request.method == 'GET':
         return render(request, 'game/game_menu.html')
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
+
+def loading_view(request):
+    if request.method == 'GET':
+        return render(request, 'game/loading.html')
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
+
+def select_tournament_view(request):
+    if request.method == 'GET':
+        return render(request, 'game/select_tournament.html')
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 
@@ -73,3 +88,59 @@ def invite_game_view(request):
             logger.error(f"Erreur lors de la récupération des données de invite game: {e}")
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
+@csrf_exempt
+def send_invitation_view(request):
+    if request.method == 'POST':
+        friend_username = request.POST.get('friend_username')
+        try:
+            friend = CustomUser.objects.get(username=friend_username)
+            # Ici, vous pouvez créer un modèle d'invitation et l'enregistrer
+            # Par exemple : Invitation.objects.create(from_user=request.user, to_user=friend)
+            return JsonResponse({'status': 'success', 'message': f'Invitation envoyée à {friend_username}.'})
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Utilisateur introuvable.'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée.'}, status=400)
+
+def accept_invitation_view(request):
+    if request.method == 'POST':
+        invitation_id = request.POST.get('invitation_id')
+        try:
+            # Récupérer l'invitation spécifique
+            invitation = GameInvitation.objects.get(id=invitation_id, to_user=request.user, status='pending')
+
+            # Accepter l'invitation
+            invitation.status = 'accepted'
+            invitation.save()
+
+            # Rechercher et bloquer toutes les autres invitations en attente pour ce joueur
+            # Invitations envoyées par l'utilisateur vers d'autres joueurs ou reçues par lui
+            # Bloquer toutes les invitations en attente reçues par l'utilisateur qui accepte
+            GameInvitation.objects.filter(
+                to_user=request.user,
+                status='pending'
+            ).exclude(id=invitation.id).delete()
+
+            # Bloquer toutes les invitations en attente envoyées par l'utilisateur qui accepte
+            GameInvitation.objects.filter(
+                from_user=request.user,
+                status='pending'
+            ).exclude(id=invitation.id).delete()
+
+            return JsonResponse({'status': 'success', 'message': 'Invitation acceptée et autres invitations bloquées.'})
+        except GameInvitation.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Invitation non trouvée.'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée.'}, status=400)
+
+@csrf_exempt
+def cancel_invitation_view(request):
+    if request.method == 'POST':
+        friend_username = request.POST.get('friend_username')
+        try:
+            friend = CustomUser.objects.get(username=friend_username)
+            # Ici, vous pouvez supprimer l'invitation correspondante
+            # Par exemple : Invitation.objects.filter(from_user=request.user, to_user=friend).delete()
+            return JsonResponse({'status': 'success', 'message': f'Invitation annulée à {friend_username}.'})
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Utilisateur introuvable.'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée.'}, status=400)

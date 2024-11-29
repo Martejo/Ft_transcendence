@@ -1,6 +1,5 @@
 // script.js
 
-
 // Fonction pour obtenir le token CSRF
 function getCSRFToken() {
     const cookies = document.cookie.split(';');
@@ -104,22 +103,10 @@ function loadContent(app, view) {
         });
 }
 
-$(document).on('click', '#login-btn', function(event) {
-    event.preventDefault();
-    console.log("Login button clicked"); // Pour le débogage
-    window.location.hash = '#accounts-login';
-});
-
 $(document).on('click', '#logout-btn', function(event) {
     event.preventDefault();
     console.log("Login button clicked"); // Pour le débogage
     window.location.hash = '#accounts-logout';
-});
-
-$(document).on('click', '#register-btn', function(event) {
-    event.preventDefault();
-    console.log("Register button clicked"); // Pour le débogage
-    window.location.hash = '#accounts-register';
 });
 
 $(document).on('click', '#enable-2fa-btn', function(event) {
@@ -153,6 +140,8 @@ function initializeView(app, view) {
         initializeEnable2FAView();
     } else if (app === 'accounts' && view === 'disable_2fa') {
         initializeDisable2FAView();
+    } else if (app === 'game' && view === 'invite_game') {
+        initializeFriendInvitation();
     }
 }
 
