@@ -29,7 +29,7 @@ function initializeGameControls(controlType) {
 	// Fonction pour éviter que les collectibles ne sortent du conteneur pendant un redimensionnement
 	function updateContainerDimensions() {
 		containerWidth = gameContainer.offsetWidth;
-		containerHeight = gameContainer.offsetHeight;
+		containerHeight = gameContainer.offsetHeight - 50;
 
 		// Réajuster les collectibles pour rester dans les limites du conteneur
 		collectibles.forEach(collectible => {
