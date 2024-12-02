@@ -8,6 +8,7 @@ INACTIVITY_PERIOD = timedelta(minutes=5)  # Durée après laquelle un utilisateu
 class OnlineStatusMiddleware(MiddlewareMixin):
     def process_request(self, request):
         user_id = request.session.get('user_id')
+        # user = request.user  # [TAGS] <JWT_tokens_use> Récupérer l'utilisateur directement du JWT
         if user_id:
             try:
                 profile = CustomUserProfile.objects.get(user_id=user_id)

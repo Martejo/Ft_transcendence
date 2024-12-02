@@ -1,0 +1,26 @@
+[TAGS]
+
+Utilite du tag : 
+Rechercher toutes les portions de code contenant un tag dans la barre de recherche de VsCode
+Naviguer toutes les portions de code contenant un tag sur une page avec ctrl+H
+
+Notation d'un element tag : 
+[TAGS] <tagName> <tagName2> ...
+
+Liste des tags du projet :
+-	<JWT_tokens_settings> parametrages
+-	<JWT_tokens_use>
+
+
+
+
+
+[TESTS]
+
+Utilite du flag [TESTS] :
+Identifier rapidement les portions de code qui necessitent d' etre testees ulterieurement
+Decrire la nature des tests que l' on souhaite realiser
+
+[IMPROVE] 
+
+Utilite du flag [IMPROVE] : les zones du code qui doivent etre ameliorees

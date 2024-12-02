@@ -116,10 +116,8 @@ def logout_view(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def get_burger_menu_data(request):
-    # user_id = request.session.get('user_id')
-    # user = get_object_or_404(CustomUser, id=user_id)
-    user = request.user  # Récupérer l'utilisateur directement du JWT
-    user.profile.refresh_from_db()  # Recharge l'objet utilisateur de la base de données
+    user = request.user  # [TAGS] <JWT_tokens_use> Récupérer l'utilisateur directement du JWT
+    user.profile.refresh_from_db()  # [TAGS] <JWT_tokens_use> Recharge l'objet utilisateur de la base de données
     # logger.debug(f"User ID: {user_id}")
     logger.debug(f"User avatar from relation: {user.profile.avatar}")
     logger.debug(f"Statut après refresh_from_db pour {user.username}: {user.profile.is_online}")
@@ -170,13 +168,15 @@ def get_burger_menu_data(request):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@csrf_protect
+# @csrf_protect
 def update_status(request):
     if request.method == 'POST':
         try:
-            user_id = request.session.get('user_id')
-            user = get_object_or_404(CustomUser, id=user_id)
-            status = request.POST.get('status')
+            # user_id = request.session.get('user_id')
+            # user = get_object_or_404(CustomUser, id=user_id)
+            user = request.user  # [TAGS] <JWT_tokens_use>
+            # status = request.POST.get('status')
+            status = request.data.get('status')
             
             if status == 'online':
                 user.profile.is_online = True
@@ -202,7 +202,7 @@ def update_status(request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@csrf_protect
+# @csrf_protect
 def friend_profile_view(request, friend_username):
     logger.debug("Entre dans friend_profile_view")
     logger.debug(f"Friend_username = {friend_username}")
@@ -250,58 +250,58 @@ def friend_profile_view(request, friend_username):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@csrf_protect
+# @csrf_protect
 def remove_friend_view(request):
-    if request.method == 'POST':
-        try:
-            user_id = request.session.get('user_id')
-            if not user_id:
-                return JsonResponse({'status': 'error', 'message': 'Utilisateur non connecté'}, status=400)
-            
-            user = get_object_or_404(CustomUser, id=user_id)
-            friend_username = request.POST.get('friend_username')
-            logger.debug(f"friend_username = {friend_username}")
-            if not friend_username:
-                return JsonResponse({'status': 'error', 'message': 'Nom d\'utilisateur de l\'ami manquant'}, status=400)
+    try:
+        # user_id = request.session.get('user_id')
+        user = request.user  # [TAGS] <JWT_tokens_use>
+        # if not user_id:
+        #     return JsonResponse({'status': 'error', 'message': 'Utilisateur non connecté'}, status=400)
+        
+        # user = get_object_or_404(CustomUser, id=user_id)
+        # friend_username = request.POST.get('friend_username')
+        friend_username = request.data.get('friend_username')
+        logger.debug(f"friend_username = {friend_username}")
+        if not friend_username:
+            return JsonResponse({'status': 'error', 'message': 'Nom d\'utilisateur de l\'ami manquant'}, status=400)
 
-            friend = get_object_or_404(CustomUser, username=friend_username)
+        friend = get_object_or_404(CustomUser, username=friend_username)
 
-            # Supprimer l'ami des listes d'amis de chaque utilisateur
-            if hasattr(user, 'profile') and hasattr(friend, 'profile'):
-                # On utilise la relation 'friends' qui contient des instances de CustomUser, et non de CustomUserProfile
-                user.profile.friends.remove(friend)  # Utilise directement l'instance de l'utilisateur
-                friend.profile.friends.remove(user)  # Utilise directement l'instance de l'utilisateur
+        # Supprimer l'ami des listes d'amis de chaque utilisateur
+        if hasattr(user, 'profile') and hasattr(friend, 'profile'):
+            # On utilise la relation 'friends' qui contient des instances de CustomUser, et non de CustomUserProfile
+            user.profile.friends.remove(friend)  # Utilise directement l'instance de l'utilisateur
+            friend.profile.friends.remove(user)  # Utilise directement l'instance de l'utilisateur
 
-            return JsonResponse({'status': 'success', 'message': 'Ami supprimé avec succès'})
+        return JsonResponse({'status': 'success', 'message': 'Ami supprimé avec succès'})
 
-        except Exception as e:
-            logger.error(f"Erreur lors de la suppression de l'ami: {e}")
-            return JsonResponse({'status': 'error', 'message': 'Erreur lors de la suppression de l\'ami'}, status=500)
+    except Exception as e:
+        logger.error(f"Erreur lors de la suppression de l'ami: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Erreur lors de la suppression de l\'ami'}, status=500)
     
-    return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
-
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def get_user_profile_data(request):
     user = request.user
-    if user.is_authenticated:
-        profile_data = {
-            'username': user.username,
-            'avatar_url': user.profile.avatar.url if user.profile.avatar else '/media/avatars/default_avatar.png',
-            'is_online': user.profile.is_online
-        }
-        return JsonResponse(profile_data)
-    else:
-        return JsonResponse({'error': 'Utilisateur non authentifié'}, status=403)
+    profile_data = {
+        'username': user.username,
+        'avatar_url': user.profile.avatar.url if user.profile.avatar else '/media/avatars/default_avatar.png',
+        'is_online': user.profile.is_online
+    }
+    return JsonResponse(profile_data)
 
 ############ Gestion de profil #############
 
-@csrf_protect
+# @csrf_protect
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def manage_profile_view(request):
     logger.debug("Entre dans manage_profile_view")
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(CustomUser, id=user_id)
+    user = request.user  # [TAGS] <JWT_tokens_use>
     if request.method == 'GET':
         profile_form = ProfileForm(instance=user)
         password_form = PasswordChangeForm()
@@ -316,33 +316,31 @@ def manage_profile_view(request):
         })
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
-@csrf_protect
+# @csrf_protect
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def update_profile_view(request):
     logger.debug("Entre dans update_profile_view")
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(CustomUser, id=user_id)
+    user = request.user  # [TAGS] <JWT_tokens_use>
+    form = ProfileForm(request.POST, instance=user)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'status': 'success', 'message': 'Profil mis à jour avec succès.'})
+    return JsonResponse({'status': 'error', 'errors': form.errors})
 
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'status': 'success', 'message': 'Profil mis à jour avec succès.'})
-        return JsonResponse({'status': 'error', 'errors': form.errors})
 
-    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
-
-@login_required
-@csrf_exempt  # Nécessaire car on fait une requête DELETE
+@api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_account(request):
     logger.debug("Entre dans delete account")
     if request.method == 'DELETE':
-        user_id = request.session.get('user_id')
-        user = get_object_or_404(CustomUser, id=user_id)        
+        # user_id = request.session.get('user_id')
+        # user = get_object_or_404(CustomUser, id=user_id)     
+        user = request.user  # [TAGS] <JWT_tokens_use>   
         # Supprime l'utilisateur et tous les objets liés
         user.delete()
 
@@ -350,52 +348,50 @@ def delete_account(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Requête invalide.'}, status=400)
 
-@csrf_protect
+# @csrf_protect
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def change_password_view(request):
     logger.debug("Entre dans change_password_view")
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(CustomUser, id=user_id)
+    user = request.user  # [TAGS] <JWT_tokens_use>
 
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.POST)
-        if form.is_valid():
-            old_password = form.cleaned_data['old_password']
-            new_password = form.cleaned_data['new_password']
+    form = PasswordChangeForm(request.POST)
+    if form.is_valid():
+        old_password = form.cleaned_data['old_password']
+        new_password = form.cleaned_data['new_password']
 
-            if verify_password(user.password_hash, old_password):
-                user.password_hash = hash_password(new_password)
-                user.save()
-                return JsonResponse({'status': 'success', 'message': 'Mot de passe mis à jour avec succès.'})
-            return JsonResponse({'status': 'error', 'message': 'Ancien mot de passe incorrect.'})
-        return JsonResponse({'status': 'error', 'errors': form.errors})
-
-    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+        if verify_password(user.password_hash, old_password):
+            user.password_hash = hash_password(new_password)
+            user.save()
+            return JsonResponse({'status': 'success', 'message': 'Mot de passe mis à jour avec succès.'})
+        return JsonResponse({'status': 'error', 'message': 'Ancien mot de passe incorrect.'})
+    return JsonResponse({'status': 'error', 'errors': form.errors})
 
 
-@csrf_protect
+
+# @csrf_protect
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def update_avatar_view(request):
     logger.debug("Entre dans update_avatar_view")
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(CustomUser, id=user_id)
+    user = request.user  # [TAGS] <JWT_tokens_use>
 
-    if request.method == 'POST':
-        form = AvatarUpdateForm(request.POST, request.FILES, instance=user.profile)
-        if form.is_valid():
-            form.save()
-            logger.debug(f"Avatar after save: {user.profile.avatar}")  # Debug print
-            logger.debug(f"Avatar URL: {user.profile.avatar.url}")
-            return JsonResponse({'status': 'success', 'message': 'Avatar mis à jour avec succès.'})
-        return JsonResponse({'status': 'error', 'errors': form.errors})
+    form = AvatarUpdateForm(request.POST, request.FILES, instance=user.profile)
+    if form.is_valid():
+        form.save()
+        logger.debug(f"Avatar after save: {user.profile.avatar}")  # Debug print
+        logger.debug(f"Avatar URL: {user.profile.avatar.url}")
+        return JsonResponse({'status': 'success', 'message': 'Avatar mis à jour avec succès.'})
+    return JsonResponse({'status': 'error', 'errors': form.errors})
 
-    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
-@csrf_protect
+# @csrf_protect
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -405,7 +401,7 @@ def profile_view(request):
     #logger.info(f"Tentative de chargement du profil de l'utilisateur avec user_id: {user_id}")
     try:
         #user = get_object_or_404(CustomUser, id=user_id)
-        user = request.user  # Récupérer l'utilisateur directement du JWT
+        user = request.user  # [TAGS] <JWT_tokens_use>
         logger.info(f"Utilisateur trouvé: {user.username}")
 
         # Calculer des données supplémentaires pour l'utilisateur
@@ -455,14 +451,16 @@ def profile_view(request):
 @permission_classes([IsAuthenticated])
 def add_friend(request):
     try:
-        user_id = request.session.get('user_id')
-        if not user_id:
-            return JsonResponse({'status': 'error', 'message': 'Utilisateur non connecté'}, status=400)
+        # user_id = request.session.get('user_id')
+        # if not user_id:
+        #     return JsonResponse({'status': 'error', 'message': 'Utilisateur non connecté'}, status=400)
 
-        from_user = get_object_or_404(CustomUser, id=user_id)
+        # from_user = get_object_or_404(CustomUser, id=user_id)
+        from_user = request.user
 
         # Ici, utilisez l'ID de l'utilisateur pour obtenir l'instance d'utilisateur et continuer
-        friend_username = request.POST.get('friend_username')
+        # friend_username = request.POST.get('friend_username') #[IMPROVE] = request.data.get('friend_username') ???
+        friend_username = request.data.get('friend_username')
         if not friend_username:
             return JsonResponse({'status': 'error', 'message': 'Nom d\'utilisateur de l\'ami manquant'}, status=400)
 
@@ -485,85 +483,92 @@ def add_friend(request):
 @permission_classes([IsAuthenticated])
 @csrf_protect
 def handle_friend_request(request):
-    if request.method == 'POST':
-        user_id = request.session.get('user_id')
-        if not user_id:
-            return JsonResponse({'status': 'error', 'message': 'Utilisateur non authentifié'}, status=403)
+    try:
+        # user_id = request.session.get('user_id')
+        # if not user_id:
+        #     return JsonResponse({'status': 'error', 'message': 'Utilisateur non authentifié'}, status=403)
+        # user = get_object_or_404(CustomUser, id=user_id)
+        user = request.user
 
-        try:
-            # Récupérer l'utilisateur courant et son profil
-            user = get_object_or_404(CustomUser, id=user_id)
-            if not hasattr(user, 'profile'):
-                return JsonResponse({'status': 'error', 'message': 'Utilisateur sans profil valide.'}, status=400)
+        if not hasattr(user, 'profile'):
+            return JsonResponse({'status': 'error', 'message': 'Utilisateur sans profil valide.'}, status=400)
 
-            request_id = request.POST.get('request_id')
-            action = request.POST.get('action')
-            logger.debug(f"Request ID reçu : {request_id}")
-            logger.debug(f"Utilisateur {user.username} avec ID : {user_id}")
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+        logger.debug(f"Request ID reçu : {request_id}")
+        logger.debug(f"Utilisateur {user.username}")
 
-            # Récupérer la demande d'ami
-            friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=user)
+        # Récupérer la demande d'ami
+        friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=user)
 
-            if action == 'accept':
-                # Ajouter les deux utilisateurs comme amis (profil à profil)
-                user_profile = user.profile
-                from_user_profile = friend_request.from_user.profile
+        if action == 'accept':
+            # Ajouter les deux utilisateurs comme amis (profil à profil)
+            user_profile = user.profile
+            from_user_profile = friend_request.from_user.profile
 
-                user_profile.friends.add(friend_request.from_user)
-                from_user_profile.friends.add(friend_request.to_user)
+            user_profile.friends.add(friend_request.from_user)
+            from_user_profile.friends.add(friend_request.to_user)
 
-                # Supprimer la demande d'ami
-                friend_request.delete()
+            # Supprimer la demande d'ami
+            friend_request.delete()
 
-                return JsonResponse({'status': 'success', 'message': 'Demande d\'ami acceptée'})
+            return JsonResponse({'status': 'success', 'message': 'Demande d\'ami acceptée'})
 
-            elif action == 'decline':
-                # Supprimer la demande
-                friend_request.delete()
-                return JsonResponse({'status': 'success', 'message': 'Demande d\'ami refusée'})
+        elif action == 'decline':
+            # Supprimer la demande
+            friend_request.delete()
+            return JsonResponse({'status': 'success', 'message': 'Demande d\'ami refusée'})
 
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Action non valide'}, status=400)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Action non valide'}, status=400)
 
-        except Exception as e:
-            logger.error(f"Erreur lors de la gestion de la demande d'ami: {e}")
-            return JsonResponse({'status': 'error', 'message': 'Erreur lors de la gestion de la demande d\'ami'}, status=500)
+    except Exception as e:
+        logger.error(f"Erreur lors de la gestion de la demande d'ami: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Erreur lors de la gestion de la demande d\'ami'}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
 
 
 
-
-@api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def match_history_view(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(CustomUser, id=user_id)
+    user = request.user
     match_histories = user.match_histories.all().order_by('-played_at')
 
     return render(request, 'accounts/match_history.html', {'match_histories': match_histories})
 
 
 # Vues supplémentaires pour la gestion des amis
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def send_friend_request(request, to_user_id):
-    user_id = request.session.get('user_id')
-    from_user = get_object_or_404(CustomUser, id=user_id)
+    from_user = request.user  # Utilisation de l'utilisateur authentifié grâce à JWT
     to_user = get_object_or_404(CustomUser, id=to_user_id)
-
+    
+    # Créer une demande d'ami
     FriendRequest.objects.create(from_user=from_user, to_user=to_user)
+    
+    # Redirection vers le profil de l'utilisateur destinataire
     return redirect('accounts:profile', username=to_user.username)
 
 
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def accept_friend_request(request, request_id):
-    user_id = request.session.get('user_id')
-    friend_request = get_object_or_404(FriendRequest, id=request_id, to_user_id=user_id)
-
+    
+    user = request.user  # L'utilisateur authentifié
+    friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=user)
+    
+    # Mettre à jour le statut de la demande
     friend_request.status = 'accepted'
     friend_request.save()
 
+    # Ajouter les deux utilisateurs comme amis
     from_user = friend_request.from_user
     to_user = friend_request.to_user
     from_user.profile.friends.add(to_user)
@@ -572,18 +577,22 @@ def accept_friend_request(request, request_id):
     return redirect('accounts:profile', username=from_user.username)
 
 
-@login_required
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def reject_friend_request(request, request_id):
-    user_id = request.session.get('user_id')
-    friend_request = get_object_or_404(FriendRequest, id=request_id, to_user_id=user_id)
+    user = request.user  # L'utilisateur authentifié
+    friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=user)
 
+    # Mettre à jour le statut de la demande
     friend_request.status = 'rejected'
     friend_request.save()
 
     return redirect('accounts:profile', username=friend_request.from_user.username)
 
 
-
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def log_guest_view(request):
     if request.method == 'POST':
         guest_user, created = CustomUser.objects.get_or_create(
@@ -609,99 +618,92 @@ def enable_2fa(request):
     """
     Handle the 2FA enablement process, generating a TOTP secret and QR code.
     """
-    if request.method == 'GET':
-        # Generate TOTP secret and JWT token
-        logger.debug("Génération du QR Code et du secret TOTP")
-        totp_secret = pyotp.random_base32()
-        totp = pyotp.TOTP(totp_secret)
-        token = jwt.encode(
-            {'user_id': request.session.get('user_id'), 'totp_secret': totp_secret, 'exp': datetime.utcnow() + timedelta(minutes=5)},
-            settings.SECRET_KEY, algorithm='HS256'
-        )
-        request.session['setup_token'] = token
+    # Generate TOTP secret and JWT token
+    logger.debug("Génération du QR Code et du secret TOTP")
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+    token = jwt.encode(
+        {'user_id': request.session.get('user_id'), 'totp_secret': totp_secret, 'exp': datetime.utcnow() + timedelta(minutes=5)},
+        settings.SECRET_KEY, algorithm='HS256'
+    )
+    request.session['setup_token'] = token
 
-        # Generate provisioning URI for QR code
-        provisioning_uri = totp.provisioning_uri(name="Transcendence", issuer_name="ggwp")
+    # Generate provisioning URI for QR code
+    provisioning_uri = totp.provisioning_uri(name="Transcendence", issuer_name="ggwp")
 
-        # Generate QR code
-        img = qrcode.make(provisioning_uri)
-        buffered = BytesIO()
-        img.save(buffered, format="PNG")
-        qr_code = base64.b64encode(buffered.getvalue()).decode()
+    # Generate QR code
+    img = qrcode.make(provisioning_uri)
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    qr_code = base64.b64encode(buffered.getvalue()).decode()
 
-        # Create an empty form to enter the OTP code
-        form = Two_factor_login_Form()
+    # Create an empty form to enter the OTP code
+    form = Two_factor_login_Form()
 
-        context = {
-            'qr_code': qr_code,  # Base64 encoded QR code
-            'secret': totp_secret,
-            'is_authenticated': True,
-            '2FA_form': form,
-        }
+    context = {
+        'qr_code': qr_code,  # Base64 encoded QR code
+        'secret': totp_secret,
+        'is_authenticated': True,
+        '2FA_form': form,
+    }
 
-        return render(request, 'accounts/enable_2fa.html', context)
-
-    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+    return render(request, 'accounts/enable_2fa.html', context)
 
 
 
 @csrf_protect
-
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def verify_2fa(request):
     logger.debug("Entre dans verify_2fa")
 
-    if request.method == 'POST':
-        setup_token = request.session.get('setup_token')
-        if not setup_token:
-            logger.warning("Aucun token de configuration 2FA trouvé.")
-            return JsonResponse({'status': 'error', 'message': 'No 2FA setup in progress.'}, status=400)
+    setup_token = request.session.get('setup_token')
+    if not setup_token:
+        logger.warning("Aucun token de configuration 2FA trouvé.")
+        return JsonResponse({'status': 'error', 'message': 'No 2FA setup in progress.'}, status=400)
 
-        form = Two_factor_login_Form(request.POST)
-        if form.is_valid():
-            try:
-                user_id = request.session.get('user_id')
-                payload = jwt.decode(setup_token, settings.SECRET_KEY, algorithms=['HS256'])
-                totp_secret = payload['totp_secret']
-                # user = User.objects.get(id=user_id)
-                #user = get_object_or_404(CustomUser, id=user_id)
-                user = get_object_or_404(CustomUser, id=payload['user_id'])
+    form = Two_factor_login_Form(request.POST)
+    if form.is_valid():
+        try:
+            user_id = request.session.get('user_id')
+            payload = jwt.decode(setup_token, settings.SECRET_KEY, algorithms=['HS256'])# [IMPROVE] utile de mettre du JWT ici ??
+            totp_secret = payload['totp_secret']
+            # user = User.objects.get(id=user_id)
+            #user = get_object_or_404(CustomUser, id=user_id)
+            user = get_object_or_404(CustomUser, id=payload['user_id'])
 
 
-                entered_code = form.cleaned_data['code']
-                logger.debug(f"Code saisi par l'utilisateur : {entered_code}")
+            entered_code = form.cleaned_data['code']
+            logger.debug(f"Code saisi par l'utilisateur : {entered_code}")
 
-                # Vérifier le code TOTP
-                totp = pyotp.TOTP(totp_secret)
-                if totp.verify(entered_code):
-                    logger.debug("Code TOTP vérifié avec succès.")
-                    user.totp_secret = totp_secret
-                    user.is_2fa_enabled = True
-                    user.save()
+            # Vérifier le code TOTP
+            totp = pyotp.TOTP(totp_secret)
+            if totp.verify(entered_code):
+                logger.debug("Code TOTP vérifié avec succès.")
+                user.totp_secret = totp_secret
+                user.is_2fa_enabled = True
+                user.save()
 
-                    # Supprimer le token de configuration de la session
-                    del request.session['setup_token']
-                    return JsonResponse({'status': 'success', 'message': '2FA setup completed successfully.'})
-                else:
-                    logger.warning("Code TOTP invalide.")
-                    return JsonResponse({'status': 'error', 'message': 'Invalid code entered.'}, status=400)
-
-            except jwt.ExpiredSignatureError:
-                logger.error("Le token JWT a expiré.")
+                # Supprimer le token de configuration de la session
                 del request.session['setup_token']
-                return JsonResponse({'status': 'error', 'message': 'Setup expired. Please try again.'}, status=400)
+                return JsonResponse({'status': 'success', 'message': '2FA setup completed successfully.'})
+            else:
+                logger.warning("Code TOTP invalide.")
+                return JsonResponse({'status': 'error', 'message': 'Invalid code entered.'}, status=400)
 
-            except jwt.InvalidTokenError:
-                logger.error("Le token JWT est invalide.")
-                del request.session['setup_token']
-                return JsonResponse({'status': 'error', 'message': 'Invalid session. Please try again.'}, status=400)
-        else:
-            logger.warning("Formulaire invalide")
-            return JsonResponse({'status': 'error', 'message': 'Invalid input.'}, status=400)
+        except jwt.ExpiredSignatureError:
+            logger.error("Le token JWT a expiré.")
+            del request.session['setup_token']
+            return JsonResponse({'status': 'error', 'message': 'Setup expired. Please try again.'}, status=400)
 
-    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+        except jwt.InvalidTokenError:
+            logger.error("Le token JWT est invalide.")
+            del request.session['setup_token']
+            return JsonResponse({'status': 'error', 'message': 'Invalid session. Please try again.'}, status=400)
+    else:
+        logger.warning("Formulaire invalide")
+        return JsonResponse({'status': 'error', 'message': 'Invalid input.'}, status=400)
 
 
 

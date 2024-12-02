@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# [IMPROVE] mettre dans .env
 SECRET_KEY = 'django-insecure-%z5ixc7qvz-wkl#jr@&nl7ed)&=&j)azcuyaj5ybeybna6kv*^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -38,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
+	'rest_framework', # [TAGS] <JWT_tokens_settings>
+    'rest_framework_simplejwt.token_blacklist',# [TAGS] <JWT_tokens_settings>
     'accounts',
     'core',
     'game',
@@ -174,7 +175,10 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", 'https://ajax.googleapis.com')  # Ajustez selon vos besoins
 CSP_STYLE_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com')  # Ajustez selon vos besoins
 
-
+# [TAGS] <JWT_tokens_settings>
+# Utilise quand on applique les decorateurs suivants avant la fonction :
+    # @authentication_classes([JWTAuthentication])
+    # @permission_classes([IsAuthenticated])
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -184,14 +188,19 @@ REST_FRAMEWORK = {
     ),
 }
 
+# [TAGS] <JWT_tokens_settings>
+# [TESTS] changer les timedeltas pour valider le fonctionnement
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), # Temps d'expiration du token d'accès
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), # Temps d'expiration du token de raffraichissement ( permettant a l' utilisateur de generer un nouveau token d' acces)
+    'ROTATE_REFRESH_TOKENS': True, # Un nouveau refresh token est genere apres chaque utilisation de refresh token
+    'BLACKLIST_AFTER_ROTATION': True, # Blacklist les refresh tokens apres leur utilisation 
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,  # Utilisez votre clé secrète Django
+    'SIGNING_KEY': SECRET_KEY,  # Clé secrète Django
 }
+
+
+
 # Authentification
 # AUTHENTICATION_BACKENDS = [
 #     'django.contrib.auth.backends.ModelBackend',
