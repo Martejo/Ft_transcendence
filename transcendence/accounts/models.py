@@ -1,11 +1,11 @@
-# User/models.py
+# accounts/models.py
 from django.db import models
 from django.utils import timezone
 from pathlib import Path
 import random
 from datetime import datetime, timedelta
 
-
+#[IMPROVE] Utiliser le Modele : class CustomUser(AbstractBaseUser, PermissionsMixin) = gere tt seul le champ password
 class CustomUser(models.Model):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)

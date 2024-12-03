@@ -8,8 +8,12 @@ Notation d'un element tag :
 [TAGS] <tagName> <tagName2> ...
 
 Liste des tags du projet :
--	<JWT_tokens_settings> parametrages
--	<JWT_tokens_use>
+
+-	<JWT_tokens_headers> en tetes associes aux JWT Tokens
+-	<JWT_tokens_settings> parametrages des JWT Tokens
+-	<JWT_tokens_use> utlisation d' elements lies aux jwt tokens
+
+
 
 
 
@@ -21,6 +25,13 @@ Utilite du flag [TESTS] :
 Identifier rapidement les portions de code qui necessitent d' etre testees ulterieurement
 Decrire la nature des tests que l' on souhaite realiser
 
+
 [IMPROVE] 
 
 Utilite du flag [IMPROVE] : les zones du code qui doivent etre ameliorees
+
+
+
+[QUESTION] 
+
+Utilite du flag [QUESTION] : les zones du code qui sont mal comprises ou sujettes a des interrogations

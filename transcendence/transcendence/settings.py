@@ -196,6 +196,8 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True, # Un nouveau refresh token est genere apres chaque utilisation de refresh token
     'BLACKLIST_AFTER_ROTATION': True, # Blacklist les refresh tokens apres leur utilisation 
     'ALGORITHM': 'HS256',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'SIGNING_KEY': SECRET_KEY,  # Clé secrète Django
 }
 

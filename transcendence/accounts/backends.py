@@ -1,6 +1,9 @@
 # accounts/backends.py
-from django.contrib.auth.backends import BaseBackend
-from .models import CustomUser
+
+
+#INUTILE PUISQUE l' auth est geree par JWT ??
+# from django.contrib.auth.backends import BaseBackend
+# from .models import CustomUser
 
 class CustomUserBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):

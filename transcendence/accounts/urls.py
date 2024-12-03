@@ -12,7 +12,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 logger.debug("Rentre dans urls.py de app accounts")
 
-app_name = 'accounts'
+# cree le namespace accounts (eviter le chevauchement du nom des vues entre les fichiers)
+app_name = 'accounts' 
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),  # Vue pour rendre le formulaire de connexion
@@ -33,7 +34,6 @@ urlpatterns = [
     path('update_profile/', views.update_profile_view, name='update_profile'),
 	path('enable_2fa/', views.enable_2fa, name='enable_2fa'),
     path('disable_2fa/', views.disable_2fa, name='disable_2fa'),
-	#path('qr-code/', views.enable_2fa, name='show_qr'),
 	path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
     path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
 	
@@ -56,7 +56,7 @@ urlpatterns = [
 	path('verify_2fa_login/', views.verify_2fa_login, name='verify_2fa_login'),
 	
 
-
+    #[QUESTION] A quoi servent ces vues et a quel moment sont elles utilisees ?
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 

@@ -1,3 +1,415 @@
+# accounts/admin.py
+from django.contrib import admin
+
+# accounts/apps.py
+from django.apps import AppConfig
+
+
+class AccountsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'accounts'
+# accounts/backends.py
+
+
+#INUTILE PUISQUE l' auth est geree par JWT ??
+# from django.contrib.auth.backends import BaseBackend
+# from .models import CustomUser
+
+class CustomUserBackend(BaseBackend):
+    def authenticate(self, request, username=None, password=None):
+        try:
+            user = CustomUser.objects.get(username=username)
+            if user.check_password(password):
+                return user
+        except CustomUser.DoesNotExist:
+            return None
+
+    def get_user(self, user_id):
+        try:
+            return CustomUser.objects.get(pk=user_id)
+        except CustomUser.DoesNotExist:
+            return None# accounts/decorators.py
+
+#INUTILE le login est verifie avec les JWT 
+# from django.shortcuts import redirect
+
+# def login_required(view_func):
+#     def wrapper(request, *args, **kwargs):
+#         # Vérifie si l'utilisateur est connecté
+#         if 'user_id' not in request.session:
+#             return redirect('accounts:login')
+#         # Vérifie si l'authentification 2FA est requise mais non terminée
+#         if request.session.get('auth_partial'):
+#             return redirect('accounts:verify_2fa_login')
+#         return view_func(request, *args, **kwargs)
+#     return wrapper
+
+# accounts/forms.py
+from django import forms
+from .models import CustomUser, CustomUserProfile
+from django.core.exceptions import ValidationError
+
+
+class RegistrationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label='Confirmer le mot de passe')
+    
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+        
+        if password != confirm_password:
+            raise ValidationError("Les mots de passe ne correspondent pas.")
+        
+        if len(password) < 8 or not any(char.isdigit() for char in password) or not any(char.isupper() for char in password):
+            raise ValidationError("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.")
+        
+        return cleaned_data
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=150, label='Nom d\'utilisateur')
+    password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
+
+class Two_factor_login_Form(forms.Form):
+	code = forms.CharField(max_length=6, min_length=6, label='Code 2FA')
+
+	def clean_code(self):
+		code = self.cleaned_data['code']
+		if not code.isdigit():
+			raise forms.ValidationError("Le code doit contenir uniquement des chiffres")
+		return code
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom d\'utilisateur'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+        }
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if CustomUser.objects.exclude(id=self.instance.id).filter(username=username).exists():
+            raise forms.ValidationError("Ce nom d'utilisateur est déjà pris.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.exclude(id=self.instance.id).filter(email=email).exists():
+            raise forms.ValidationError("Cet email est déjà utilisé.")
+        return email
+
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(
+        label="Ancien Mot de Passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Ancien Mot de Passe'}),
+        required=True
+    )
+    new_password = forms.CharField(
+        label="Nouveau Mot de Passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Nouveau Mot de Passe'}),
+        required=True
+    )
+    confirm_new_password = forms.CharField(
+        label="Confirmer le Nouveau Mot de Passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirmer le Nouveau Mot de Passe'}),
+        required=True
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_new_password = cleaned_data.get("confirm_new_password")
+
+        if new_password and confirm_new_password and new_password != confirm_new_password:
+            self.add_error('confirm_new_password', "Les mots de passe ne correspondent pas.")
+
+        return cleaned_data
+
+
+class AvatarUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUserProfile
+        fields = ['avatar']
+        widgets = {
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        }
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar', False)
+        if avatar:
+            if avatar.size > 4 * 1024 * 1024:
+                raise forms.ValidationError("L'image ne doit pas dépasser 4 Mo.")
+            if not avatar.content_type in ["image/jpeg", "image/png", "image/gif"]:
+                raise forms.ValidationError("Seules les images JPEG, PNG et GIF sont autorisées.")
+        return avatar
+
+# accounts/__init__.py# accounts/middleware.py
+from django.utils.deprecation import MiddlewareMixin
+from django.utils import timezone
+from datetime import timedelta, datetime
+from .models import CustomUserProfile
+
+INACTIVITY_PERIOD = timedelta(minutes=5)  # Durée après laquelle un utilisateur est considéré comme inactif
+
+# class OnlineStatusMiddleware(MiddlewareMixin):
+#     def process_request(self, request):
+#         user_id = request.session.get('user_id')
+#         # user = request.user  # [TAGS] <JWT_tokens_use> Récupérer l'utilisateur directement du JWT
+#         if user_id:
+#             try:
+#                 profile = CustomUserProfile.objects.get(user_id=user_id)
+#                 # Si l'utilisateur a explicitement choisi d'être hors ligne, ne rien faire
+#                 if not profile.is_online:
+#                     # Mettre à jour à `True` uniquement si l'utilisateur est actif ou revient après une période d'inactivité
+#                     last_activity = request.session.get('last_activity')
+#                     now = timezone.now()
+
+#                     if last_activity:
+#                         # Utiliser `fromisoformat` pour analyser la date-heure
+#                         last_activity = datetime.fromisoformat(last_activity)
+#                         if now - last_activity > INACTIVITY_PERIOD:
+#                             profile.is_online = True  # L'utilisateur redevient en ligne s'il interagit après une longue absence
+#                     else:
+#                         # Si `last_activity` n'est pas défini, on le considère en ligne maintenant
+#                         profile.is_online = True
+
+#                     profile.save()
+
+#                 # Mettre à jour l'heure de la dernière activité
+#                 request.session['last_activity'] = str(timezone.now())
+
+#             except CustomUserProfile.DoesNotExist:
+#                 pass
+
+class OnlineStatusMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        # user_id = request.session.get('user_id')
+        # user = request.user  # [TAGS] <JWT_tokens_use> Récupérer l'utilisateur directement du JWT
+        if request.user.is_authenticated:
+            try:
+                profile = request.user.profile
+                # Si l'utilisateur a explicitement choisi d'être hors ligne, ne rien faire
+                if not profile.is_online:
+                    # Mettre à jour à `True` uniquement si l'utilisateur est actif ou revient après une période d'inactivité
+                    # last_activity = request.session.get('last_activity')
+                    last_activity = request.user.last_activity
+                    now = timezone.now()
+
+                    if last_activity:
+                        # Utiliser `fromisoformat` pour analyser la date-heure
+                        last_activity = datetime.fromisoformat(last_activity)
+                        if now - last_activity > INACTIVITY_PERIOD:
+                            profile.is_online = True  # L'utilisateur redevient en ligne s'il interagit après une longue absence
+                    else:
+                        # Si `last_activity` n'est pas défini, on le considère en ligne maintenant
+                        profile.is_online = True
+
+                    profile.save()
+
+                # Mettre à jour l'heure de la dernière activité
+                # request.session['last_activity'] = str(timezone.now())
+                request.user.last_activity =  str(timezone.now())
+
+            except CustomUserProfile.DoesNotExist:
+                pass
+
+    def process_response(self, request, response):
+        # On ne remet plus automatiquement à `offline` dans le `process_response`
+        return response
+# accounts/models.py
+from django.db import models
+from django.utils import timezone
+from pathlib import Path
+import random
+from datetime import datetime, timedelta
+
+#[IMPROVE] Utiliser le Modele : class CustomUser(AbstractBaseUser, PermissionsMixin) = gere tt seul le champ password
+class CustomUser(models.Model):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    password_hash = models.CharField(max_length=256)  # Hachage du mot de passe
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_2fa_enabled = models.BooleanField(default=False)
+    totp_secret = models.CharField(max_length=32, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)  # Nécessaire pour l'administration
+    is_superuser = models.BooleanField(default=False)  # Nécessaire pour les permissions
+
+    USERNAME_FIELD = 'username'  # Champ utilisé comme identifiant unique
+    REQUIRED_FIELDS = ['email']  # Attribut obligatoire
+    
+    def __str__(self):
+        return self.username
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    def get_full_name(self):
+        return self.username
+
+    def get_short_name(self):
+        return self.username
+
+class CustomUserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        null=True,
+        blank=True,
+        default='avatars/default_avatar.png'  # Chemin vers l'image par défaut
+    )
+    bio = models.TextField(max_length=500, blank=True)
+    is_online = models.BooleanField(default=False) # status du user visible par les amis et lui
+    is_logged_in = models.BooleanField(default=False) # indique si user est login, utile pour le html
+    # ManyToMany type de champ Django qui permet de créer une relation de plusieurs à plusieurs entre les objets.
+    friends = models.ManyToManyField(CustomUser, symmetrical=True, blank=True)  
+
+    
+    def __str__(self):
+        return f"Profile de {self.user.username}"
+
+class FriendRequest(models.Model):
+    from_user = models.ForeignKey(CustomUser, related_name='friend_requests_sent', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(CustomUser, related_name='friend_requests_received', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')],
+        default='pending'
+    )
+    
+    def __str__(self):
+        return f"{self.from_user} to {self.to_user} - {self.status}"
+
+class Game(models.Model):
+    player1 = models.ForeignKey(CustomUser, related_name='games_as_player1', on_delete=models.CASCADE)
+    player2 = models.ForeignKey(CustomUser, related_name='games_as_player2', on_delete=models.CASCADE)
+    score_player1 = models.IntegerField(default=0)
+    score_player2 = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=[('ongoing', 'Ongoing'), ('finished', 'Finished')], default='ongoing')
+    
+    def __str__(self):
+        return f"Game {self.id} - {self.player1} vs {self.player2}"
+
+class MatchHistory(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='match_histories', on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, related_name='match_histories', on_delete=models.CASCADE)
+    result = models.CharField(max_length=10, choices=[('win', 'Win'), ('loss', 'Loss'), ('draw', 'Draw')])
+    played_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user} - {self.game} - {self.result}"
+
+
+class TwoFactorCode(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    @classmethod
+    def generate_code(cls, user):
+        # Delete old codes
+        cls.objects.filter(user=user).delete()
+        # Generate new code
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        return cls.objects.create(user=user, code=code)
+    
+    def is_valid(self):
+        # Code expires after 10 minutes
+        return datetime.now() - timedelta(minutes=10) <= self.created_at.replace(tzinfo=None)# accounts/tests.py
+from django.test import TestCase
+
+# Create your tests here.
+# accounts/urls.py
+from django.urls import path
+from . import views
+import logging
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+logger.debug("Rentre dans urls.py de app accounts")
+
+# cree le namespace accounts (eviter le chevauchement du nom des vues entre les fichiers)
+app_name = 'accounts' 
+
+urlpatterns = [
+    path('login/', views.login_view, name='login'),  # Vue pour rendre le formulaire de connexion
+    path('submit_login/', views.submit_login, name='submit_login'),  # Vue pour traiter la soumission AJAX
+    path('profile/', views.profile_view, name='profile'),
+    path('submit_registration/', views.submit_registration, name='submit_registration'),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
+    path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
+    path('delete_account/', views.delete_account, name='delete_account'),
+
+
+    ###### Gestion de profil ######
+    # path('profile/<str:username>/', views.profile_view, name='profile'),
+    path('gestion_profil/', views.manage_profile_view, name='gestion_profil'),
+    path('change_password/', views.change_password_view, name='change_password'),
+    path('update_avatar/', views.update_avatar_view, name='update_avatar'),
+    path('update_profile/', views.update_profile_view, name='update_profile'),
+	path('enable_2fa/', views.enable_2fa, name='enable_2fa'),
+    path('disable_2fa/', views.disable_2fa, name='disable_2fa'),
+	path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
+    path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
+	
+    path('add_friend/', views.add_friend, name='add_friend'),
+    path('handle_friend_request/', views.handle_friend_request, name='handle_friend_request'),
+	path('friend_profile/<str:friend_username>/', views.friend_profile_view, name='friend_profile'),
+    path('remove_friend/', views.remove_friend_view, name='remove_friend'),
+    path('update_status/', views.update_status, name='update_status'),
+
+
+
+	path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
+    
+    path('match-history/', views.match_history_view, name='match_history'),
+    path('send-friend-request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),
+    path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
+    path('reject-friend-request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
+    path('update-avatar/', views.update_avatar_view, name='update_avatar'),
+    path('log-guest/', views.log_guest_view, name='log_guest'),
+	path('verify_2fa_login/', views.verify_2fa_login, name='verify_2fa_login'),
+	
+
+    #[QUESTION] A quoi servent ces vues et a quel moment sont elles utilisees ?
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+]
+# User/utils.py
+import bcrypt
+
+# [IMPROVE] Conseil de chat gpt : revoir le CustomUser de Models.py pour ne pas avoir a gerer nous meme les passwords
+#   Supprimez ces fonctions et utilisez les méthodes intégrées de Django (set_password et check_password).
+#   Cela garantit une gestion sécurisée des mots de passe en utilisant les algorithmes recommandés.
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(hashed_password, password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 # accounts/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse  # Vérifier que HttpResponse est bien importé

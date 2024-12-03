@@ -1,4 +1,4 @@
-# User/forms.py
+# accounts/forms.py
 from django import forms
 from .models import CustomUser, CustomUserProfile
 from django.core.exceptions import ValidationError
@@ -60,8 +60,6 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError("Cet email est déjà utilisé.")
         return email
 
-
-# accounts/forms.py
 
 class PasswordChangeForm(forms.Form):
     old_password = forms.CharField(

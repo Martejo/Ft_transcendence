@@ -1,3 +1,4 @@
+# accounts/middleware.py
 from django.utils.deprecation import MiddlewareMixin
 from django.utils import timezone
 from datetime import timedelta, datetime
@@ -5,17 +6,48 @@ from .models import CustomUserProfile
 
 INACTIVITY_PERIOD = timedelta(minutes=5)  # Durée après laquelle un utilisateur est considéré comme inactif
 
+# class OnlineStatusMiddleware(MiddlewareMixin):
+#     def process_request(self, request):
+#         user_id = request.session.get('user_id')
+#         # user = request.user  # [TAGS] <JWT_tokens_use> Récupérer l'utilisateur directement du JWT
+#         if user_id:
+#             try:
+#                 profile = CustomUserProfile.objects.get(user_id=user_id)
+#                 # Si l'utilisateur a explicitement choisi d'être hors ligne, ne rien faire
+#                 if not profile.is_online:
+#                     # Mettre à jour à `True` uniquement si l'utilisateur est actif ou revient après une période d'inactivité
+#                     last_activity = request.session.get('last_activity')
+#                     now = timezone.now()
+
+#                     if last_activity:
+#                         # Utiliser `fromisoformat` pour analyser la date-heure
+#                         last_activity = datetime.fromisoformat(last_activity)
+#                         if now - last_activity > INACTIVITY_PERIOD:
+#                             profile.is_online = True  # L'utilisateur redevient en ligne s'il interagit après une longue absence
+#                     else:
+#                         # Si `last_activity` n'est pas défini, on le considère en ligne maintenant
+#                         profile.is_online = True
+
+#                     profile.save()
+
+#                 # Mettre à jour l'heure de la dernière activité
+#                 request.session['last_activity'] = str(timezone.now())
+
+#             except CustomUserProfile.DoesNotExist:
+#                 pass
+
 class OnlineStatusMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        user_id = request.session.get('user_id')
+        # user_id = request.session.get('user_id')
         # user = request.user  # [TAGS] <JWT_tokens_use> Récupérer l'utilisateur directement du JWT
-        if user_id:
+        if request.user.is_authenticated:
             try:
-                profile = CustomUserProfile.objects.get(user_id=user_id)
+                profile = request.user.profile
                 # Si l'utilisateur a explicitement choisi d'être hors ligne, ne rien faire
                 if not profile.is_online:
                     # Mettre à jour à `True` uniquement si l'utilisateur est actif ou revient après une période d'inactivité
-                    last_activity = request.session.get('last_activity')
+                    # last_activity = request.session.get('last_activity')
+                    last_activity = request.user.last_activity
                     now = timezone.now()
 
                     if last_activity:
@@ -30,7 +62,8 @@ class OnlineStatusMiddleware(MiddlewareMixin):
                     profile.save()
 
                 # Mettre à jour l'heure de la dernière activité
-                request.session['last_activity'] = str(timezone.now())
+                # request.session['last_activity'] = str(timezone.now())
+                request.user.last_activity =  str(timezone.now())
 
             except CustomUserProfile.DoesNotExist:
                 pass

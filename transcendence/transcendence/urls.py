@@ -23,7 +23,7 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-logger.debug("Rentre dnas urls.py de app transcendence")
+logger.debug("Rentre dans urls.py de app transcendence")
 urlpatterns = [
     #path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
