@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
+    'transcendence.middleware.JWTAuthenticationMiddleware', # [TAGS] <JWT_tokens>
 	# 'django.template.context_processors.csrf',  # Assurez-vous que celui-ci est présent
 
 ]

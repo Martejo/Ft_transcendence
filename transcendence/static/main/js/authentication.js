@@ -24,7 +24,7 @@ function initializeLoginView() {
                     } else {
                         // Stocker les tokens dans `sessionStorage`
                         sessionStorage.setItem('accessToken', response.access);
-                        sessionStorage.setItem('refreshToken', response.refresh);
+                        // sessionStorage.setItem('refreshToken', response.refresh);
 
                         // Attendre un petit délai avant de charger la nouvelle barre de navigation
                         setTimeout(function() {

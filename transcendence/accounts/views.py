@@ -5,17 +5,17 @@ from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.db.models import Max  # Remplacer models.Max par l'import direct de Max
-from .models import CustomUser, CustomUserProfile, FriendRequest, Game, MatchHistory
+from .models import CustomUser, CustomUserProfile, FriendRequest, Game
 from .forms import RegistrationForm, LoginForm, ProfileForm, AvatarUpdateForm, PasswordChangeForm, Two_factor_login_Form
 from .utils import hash_password, verify_password
 from .decorators import login_required
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
+# from rest_framework_simplejwt.tokens import RefreshToken
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.decorators import api_view, permission_classes, authentication_classes
+# from rest_framework.response import Response
+# from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 import pyotp
 import jwt
@@ -77,19 +77,22 @@ def submit_login(request):
                     request.session['auth_partial'] = True
                     return JsonResponse({'status': 'success', 'requires_2fa': True})
                 
-                # Mise à jour de la session pour `is_authenticated`
-                refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
-                refresh_token = str(refresh)
-
-                request.session['is_authenticated'] = True
+                # Générer le jeton JWT
+                payload = {
+                    'user_id': user.id,
+                    'exp': datetime.utcnow() + timedelta(hours=1),  # Durée de validité du jeton
+                }
+                tokenJwt = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+                # [QUESTION] que se passe t il ici ?
+                if isinstance(tokenJwt, bytes):
+                    tokenJwt = tokenJwt.decode('utf-8')
+                
                 user.profile.is_online = True
                 user.profile.is_logged_in = True
                 user.profile.save()
                 return JsonResponse({
                     'status': 'success',
-                    'access': access_token,
-                    'refresh': refresh_token,
+                    'access': tokenJwt,
                     'requires_2fa': False
                 })
 
@@ -112,9 +115,7 @@ def logout_view(request):
     return JsonResponse({'status': 'success', 'message': 'Déconnexion réussie.'})
 
 
-@api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+
 def get_burger_menu_data(request):
     # user_id = request.session.get('user_id')
     # user = get_object_or_404(CustomUser, id=user_id)
@@ -167,9 +168,6 @@ def get_burger_menu_data(request):
         logger.error(f"Erreur lors de la récupération des données du menu burger: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 @csrf_protect
 def update_status(request):
     if request.method == 'POST':
@@ -199,9 +197,6 @@ def update_status(request):
 
 
 
-@api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 @csrf_protect
 def friend_profile_view(request, friend_username):
     logger.debug("Entre dans friend_profile_view")
@@ -247,9 +242,7 @@ def friend_profile_view(request, friend_username):
         logger.error(f"Erreur lors du chargement du profil de l'ami: {e}")
         return HttpResponse("Erreur lors du chargement du profil de l'ami.", status=500)
 
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+
 @csrf_protect
 def remove_friend_view(request):
     if request.method == 'POST':
@@ -295,9 +288,6 @@ def get_user_profile_data(request):
 ############ Gestion de profil #############
 
 @csrf_protect
-@api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def manage_profile_view(request):
     logger.debug("Entre dans manage_profile_view")
     user_id = request.session.get('user_id')
@@ -317,9 +307,6 @@ def manage_profile_view(request):
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def update_profile_view(request):
     logger.debug("Entre dans update_profile_view")
     user_id = request.session.get('user_id')
@@ -336,8 +323,6 @@ def update_profile_view(request):
 
 @login_required
 @csrf_exempt  # Nécessaire car on fait une requête DELETE
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def delete_account(request):
     logger.debug("Entre dans delete account")
     if request.method == 'DELETE':
@@ -351,9 +336,7 @@ def delete_account(request):
         return JsonResponse({'status': 'error', 'message': 'Requête invalide.'}, status=400)
 
 @csrf_protect
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+
 def change_password_view(request):
     logger.debug("Entre dans change_password_view")
     user_id = request.session.get('user_id')
@@ -376,9 +359,6 @@ def change_password_view(request):
 
 
 @csrf_protect
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def update_avatar_view(request):
     logger.debug("Entre dans update_avatar_view")
     user_id = request.session.get('user_id')
@@ -396,9 +376,6 @@ def update_avatar_view(request):
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect
-@api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def profile_view(request):
     logger.debug("Entre dans profile_view")
     #user_id = request.session.get('user_id')
@@ -450,9 +427,7 @@ def profile_view(request):
 ############## Fin de gestion de profil ###############
 
 
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+@csrf_protect
 def add_friend(request):
     try:
         user_id = request.session.get('user_id')
@@ -480,9 +455,6 @@ def add_friend(request):
         logger.error(f"Erreur lors de l'envoi d'une demande d'ami: {e}")
         return JsonResponse({'status': 'error', 'message': 'Erreur lors de l\'envoi de la demande d\'ami'}, status=500)
     
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 @csrf_protect
 def handle_friend_request(request):
     if request.method == 'POST':
@@ -531,18 +503,6 @@ def handle_friend_request(request):
 
     return JsonResponse({'status': 'error', 'message': 'Requête non autorisée'}, status=405)
 
-
-
-
-@api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-def match_history_view(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(CustomUser, id=user_id)
-    match_histories = user.match_histories.all().order_by('-played_at')
-
-    return render(request, 'accounts/match_history.html', {'match_histories': match_histories})
 
 
 # Vues supplémentaires pour la gestion des amis
@@ -601,39 +561,32 @@ def log_guest_view(request):
 # ///////////////////////////----2FA----///////////////////////////////////
 
 @csrf_protect
-@api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def enable_2fa(request):
     logger.debug("Entre dans enable2FA_view")
-    """
-    Handle the 2FA enablement process, generating a TOTP secret and QR code.
-    """
     if request.method == 'GET':
-        # Generate TOTP secret and JWT token
+        # Générer le secret TOTP
         logger.debug("Génération du QR Code et du secret TOTP")
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
-        token = jwt.encode(
-            {'user_id': request.session.get('user_id'), 'totp_secret': totp_secret, 'exp': datetime.utcnow() + timedelta(minutes=5)},
-            settings.SECRET_KEY, algorithm='HS256'
-        )
-        request.session['setup_token'] = token
 
-        # Generate provisioning URI for QR code
+        # Stocker le secret dans la session
+        request.session['totp_secret'] = totp_secret
+        request.session.set_expiry(300)  # Expiration dans 5 minutes
+
+        # Générer l'URI de provisioning pour le QR code
         provisioning_uri = totp.provisioning_uri(name="Transcendence", issuer_name="ggwp")
 
-        # Generate QR code
+        # Générer le QR code
         img = qrcode.make(provisioning_uri)
         buffered = BytesIO()
         img.save(buffered, format="PNG")
         qr_code = base64.b64encode(buffered.getvalue()).decode()
 
-        # Create an empty form to enter the OTP code
+        # Créer un formulaire vide
         form = Two_factor_login_Form()
 
         context = {
-            'qr_code': qr_code,  # Base64 encoded QR code
+            'qr_code': qr_code,
             'secret': totp_secret,
             'is_authenticated': True,
             '2FA_form': form,
@@ -644,61 +597,40 @@ def enable_2fa(request):
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 
-
 @csrf_protect
-
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def verify_2fa(request):
     logger.debug("Entre dans verify_2fa")
 
     if request.method == 'POST':
-        setup_token = request.session.get('setup_token')
-        if not setup_token:
-            logger.warning("Aucun token de configuration 2FA trouvé.")
+        totp_secret = request.session.get('totp_secret')
+        if not totp_secret:
+            logger.warning("Aucun secret TOTP trouvé dans la session.")
             return JsonResponse({'status': 'error', 'message': 'No 2FA setup in progress.'}, status=400)
 
         form = Two_factor_login_Form(request.POST)
         if form.is_valid():
-            try:
+            entered_code = form.cleaned_data['code']
+            logger.debug(f"Code saisi par l'utilisateur : {entered_code}")
+
+            # Vérifier le code TOTP
+            totp = pyotp.TOTP(totp_secret)
+            if totp.verify(entered_code):
+                logger.debug("Code TOTP vérifié avec succès.")
                 user_id = request.session.get('user_id')
-                payload = jwt.decode(setup_token, settings.SECRET_KEY, algorithms=['HS256'])
-                totp_secret = payload['totp_secret']
-                # user = User.objects.get(id=user_id)
-                #user = get_object_or_404(CustomUser, id=user_id)
-                user = get_object_or_404(CustomUser, id=payload['user_id'])
+                user = get_object_or_404(CustomUser, id=user_id)
 
+                user.totp_secret = totp_secret
+                user.is_2fa_enabled = True
+                user.save()
 
-                entered_code = form.cleaned_data['code']
-                logger.debug(f"Code saisi par l'utilisateur : {entered_code}")
-
-                # Vérifier le code TOTP
-                totp = pyotp.TOTP(totp_secret)
-                if totp.verify(entered_code):
-                    logger.debug("Code TOTP vérifié avec succès.")
-                    user.totp_secret = totp_secret
-                    user.is_2fa_enabled = True
-                    user.save()
-
-                    # Supprimer le token de configuration de la session
-                    del request.session['setup_token']
-                    return JsonResponse({'status': 'success', 'message': '2FA setup completed successfully.'})
-                else:
-                    logger.warning("Code TOTP invalide.")
-                    return JsonResponse({'status': 'error', 'message': 'Invalid code entered.'}, status=400)
-
-            except jwt.ExpiredSignatureError:
-                logger.error("Le token JWT a expiré.")
-                del request.session['setup_token']
-                return JsonResponse({'status': 'error', 'message': 'Setup expired. Please try again.'}, status=400)
-
-            except jwt.InvalidTokenError:
-                logger.error("Le token JWT est invalide.")
-                del request.session['setup_token']
-                return JsonResponse({'status': 'error', 'message': 'Invalid session. Please try again.'}, status=400)
+                # Supprimer le secret de la session
+                del request.session['totp_secret']
+                return JsonResponse({'status': 'success', 'message': '2FA setup completed successfully.'})
+            else:
+                logger.warning("Code TOTP invalide.")
+                return JsonResponse({'status': 'error', 'message': 'Invalid code entered.'}, status=400)
         else:
-            logger.warning("Formulaire invalide")
+            logger.warning("Formulaire invalide.")
             return JsonResponse({'status': 'error', 'message': 'Invalid input.'}, status=400)
 
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
@@ -769,8 +701,6 @@ def verify_2fa_login(request):
 
 
 @csrf_protect
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def disable_2fa(request):
     logger.debug("Entre dans disable_2fa")
 

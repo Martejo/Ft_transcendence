@@ -80,14 +80,14 @@ class Game(models.Model):
     def __str__(self):
         return f"Game {self.id} - {self.player1} vs {self.player2}"
 
-class MatchHistory(models.Model):
-    user = models.ForeignKey(CustomUser, related_name='match_histories', on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, related_name='match_histories', on_delete=models.CASCADE)
-    result = models.CharField(max_length=10, choices=[('win', 'Win'), ('loss', 'Loss'), ('draw', 'Draw')])
-    played_at = models.DateTimeField(auto_now_add=True)
+# class MatchHistory(models.Model):
+#     user = models.ForeignKey(CustomUser, related_name='match_histories', on_delete=models.CASCADE)
+#     game = models.ForeignKey(Game, related_name='match_histories', on_delete=models.CASCADE)
+#     result = models.CharField(max_length=10, choices=[('win', 'Win'), ('loss', 'Loss'), ('draw', 'Draw')])
+#     played_at = models.DateTimeField(auto_now_add=True)
     
-    def __str__(self):
-        return f"{self.user} - {self.game} - {self.result}"
+#     def __str__(self):
+#         return f"{self.user} - {self.game} - {self.result}"
 
 
 class TwoFactorCode(models.Model):

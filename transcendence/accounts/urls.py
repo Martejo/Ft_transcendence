@@ -47,7 +47,7 @@ urlpatterns = [
 
 	path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
     
-    path('match-history/', views.match_history_view, name='match_history'),
+    # path('match-history/', views.match_history_view, name='match_history'),
     path('send-friend-request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),
     path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
     path('reject-friend-request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
@@ -57,7 +57,7 @@ urlpatterns = [
 	
 
 
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 ]

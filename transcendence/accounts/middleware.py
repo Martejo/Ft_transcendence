@@ -37,3 +37,5 @@ class OnlineStatusMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         # On ne remet plus automatiquement à `offline` dans le `process_response`
         return response
+
+
