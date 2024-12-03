@@ -4,6 +4,6 @@ python-dotenv
 bcrypt
 Pillow
 pyotp
-PyJWT==2.8.0
+PyJWT
 qrcode
 djangorestframework-simplejwt

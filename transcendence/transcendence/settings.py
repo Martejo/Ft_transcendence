@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'rest_framework', # [TAGS] <JWT_tokens_settings>
-    'rest_framework_simplejwt.token_blacklist',# [TAGS] <JWT_tokens_settings>
+	# 'rest_framework', # [TAGS] <JWT_tokens_settings>
+    # 'rest_framework_simplejwt.token_blacklist',# [TAGS] <JWT_tokens_settings>
     'accounts',
     'core',
     'game',
@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
+    'accounts.middleware.JWTAuthenticationMiddleware', #[TAGS] <JWT_tokens_settings>
 	# 'django.template.context_processors.csrf',  # Assurez-vous que celui-ci est présent
 
 ]
@@ -175,31 +176,41 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", 'https://ajax.googleapis.com')  # Ajustez selon vos besoins
 CSP_STYLE_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com')  # Ajustez selon vos besoins
 
-# [TAGS] <JWT_tokens_settings>
-# Utilise quand on applique les decorateurs suivants avant la fonction :
-    # @authentication_classes([JWTAuthentication])
-    # @permission_classes([IsAuthenticated])
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-}
 
-# [TAGS] <JWT_tokens_settings>
-# [TESTS] changer les timedeltas pour valider le fonctionnement
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), # Temps d'expiration du token d'accès
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), # Temps d'expiration du token de raffraichissement ( permettant a l' utilisateur de generer un nouveau token d' acces)
-    'ROTATE_REFRESH_TOKENS': True, # Un nouveau refresh token est genere apres chaque utilisation de refresh token
-    'BLACKLIST_AFTER_ROTATION': True, # Blacklist les refresh tokens apres leur utilisation 
-    'ALGORITHM': 'HS256',
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'SIGNING_KEY': SECRET_KEY,  # Clé secrète Django
-}
+# Ajoutez votre clé secrète pour PyJWT
+JWT_SECRET_KEY = SECRET_KEY  # Vous pouvez utiliser la même clé que Django pour JWT
+
+# Paramètres pour JWT (sans DRF)
+JWT_ALGORITHM = 'HS256'
+JWT_ACCESS_TOKEN_EXPIRES = 3600  # Durée de validité du token en secondes (ici 1 heure)
+
+
+
+# # [TAGS] <JWT_tokens_settings>
+# # Utilise quand on applique les decorateurs suivants avant la fonction :
+#     # @authentication_classes([JWTAuthentication])
+#     # @permission_classes([IsAuthenticated])
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+# }
+
+# # [TAGS] <JWT_tokens_settings>
+# # [TESTS] changer les timedeltas pour valider le fonctionnement
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), # Temps d'expiration du token d'accès
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1), # Temps d'expiration du token de raffraichissement ( permettant a l' utilisateur de generer un nouveau token d' acces)
+#     'ROTATE_REFRESH_TOKENS': True, # Un nouveau refresh token est genere apres chaque utilisation de refresh token
+#     'BLACKLIST_AFTER_ROTATION': True, # Blacklist les refresh tokens apres leur utilisation 
+#     'ALGORITHM': 'HS256',
+#     'AUTH_HEADER_TYPES': ('Bearer',),
+#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+#     'SIGNING_KEY': SECRET_KEY,  # Clé secrète Django
+# }
 
 
 
