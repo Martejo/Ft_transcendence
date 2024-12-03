@@ -1,8 +1,7 @@
 # accounts/forms.py
 from django import forms
-from .models import CustomUser, CustomUserProfile
 from django.core.exceptions import ValidationError
-
+from .models import CustomUser, CustomUserProfile
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
@@ -25,19 +24,25 @@ class RegistrationForm(forms.ModelForm):
         
         return cleaned_data
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])  # Utilisez set_password pour hacher le mot de passe
+        if commit:
+            user.save()
+        return user
+
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, label='Nom d\'utilisateur')
     password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
 
-class Two_factor_login_Form(forms.Form):
-	code = forms.CharField(max_length=6, min_length=6, label='Code 2FA')
+class TwoFactorLoginForm(forms.Form):
+    code = forms.CharField(max_length=6, min_length=6, label='Code 2FA')
 
-	def clean_code(self):
-		code = self.cleaned_data['code']
-		if not code.isdigit():
-			raise forms.ValidationError("Le code doit contenir uniquement des chiffres")
-		return code
-
+    def clean_code(self):
+        code = self.cleaned_data['code']
+        if not code.isdigit():
+            raise forms.ValidationError("Le code doit contenir uniquement des chiffres")
+        return code
 
 class ProfileForm(forms.ModelForm):
     class Meta:
@@ -59,7 +64,6 @@ class ProfileForm(forms.ModelForm):
         if CustomUser.objects.exclude(id=self.instance.id).filter(email=email).exists():
             raise forms.ValidationError("Cet email est déjà utilisé.")
         return email
-
 
 class PasswordChangeForm(forms.Form):
     old_password = forms.CharField(
@@ -88,7 +92,6 @@ class PasswordChangeForm(forms.Form):
 
         return cleaned_data
 
-
 class AvatarUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUserProfile
@@ -105,4 +108,3 @@ class AvatarUpdateForm(forms.ModelForm):
             if not avatar.content_type in ["image/jpeg", "image/png", "image/gif"]:
                 raise forms.ValidationError("Seules les images JPEG, PNG et GIF sont autorisées.")
         return avatar
-
