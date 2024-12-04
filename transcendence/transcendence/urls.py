@@ -14,21 +14,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-#from django.contrib import admin
+from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 import logging
+from core import views as core_views  # Importer 'landing_view' depuis 'core.views'
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 logger.debug("Rentre dnas urls.py de app transcendence")
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('game/', include('game.urls', namespace='game')),
-    path('', include('core.urls')),  #landing page
+    path('core/', include('core.urls', namespace='core')),
+    path('', core_views.landing_view, name='landing'),  # Landing page à la racine
 ]
 
 if settings.DEBUG:

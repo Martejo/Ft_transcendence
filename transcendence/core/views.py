@@ -167,11 +167,11 @@ def load_view(request, app: str, view_name: str):
 
 def get_navbar(request):
     logger.debug("Entre dans get_navbar_view")
-    is_authenticated = request.session.get('is_authenticated', False)
+    is_authenticated = request.user.is_authenticated
 
     if is_authenticated:
         # Génère le HTML du burger-menu sans appeler la vue `burger_menu_view`
-        burger_menu_html = render_to_string('accounts/burger_menu.html')
+        burger_menu_html = render_to_string('accounts/burger_menu.html', {'user': request.user})
         return render(request, 'core/navbar_logged_in.html', {
             'burger_menu': burger_menu_html
         })
@@ -184,6 +184,6 @@ def home_view(request):
 
 def landing_view(request):
     logger.debug("Entre dans landing_view")
-    user_id = request.session.get('user_id')
-    is_authenticated = bool(user_id)
+    is_authenticated = request.user.is_authenticated
     return render(request, 'landing.html', {'is_authenticated': is_authenticated})
+

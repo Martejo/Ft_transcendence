@@ -20,10 +20,10 @@ $.ajaxSetup({
             xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
         }
 
-        // Ajouter l'en-tête `Authorization` si un accessToken est disponible
-        const accessToken = sessionStorage.getItem('accessToken');
-        if (accessToken) {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        // Ajouter l'en-tête `Authorization` si un jwtToken est disponible
+        const jwtToken = sessionStorage.getItem('jwtToken');
+        if (jwtToken) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
         }
     }
 });

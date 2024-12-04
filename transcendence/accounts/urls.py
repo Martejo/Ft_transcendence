@@ -34,7 +34,7 @@ urlpatterns = [
 	path('enable_2fa/', views.enable_2fa, name='enable_2fa'),
     path('disable_2fa/', views.disable_2fa, name='disable_2fa'),
 	#path('qr-code/', views.enable_2fa, name='show_qr'),
-	path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
+	path('check_2fa/', views.check_2fa, name='check_2fa'),
     path('test_manage_profile/', views.manage_profile_view, name='test_manage_profile'),
 	
     path('add_friend/', views.add_friend, name='add_friend'),
@@ -44,15 +44,12 @@ urlpatterns = [
     path('update_status/', views.update_status, name='update_status'),
 
 
-
-	path('get_burger_menu_data/', views.get_burger_menu_data, name='get_burger_menu_data'),
     
     # path('match-history/', views.match_history_view, name='match_history'),
     path('send-friend-request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),
     path('accept-friend-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
     path('reject-friend-request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
     path('update-avatar/', views.update_avatar_view, name='update_avatar'),
-    path('log-guest/', views.log_guest_view, name='log_guest'),
 	path('verify_2fa_login/', views.verify_2fa_login, name='verify_2fa_login'),
 	
 

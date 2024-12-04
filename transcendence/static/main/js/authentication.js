@@ -23,7 +23,7 @@ function initializeLoginView() {
                         window.location.hash = '#accounts-verify_2fa_login';
                     } else {
                         // Stocker les tokens dans `sessionStorage`
-                        sessionStorage.setItem('accessToken', response.access);
+                        sessionStorage.setItem('jwtToken', response.jwtToken);
                         // sessionStorage.setItem('refreshToken', response.refresh);
 
                         // Attendre un petit délai avant de charger la nouvelle barre de navigation
@@ -65,6 +65,7 @@ function logoutUser() {
         type: 'POST',  // Utilisez POST pour déconnecter
         success: function(response) {
             if (response.status === 'success') {
+                sessionStorage.removeItem('jwtToken');
                 console.log('Déconnexion réussie');
                  // Optionnel : Réinitialiser les éléments spécifiques à l'utilisateur
                  $('#navbar').html(''); // Vide la barre de navigation
