@@ -1,0 +1,25 @@
+Regle : 
+Aucun objet ne chevauche un autre
+
+Bonus de joueur (maintenir touche enfoncee pendant que le joueur est en statut de bonus et que la balle touche le palet) = le declencheur ajoute la surprise
+tir rapide
+invincibilite sur 1 rebond
+flash (il se declenche au moment ou la balle repart dans l'autre sens et empeche l' adversaire de voir l' angle)
+
+
+
+Objets bonus (rond) :(max 2 au total)
+mettre du temps avant le 1er bonus (rand(2-10 sec))
+un nouveau bonus apparait seulement entre 3-6 sec apres la derniere disparition de bonus
+pendant 10 sec 1 seul bonus peut apparaitre a l' ecran (apres 2 bonus peuvent apparaitre)
+
+
+
+Objets de terrain (carre) : Apparition spontanee (max 3 au total et jamais trop proches des joueurs)
+bumpers (max 3)
+redirection
+accelerateurs/ralentisseur (max 1)
+teleporteurs (toujours 1 en double)
+
+
+

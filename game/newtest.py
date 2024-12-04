@@ -6,21 +6,12 @@ import random
 # Initialisation de Pygame
 pygame.init()
 
-# Power ups specifics
-MAX_ACTIVE_POWERUPS = 2
-POWERUP_SPAWN_COOLDOWN = 8
-INITIAL_SPAWN_DELAY = 3
-
 # Dimensions de la fenêtre et du terrain
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 400
 FPS = 60
 INITIAL_BALL_SPEED = 4
 PADDLE_SPEED = 5
 BALL_SPEED_INCREMENT = 0.03
-
-# Physics constants
-ICE_ACCELERATION = 0.5
-ICE_FRICTION = 0.02
 
 # Tailles des raquettes
 INITIAL_PADDLE_HEIGHT = 60
@@ -31,7 +22,6 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 PURPLE = (147, 0, 211)  # Couleur pour l'orbe d'inversion
 RED = (255, 0, 0)      # Couleur pour l'orbe de rétrécissement
-BLUE = (0, 191, 255)   # Couleur pour l'orbe de glace
 
 # Initialisation de la fenêtre
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -43,40 +33,12 @@ clock = pygame.time.Clock()
 # Terrain
 terrain_rect = pygame.Rect(50, 50, WINDOW_WIDTH - 100, WINDOW_HEIGHT - 100)
 
-class Paddle:
-    def __init__(self, x, y, width, height):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.velocity = 0
-        self.on_ice = False
-        
-    def move(self, direction, is_on_ice, terrain_top, terrain_bottom):
-        if is_on_ice:
-            # Add to velocity based on input
-            self.velocity += direction * ICE_ACCELERATION
-            # Apply friction
-            self.velocity *= (1 - ICE_FRICTION)
-        else:
-            # Normal movement
-            self.velocity = direction * PADDLE_SPEED
-            
-        # Apply movement with boundary checking
-        new_y = self.rect.y + self.velocity
-        if new_y < terrain_top:
-            new_y = terrain_top
-            self.velocity = 0
-        elif new_y + self.rect.height > terrain_bottom:
-            new_y = terrain_bottom - self.rect.height
-            self.velocity = 0
-            
-        self.rect.y = new_y
-
 # Raquettes
-paddle_left = Paddle(terrain_rect.left + 10, 
-                    terrain_rect.centery - INITIAL_PADDLE_HEIGHT // 2,
-                    10, INITIAL_PADDLE_HEIGHT)
-paddle_right = Paddle(terrain_rect.right - 20,
-                     terrain_rect.centery - INITIAL_PADDLE_HEIGHT // 2,
-                     10, INITIAL_PADDLE_HEIGHT)
+paddle_width = 10
+paddle_left = pygame.Rect(terrain_rect.left + 10, terrain_rect.centery - INITIAL_PADDLE_HEIGHT // 2, 
+                         paddle_width, INITIAL_PADDLE_HEIGHT)
+paddle_right = pygame.Rect(terrain_rect.right - 20, terrain_rect.centery - INITIAL_PADDLE_HEIGHT // 2, 
+                          paddle_width, INITIAL_PADDLE_HEIGHT)
 
 # Balle
 ball_size = 15
@@ -89,11 +51,11 @@ score_left, score_right = 0, 0
 # Power-up system
 class PowerUpOrb:
     def __init__(self, terrain_rect, color, effect_type):
-        self.size = 30
+        self.size = 30  # Increased orb size
         self.color = color
         self.effect_type = effect_type
-        self.active = False
-        self.respawn_time = 10
+        self.active = True
+        self.respawn_time = 5  # Secondes avant réapparition
         self.last_collected_time = 0
         self.reposition(terrain_rect)
         
@@ -105,28 +67,21 @@ class PowerUpOrb:
         
     def update(self, current_time):
         if not self.active and current_time - self.last_collected_time >= self.respawn_time:
-            if active_orbs_count < MAX_ACTIVE_POWERUPS:
-                self.active = True
-                self.reposition(terrain_rect)
+            self.active = True
+            self.reposition(terrain_rect)
             
     def collect(self, current_time):
         self.active = False
         self.last_collected_time = current_time
-
-    def count_active_orbs(orbs):
-        return sum(1 for orb in orbs if orb.active)
 
 # État des power-ups
 class PowerUpState:
     def __init__(self):
         self.inverted_controls = {"left": False, "right": False}
         self.shrunk_paddle = {"left": False, "right": False}
-        self.ice_physics = {"left": False, "right": False}
-        self.effect_duration = 5
-        self.effect_start_time = {
-            "left": {"invert": 0, "shrink": 0, "ice": 0}, 
-            "right": {"invert": 0, "shrink": 0, "ice": 0}
-        }
+        self.effect_duration = 5  # Durée en secondes
+        self.effect_start_time = {"left": {"invert": 0, "shrink": 0}, 
+                                "right": {"invert": 0, "shrink": 0}}
         
     def apply_effect(self, player, effect_type, current_time):
         if effect_type == "invert":
@@ -135,9 +90,6 @@ class PowerUpState:
         elif effect_type == "shrink":
             self.shrunk_paddle[player] = True
             self.effect_start_time[player]["shrink"] = current_time
-        elif effect_type == "ice":
-            self.ice_physics[player] = True
-            self.effect_start_time[player]["ice"] = current_time
         
     def update(self, current_time):
         for player in ["left", "right"]:
@@ -151,56 +103,55 @@ class PowerUpState:
                 if current_time - self.effect_start_time[player]["shrink"] >= self.effect_duration:
                     self.shrunk_paddle[player] = False
                     # Reset paddle height
-                    paddle = paddle_left if player == "left" else paddle_right
-                    paddle.rect.height = INITIAL_PADDLE_HEIGHT
-                    paddle.rect.centery = paddle.rect.centery
-                    
-            # Update ice physics effect
-            if self.ice_physics[player]:
-                if current_time - self.effect_start_time[player]["ice"] >= self.effect_duration:
-                    self.ice_physics[player] = False
-                    # Reset velocity
-                    paddle = paddle_left if player == "left" else paddle_right
-                    paddle.velocity = 0
+                    if player == "left":
+                        paddle_left.height = INITIAL_PADDLE_HEIGHT
+                        paddle_left.centery = paddle_left.centery  # Recenter paddle
+                    else:
+                        paddle_right.height = INITIAL_PADDLE_HEIGHT
+                        paddle_right.centery = paddle_right.centery  # Recenter paddle
 
 # Création des objets power-up
 power_up_orbs = [
     PowerUpOrb(terrain_rect, PURPLE, "invert"),
-    PowerUpOrb(terrain_rect, RED, "shrink"),
-    PowerUpOrb(terrain_rect, BLUE, "ice")
+    PowerUpOrb(terrain_rect, RED, "shrink")
 ]
 power_up_state = PowerUpState()
 
-def calculate_collision(ball, paddle_rect, is_left_paddle):
+def calculate_collision(ball, paddle, is_left_paddle):
     global ball_speed_x, ball_speed_y
     
     if is_left_paddle:
-        if ball.right < paddle_rect.left or ball_speed_x > 0:
+        if ball.right < paddle.left or ball_speed_x > 0:
             return "miss"
     else:
-        if ball.left > paddle_rect.right or ball_speed_x < 0:
+        if ball.left > paddle.right or ball_speed_x < 0:
             return "miss"
             
-    if abs(ball.centery - paddle_rect.centery) > paddle_rect.height/2:
+    if abs(ball.centery - paddle.centery) > paddle.height/2:
         return "miss"
         
-    relative_position = (ball.centery - paddle_rect.centery) / (paddle_rect.height / 2)
+    relative_position = (ball.centery - paddle.centery) / (paddle.height / 2)
     ball_speed_y = relative_position * abs(ball_speed_x)
     ball_speed_x = -ball_speed_x * (1 + BALL_SPEED_INCREMENT)
     
     if is_left_paddle:
-        ball.left = paddle_rect.right
+        ball.left = paddle.right
     else:
-        ball.right = paddle_rect.left
+        ball.right = paddle.left
         
     return "hit"
 
 def apply_shrink_effect(player):
-    paddle = paddle_left if player == "left" else paddle_right
-    paddle.rect.height = MIN_PADDLE_HEIGHT
-    paddle.rect.centery = min(max(terrain_rect.top + paddle.rect.height//2,
-                                paddle.rect.centery),
-                            terrain_rect.bottom - paddle.rect.height//2)
+    if player == "left":
+        paddle_left.height = MIN_PADDLE_HEIGHT
+        paddle_left.centery = min(max(terrain_rect.top + paddle_left.height//2,
+                                    paddle_left.centery),
+                                terrain_rect.bottom - paddle_left.height//2)
+    else:
+        paddle_right.height = MIN_PADDLE_HEIGHT
+        paddle_right.centery = min(max(terrain_rect.top + paddle_right.height//2,
+                                     paddle_right.centery),
+                                 terrain_rect.bottom - paddle_right.height//2)
 
 # Variable pour suivre le dernier joueur ayant touché la balle
 last_paddle_hit = None
@@ -223,28 +174,28 @@ while True:
     keys = pygame.key.get_pressed()
     
     # Raquette gauche
-    direction_left = 0
     if power_up_state.inverted_controls["left"]:
-        if keys[pygame.K_s]: direction_left -= 1
-        if keys[pygame.K_w]: direction_left += 1
+        if keys[pygame.K_s] and paddle_left.top > terrain_rect.top:
+            paddle_left.y -= PADDLE_SPEED
+        if keys[pygame.K_w] and paddle_left.bottom < terrain_rect.bottom:
+            paddle_left.y += PADDLE_SPEED
     else:
-        if keys[pygame.K_w]: direction_left -= 1
-        if keys[pygame.K_s]: direction_left += 1
-    
-    paddle_left.move(direction_left, power_up_state.ice_physics["left"], 
-                    terrain_rect.top, terrain_rect.bottom)
+        if keys[pygame.K_w] and paddle_left.top > terrain_rect.top:
+            paddle_left.y -= PADDLE_SPEED
+        if keys[pygame.K_s] and paddle_left.bottom < terrain_rect.bottom:
+            paddle_left.y += PADDLE_SPEED
     
     # Raquette droite
-    direction_right = 0
     if power_up_state.inverted_controls["right"]:
-        if keys[pygame.K_DOWN]: direction_right -= 1
-        if keys[pygame.K_UP]: direction_right += 1
+        if keys[pygame.K_DOWN] and paddle_right.top > terrain_rect.top:
+            paddle_right.y -= PADDLE_SPEED
+        if keys[pygame.K_UP] and paddle_right.bottom < terrain_rect.bottom:
+            paddle_right.y += PADDLE_SPEED
     else:
-        if keys[pygame.K_UP]: direction_right -= 1
-        if keys[pygame.K_DOWN]: direction_right += 1
-    
-    paddle_right.move(direction_right, power_up_state.ice_physics["right"],
-                     terrain_rect.top, terrain_rect.bottom)
+        if keys[pygame.K_UP] and paddle_right.top > terrain_rect.top:
+            paddle_right.y -= PADDLE_SPEED
+        if keys[pygame.K_DOWN] and paddle_right.bottom < terrain_rect.bottom:
+            paddle_right.y += PADDLE_SPEED
 
     # Déplacement de la balle
     ball.x += ball_speed_x
@@ -255,8 +206,8 @@ while True:
         ball_speed_y *= -1
 
     # Gestion des collisions avec les raquettes et mise à jour du dernier joueur
-    if ball.colliderect(paddle_left.rect):
-        collision_result = calculate_collision(ball, paddle_left.rect, is_left_paddle=True)
+    if ball.colliderect(paddle_left):
+        collision_result = calculate_collision(ball, paddle_left, is_left_paddle=True)
         if collision_result == "hit":
             last_paddle_hit = "left"
         else:
@@ -265,8 +216,8 @@ while True:
             ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
             last_paddle_hit = None
             
-    elif ball.colliderect(paddle_right.rect):
-        collision_result = calculate_collision(ball, paddle_right.rect, is_left_paddle=False)
+    elif ball.colliderect(paddle_right):
+        collision_result = calculate_collision(ball, paddle_right, is_left_paddle=False)
         if collision_result == "hit":
             last_paddle_hit = "right"
         else:
@@ -299,8 +250,8 @@ while True:
     # Dessin
     screen.fill(BLACK)
     pygame.draw.rect(screen, WHITE, terrain_rect, 2)
-    pygame.draw.rect(screen, WHITE, paddle_left.rect)
-    pygame.draw.rect(screen, WHITE, paddle_right.rect)
+    pygame.draw.rect(screen, WHITE, paddle_left)
+    pygame.draw.rect(screen, WHITE, paddle_right)
     pygame.draw.ellipse(screen, WHITE, ball)
     
     # Dessin des orbes de power-up
@@ -322,8 +273,6 @@ while True:
             effects.append("Inverted!")
         if power_up_state.shrunk_paddle[player]:
             effects.append("Shrunk!")
-        if power_up_state.ice_physics[player]:
-            effects.append("Icy!")
             
         if effects:
             effect_text = font.render(" & ".join(effects), True, PURPLE)

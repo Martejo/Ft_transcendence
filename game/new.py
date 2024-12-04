@@ -86,35 +86,65 @@ ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
 # Scores
 score_left, score_right = 0, 0
 
-# Power-up system
 class PowerUpOrb:
     def __init__(self, terrain_rect, color, effect_type):
         self.size = 30
         self.color = color
         self.effect_type = effect_type
-        self.active = False
-        self.respawn_time = 10
+        self.active = False  # Start inactive
+        self.respawn_time = 7
         self.last_collected_time = 0
+        self.existing_orbs = existing_orbs
         self.reposition(terrain_rect)
+
+    def is_overlapping(self, other_orb):
+        center1 = (self.x + self.size//2, self.y + self.size//2)
+        center2 = (other_orb.x + other_orb.size//2, other_orb.y + other_orb.size//2)
+
+        # Calculate distance between centers
+        distance = ((center1[0] - center2[0])**2 + (center1[1] - center2[1])**2)**0.5
         
+        # Add a minimum spacing between orbs (1.5 times the orb size for visual clarity)
+        min_distance = (self.size + other_orb.size) * 0.75
+        
+        return distance < min_distance
+
     def reposition(self, terrain_rect):
+        max_attempts = 100  # Prevent infinite loops
         margin = 50
-        self.x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
-        self.y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
-        self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
         
-    def update(self, current_time):
+        for _ in range(max_attempts):
+            # Generate new random position
+            self.x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
+            self.y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
+            
+            # Check overlap with other orbs
+            overlapping = False
+            for orb in power_up_orbs:
+                if orb != self and orb.active:
+                    if self.is_overlapping(orb):
+                        overlapping = True
+                        break
+            
+            # If no overlap found, accept this position
+            if not overlapping:
+                self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
+                return True
+                
+        # If we couldn't find a non-overlapping position, try again later
+        return False
+
+    def update(self, current_time, active_orbs_count):
         if not self.active and current_time - self.last_collected_time >= self.respawn_time:
             if active_orbs_count < MAX_ACTIVE_POWERUPS:
-                self.active = True
-                self.reposition(terrain_rect)
+                # Only activate if we haven't reached the maximum
+                if self.reposition(terrain_rect):
+                	self.active = True
+                
             
     def collect(self, current_time):
         self.active = False
         self.last_collected_time = current_time
-
-    def count_active_orbs(orbs):
-        return sum(1 for orb in orbs if orb.active)
 
 # État des power-ups
 class PowerUpState:
@@ -163,12 +193,29 @@ class PowerUpState:
                     paddle = paddle_left if player == "left" else paddle_right
                     paddle.velocity = 0
 
+def count_active_orbs(orbs):
+    return sum(1 for orb in orbs if orb.active)
+
 # Création des objets power-up
 power_up_orbs = [
     PowerUpOrb(terrain_rect, PURPLE, "invert"),
     PowerUpOrb(terrain_rect, RED, "shrink"),
     PowerUpOrb(terrain_rect, BLUE, "ice")
 ]
+
+def initialize_orbs():
+    for i, orb in enumerate(power_up_orbs):
+        if i < MAX_ACTIVE_POWERUPS:  # Only activate initial orbs up to the maximum
+            orb.active = True
+            orb.reposition(terrain_rect)
+        else:
+            orb.active = False
+            # Set different last_collected_times to stagger spawns
+            orb.last_collected_time = time.time() - orb.respawn_time + (i * POWERUP_SPAWN_COOLDOWN)
+
+# Initialize the orbs
+initialize_orbs()
+
 power_up_state = PowerUpState()
 
 def calculate_collision(ball, paddle_rect, is_left_paddle):
@@ -214,9 +261,10 @@ while True:
             pygame.quit()
             sys.exit()
 
-    # Mise à jour des power-ups
+    # Mise à jour des power-ups avec le compte des orbes actifs
+    active_orbs = count_active_orbs(power_up_orbs)
     for orb in power_up_orbs:
-        orb.update(current_time)
+        orb.update(current_time, active_orbs)
     power_up_state.update(current_time)
 
     # Déplacement des raquettes avec gestion des contrôles inversés

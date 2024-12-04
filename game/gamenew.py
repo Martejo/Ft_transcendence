@@ -1,5 +1,7 @@
 import pygame
 import sys
+import time
+import random
 
 # Initialisation de Pygame
 pygame.init()
@@ -7,9 +9,9 @@ pygame.init()
 # Dimensions de la fenêtre et du terrain
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 400
 FPS = 60
-INITIAL_BALL_SPEED = 3
+INITIAL_BALL_SPEED = 4
 PADDLE_SPEED = 5
-BALL_SPEED_INCREMENT = 0.1  # Augmentation progressive de la vitesse horizontale
+BALL_SPEED_INCREMENT = 0.03  # Augmentation progressive de la vitesse horizontale
 
 # Couleurs
 WHITE = (255, 255, 255)
@@ -19,16 +21,19 @@ BLACK = (0, 0, 0)
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Pongame")
 
+# Clock for controlling FPS
+clock = pygame.time.Clock()
+
 # Terrain
 terrain_rect = pygame.Rect(50, 50, WINDOW_WIDTH - 100, WINDOW_HEIGHT - 100)
 
 # Raquettes
 paddle_width, paddle_height = 10, 60
 paddle_left = pygame.Rect(terrain_rect.left + 10, terrain_rect.centery - paddle_height // 2, paddle_width, paddle_height)
-paddle_right = pygame.Rect(terrain_rect.right - 20, terrain_rect.centery - paddle_height // 2, paddle_width, paddle_height)
+paddle_right = pygame.Rect(terrain_rect.right - 10, terrain_rect.centery - paddle_height // 2, paddle_width, paddle_height)
 
 # Balle
-ball_size = 10
+ball_size = 15
 ball = pygame.Rect(terrain_rect.centerx, terrain_rect.centery, ball_size, ball_size)
 ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
 
@@ -38,31 +43,51 @@ score_left, score_right = 0, 0
 # Horloge pour contrôler les FPS
 clock = pygame.time.Clock()
 
-# def calculate_collision(ball, paddle, is_left_paddle):
-#     """
-#     Calcule la nouvelle direction de la balle après une collision avec une raquette.
-#     """
-#     global ball_speed_x, ball_speed_y
+# Power-up system
+class PowerUpOrb:
+    def __init__(self, terrain_rect):
+        self.size = 20
+        self.active = True
+        self.respawn_time = 5  # Secondes avant réapparition
+        self.last_collected_time = 0
+        self.reposition(terrain_rect)
+        
+    def reposition(self, terrain_rect):
+        # Position aléatoire dans le terrain, en évitant les bords
+        margin = 50
+        self.x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
+        self.y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
+        self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
+        
+    def update(self, current_time):
+        if not self.active and current_time - self.last_collected_time >= self.respawn_time:
+            self.active = True
+            self.reposition(terrain_rect)
+            
+    def collect(self, current_time):
+        self.active = False
+        self.last_collected_time = current_time
 
-#     # Vérifier si la balle dépasse les côtés de la raquette
-#     if ball.bottom < paddle.top or ball.top > paddle.bottom:
-#         # La balle est considérée comme hors terrain
-#         return "miss"
+# État des power-ups
+class PowerUpState:
+    def __init__(self):
+        self.inverted_controls = {"left": False, "right": False}
+        self.effect_duration = 5  # Durée en secondes
+        self.effect_start_time = {"left": 0, "right": 0}
+        
+    def apply_inversion(self, player, current_time):
+        self.inverted_controls[player] = True
+        self.effect_start_time[player] = current_time
+        
+    def update(self, current_time):
+        for player in ["left", "right"]:
+            if self.inverted_controls[player]:
+                if current_time - self.effect_start_time[player] >= self.effect_duration:
+                    self.inverted_controls[player] = False
 
-#     # Calcule l'angle de rebond en fonction de la position relative sur la raquette
-#     relative_position = (ball.centery - paddle.centery) / (paddle_height / 2)  # Entre -1 et 1
-#     ball_speed_y = relative_position * abs(ball_speed_x)  # Plus l'impact est éloigné du centre, plus l'angle est prononcé
-
-#     # Augmente légèrement la vitesse horizontale de la balle
-#     ball_speed_x = -ball_speed_x * (1 + BALL_SPEED_INCREMENT)
-
-#     # Correction de position pour éviter que la balle reste collée
-#     if is_left_paddle:
-#         ball.left = paddle.right
-#     else:
-#         ball.right = paddle.left
-
-#     return "hit"
+# Création des objets power-up
+power_up_orb = PowerUpOrb(terrain_rect)
+power_up_state = PowerUpState()
 
 def calculate_collision(ball, paddle, is_left_paddle):
     global ball_speed_x, ball_speed_y
@@ -91,6 +116,8 @@ def calculate_collision(ball, paddle, is_left_paddle):
         
     return "hit"
 
+# Variable pour suivre le dernier joueur ayant touché la balle
+last_paddle_hit = None
 
 # Boucle principale du jeu
 while True:
@@ -98,6 +125,10 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+    # Mise à jour des power-ups
+    power_up_orb.update(current_time)
+    power_up_state.update(current_time)
 
     # Déplacement des raquettes
     keys = pygame.key.get_pressed()
@@ -118,23 +149,18 @@ while True:
     if ball.top <= terrain_rect.top or ball.bottom >= terrain_rect.bottom:
         ball_speed_y *= -1
 
-    # # Gestion des collisions avec les raquettes
-    # if ball.colliderect(paddle_left):
-    #     calculate_collision(ball, paddle_left, is_left_paddle=True)
-    # elif ball.colliderect(paddle_right):
-    #     calculate_collision(ball, paddle_right, is_left_paddle=False)
-
-    # Gestion des collisions avec les raquettes
  # Gestion des collisions avec les raquettes
     if ball.colliderect(paddle_left):
         collision_result = calculate_collision(ball, paddle_left, is_left_paddle=True)
         if collision_result == "miss":
+            # time.sleep(1)
             score_right += 1
             ball.x, ball.y = terrain_rect.center
             ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
     elif ball.colliderect(paddle_right):
         collision_result = calculate_collision(ball, paddle_right, is_left_paddle=False)
         if collision_result == "miss":
+            # time.sleep(1)
             score_left += 1
             ball.x, ball.y = terrain_rect.center
             ball_speed_x, ball_speed_y = -INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
@@ -143,10 +169,12 @@ while True:
 
     # Gestion des sorties de balle (lorsqu'elle dépasse les bords latéraux)
     if ball.left <= terrain_rect.left:
+        # time.sleep(1)
         score_right += 1
         ball.x, ball.y = terrain_rect.center
         ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
-    if ball.right >= terrain_rect.right:
+    if ball.right  >= terrain_rect.right:
+        # time.sleep(1)
         score_left += 1
         ball.x, ball.y = terrain_rect.center
         ball_speed_x, ball_speed_y = -INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
