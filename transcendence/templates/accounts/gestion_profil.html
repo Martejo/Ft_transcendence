@@ -10,7 +10,7 @@
             <div class="card">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-2">Changer d'avatar</h5>
-                    <form id="change-avatar-form" method="POST" enctype="multipart/form-data">
+                    <form id="change-avatar-form" method="POST" enctype="multipart/form-data" style="color: white">
                         {% csrf_token %}
                         {{ avatar_form.as_p }}
                         <button type="submit" class="btn btn-primary w-90">Valider</button>
@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-2">Changer de pseudo</h5>
-                    <form id="change-username-form" method="POST">
+                    <form id="change-username-form" method="POST" style="color: white">
                         {% csrf_token %}
                         {{ profile_form.as_p }}
                         <button type="submit" class="btn btn-primary w-90">Valider</button>
@@ -48,7 +48,7 @@
             <div class="card w-100">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-2">Changer de mot de passe</h5>
-                    <form id="change-password-form" method="POST">
+                    <form id="change-password-form" method="POST" style="color: white">
                         {% csrf_token %}
                         {{ password_form.as_p }}
                         <button type="submit" class="btn btn-primary w-90">Valider</button>
