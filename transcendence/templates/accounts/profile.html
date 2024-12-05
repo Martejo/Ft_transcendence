@@ -9,7 +9,7 @@
 			<div class="card p-4">
 				<div class="profile-info d-flex flex-column justify-content-center align-items-center">
 					{% if avatar_url %}
-                        <img src="{{ avatar_url }}" alt="Avatar">
+                        <img src="{{ avatar_url }}" alt="Avatar" style="width: 120px; height: 120px;">
                     {% else %}
                         <img src="{% static 'media/avatars/default_avatar.png' %}" alt="Avatar"> <!-- Image par défaut si l'avatar n'est pas défini -->
                     {% endif %}
