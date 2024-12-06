@@ -29,8 +29,6 @@ $.ajaxSetup({
 });
 
 
-// Charger les modules en fonction des vues
-$(window).on('hashchange', handleHashChange);
 
 $(document).ready(function() {
     loadNavbar();
@@ -40,13 +38,16 @@ $(document).ready(function() {
         if ($('#burger-menu-toggle').length > 0) {
             console.log("Utilisateur connecté - initialisation du rafraîchissement du menu burger.");
             loadBurgerMenuData();
-
+            
             // Rafraîchit toutes les 10 secondes si l'utilisateur est connecté
             setInterval(loadBurgerMenuData, 10000);
         }
     });
     handleHashChange();
 });
+
+// Charger les modules en fonction des vues
+$(window).on('hashchange', handleHashChange);
 
 function handleHashChange() {
     console.log("Hash changé : ", window.location.hash);
@@ -63,7 +64,7 @@ function handleHashChange() {
     }
 }
 
-
+// genere les requetes ajax, qui chargeront le contenu de la div "navbar" de la SPA
 function loadNavbar() {
     console.log("Rentre dans loadNavbar");
     $.ajax({
@@ -87,7 +88,7 @@ function loadNavbar() {
         }
     });
 }
-
+// genere les requetes ajax, qui chargeront le contenu de la div "content" de la SPA
 function loadContent(app, view) {
         $.ajax({
             url: `/${app}/${view}/`,

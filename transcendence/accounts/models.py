@@ -3,9 +3,11 @@ from django.db import models
 from django.conf import settings  
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+# from django.utils.timezone import now
 from pathlib import Path
 import random
 from datetime import datetime, timedelta
+
 
 #[DOCUMENTATION] <Django - User & Abstract User>
 class CustomUser(AbstractUser):
@@ -84,3 +86,20 @@ class TwoFactorCode(models.Model):
     def is_valid(self):
         # Le code expire après 10 minutes
         return datetime.now() - timedelta(minutes=10) <= self.created_at.replace(tzinfo=None)
+
+
+# Stocker les refresh tokens en base de donnee 
+# pour pouvoir les comparer a ceux que l' utilisateur nous envoie
+# la validite des access tokens est elle geree par PyJWT
+class RefreshToken(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='refresh_tokens')
+    token = models.CharField(max_length=255, unique=True)  # Le token JWT
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def is_expired(self):
+        """Vérifie si le token a expiré"""
+        return now() > self.expires_at
+
+    def __str__(self):
+        return f"RefreshToken(user={self.user}, expires_at={self.expires_at})"

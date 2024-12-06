@@ -73,8 +73,6 @@ def login_view(request):
 
 @csrf_protect
 @require_POST
-@csrf_protect
-@require_POST
 def submit_login(request):
     logger.debug("Entre dans submit_login")
 
@@ -510,6 +508,42 @@ def reject_friend_request(request, request_id):
     return redirect('accounts:profile', friend_username=friend_request.from_user.username)
 
 ################ FIN GESTION AMI ##############
+################ GESTION DES JWT ##############
+
+# Cette view/endpoint est appelee par le JS cote client avant chaque requete AJAX
+# Une premiere requete AJAX est envoyee sur cette view avec : async function getAccessToken()
+# Cette requete 
+# Cette view lui renvoie un nouvel access token valide pour la prochaine requete du client
+def refresh_token_view(request):
+
+    refresh_token = request.data.get('refresh_token')
+
+    if not refresh_token:
+        return JsonResponse({'error': 'Refresh token is required'}, status=400)
+
+    try:
+        payload = decode(refresh_token, settings.SECRET_KEY, algorithms=['HS256'])
+
+        # Vérifier si le token est stocké dans la base de données et qu'il n'est pas expiré
+        token_obj = RefreshToken.objects.filter(token=refresh_token).first()
+        if not token_obj or token_obj.is_expired():
+            return JsonResponse({'error': 'Invalid or expired refresh token'}, status=401)
+
+        # Générer un nouveau Access Token
+        access_payload = {
+            'user_id': payload['user_id'],
+            'username': payload['username'],
+            'exp': datetime.utcnow() + timedelta(hours=1),  # Nouvelle durée de validité
+        }
+        new_access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
+
+        return JsonResponse({'access_token': new_access_token}, status=200)
+
+    except ExpiredSignatureError:
+        return JsonResponse({'error': 'Refresh token expired'}, status=401)
+    except InvalidTokenError:
+        return JsonResponse({'error': 'Invalid refresh token'}, status=401)
+################ FIN GESTION DES JWT ##############
 
 
 # ///////////////////////////----2FA----///////////////////////////////////

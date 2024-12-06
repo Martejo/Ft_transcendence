@@ -1,4 +1,5 @@
 <!-- templates/core/navbar_logged_in.html -->
+<!-- Cette page html represente la navbar visible lorsqu' un utilisateur est logge-->
 <nav id="navbar" class="navbar navbar-expand">
     <div class="container-fluid">
         <a id="home-btn" class="navbar-brand text-white" onclick="window.location.hash='#game-play'">PONGAME</a>
@@ -13,7 +14,7 @@
     </div>
 </nav>
 
-<!-- Inclure le contenu du burger-menu -->
+<!-- Inclure le contenu du burger-menu (accessible uNiquement aux utilisateurs logges)-->
 {{ burger_menu|safe }}
 <div id="overlay" style="display: none;" onclick="toggleBurgerMenu()"></div>
 
