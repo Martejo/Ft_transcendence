@@ -3,7 +3,7 @@
 
 
 		<!-- Liste d'amis -->
-		<!-- <div id="friend-list" class="list-group mb-4 col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4"> -->
+	<div class="list-group mb-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4">
 			<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
 			<!-- <div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
 				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
@@ -17,11 +17,11 @@
 					</button>
 				</div> -->
 
-		<div class="col-12 list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
+		<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2 w-100">
 			<div class="text-white p-3 w-100">
 					<ul class="list-unstyled w-100 mb-0" id="friends-list-container">
 						{% for friend in friends %}
-						<li class="d-flex align-items-center justify-content-between mb-2">
+						<li class="d-flex flex-column flex-sm-row align-items-center justify-content-between mb-2">
 							<div class="avatar position-relative">
 								<img src="{{ friend.avatar_url }}" alt="Avatar of {{ friend.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
 								<span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
@@ -42,6 +42,7 @@
 				<button id="start-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">Commencer</button>
 			</div>
 		</div>
+	</div>
 </div>
 <style>
 	body, html {
@@ -52,7 +53,6 @@
 		border-radius: 10px;
 		font-size: 1.25em !important;
 		overflow: hidden;
-		min-width: 6em;
 	}
 	.list-group-item, .friend-btn{
 		background-color:  #101A32;
@@ -72,30 +72,33 @@
 		font-size: 1.25em !important;
 	} 
 
+	.friend-btn {
+		min-width: 4em;
+	}
+
     .invite-button {
     /* width: 150px; Définir la largeur fixe du bouton */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgb(153, 148, 148);
-    border-radius: 10px;
     background: none;
     color: white;
     padding: 5px 10px;
     cursor: pointer;
     position: relative;
     text-align: center;
+	min-width: 6em;
     /* overflow: hidden; */
 }
 	.invite-button:hover {
 		border: 2px solid rgb(153, 148, 148);
 	}
 
-	@media (max-width: 440px) {
-		#friends-list-container li {
-			flex-direction: column; /* Change la direction des éléments en colonne */
+	@media (max-width: 576px) {
+		/* #friends-list-container li {
+			flex-direction: column;
 			align-items: center;
-		}
+		} */
 
 		.avatar, .invite-button, .friend-btn{
 			margin-bottom: 10px;
