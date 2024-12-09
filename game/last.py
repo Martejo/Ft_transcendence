@@ -114,7 +114,7 @@ class PowerUpOrb:
         for _ in range(max_attempts):
             new_x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
             new_y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
-            
+
             overlapping = False
             for orb in power_up_orbs:
                 if orb != self and orb.active:
@@ -145,8 +145,7 @@ class PowerUpOrb:
                 self.respawn_time = random.uniform(5, 10)  # New random spawn time
                 PowerUpOrb.last_global_vanish_time = current_time
                 PowerUpOrb.next_spawn_time = current_time + PowerUpOrb.global_spawn_cooldown
-                Bumper.last_global_vanish_time = current_time + Bumper.global_spawn_cooldown
-                Bumper.next_spawn_time = current_time + Bumper.global_spawn_cooldown
+
         # If inactive, check if it should spawn
         elif current_time >= PowerUpOrb.next_spawn_time:
             current_active_orbs = sum(1 for orb in power_up_orbs if orb.active)
@@ -161,7 +160,7 @@ class PowerUpOrb:
                if self.reposition(terrain_rect):
                    self.active = True
                    self.activation_time = current_time
-                   Bumper.next_spawn_time = current_time + Bumper.global_spawn_cooldown
+                   Bumper.next_spawn_time = current_time + random.uniform(7, 12)
 
     def collect(self, current_time):
         self.active = False
@@ -241,7 +240,7 @@ class PowerUpState:
             if self.inverted_controls[player]:
                 if current_time - self.effect_start_time[player]["invert"] >= self.effect_duration:
                     self.inverted_controls[player] = False
-            
+
             # Update shrink effect
             if self.shrunk_paddle[player]:
                 if current_time - self.effect_start_time[player]["shrink"] >= self.effect_duration:
@@ -321,49 +320,74 @@ last_paddle_hit = None
 
 class Bumper:
     last_global_vanish_time = 0
-    next_spawn_time = time.time() + 12
-    global_spawn_cooldown = 12
+    next_spawn_time = time.time() + random.uniform(5, 10)
+    global_spawn_cooldown = random.uniform(5, 10)
 
-    def __init__(self, terrain_rect):
+    def __init__(self, terrain_rect, color=WHITE):
         self.radius = 20
+        self.color = color
         self.active = False
-        self.duration = 12
+        self.respawn_time = random.uniform(5, 10)
+        self.duration = random.uniform(5, 10)
+        self.spawn_start_time = time.time()
+        self.activation_time = 0
         self.x = 0
         self.y = 0
-        self.activation_time = 0
+        self.rect = pygame.Rect(0, 0, self.radius * 2, self.radius * 2)
 
-    def reposition(self, terrain_rect, paddles):
-        min_dist_from_paddle = 100
+    def reposition(self, terrain_rect):
+        max_attempts = 100
         margin = self.radius + 20
         
-        for _ in range(100):  # Max attempts
-            x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
-            y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
+        for _ in range(max_attempts):
+            new_x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
+            new_y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
             
-            # Check distance from paddles
-            if (abs(x - paddle_left.rect.right) < min_dist_from_paddle or 
-                abs(paddle_right.rect.left - x) < min_dist_from_paddle):
-                continue
-
             overlapping = False
             for bumper in bumpers:
-               if bumper != self and bumper.active:
-                   dist = ((x - bumper.x)**2 + (y - bumper.y)**2)**0.5
-                   if dist < (self.radius + bumper.radius) * 2:
-                       overlapping = True
-                       break
+                if bumper != self and bumper.active:
+                    center1 = (new_x + self.radius, new_y + self.radius)
+                    center2 = (bumper.x + bumper.radius, bumper.y + bumper.radius)
+                    
+                    distance = ((center1[0] - center2[0])**2 + (center1[1] - center2[1])**2)**0.5
+                    min_distance = (self.radius + bumper.radius) * 0.75
+                    
+                    if distance < min_distance:
+                        overlapping = True
+                        break
+            
             if not overlapping:
-                self.x = x
-                self.y = y
+                self.x = new_x
+                self.y = new_y
+                self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius, 
+                                    self.radius * 2, self.radius * 2)
                 return True
         return False
+
+    def update(self, current_time, active_bumpers_count):
+        # If active, check if it should vanish
+        if self.active:
+            if current_time - self.activation_time >= self.duration:
+                self.active = False
+                self.spawn_start_time = current_time
+                self.respawn_time = random.uniform(5, 10)
+                Bumper.last_global_vanish_time = current_time
+                Bumper.next_spawn_time = current_time + Bumper.global_spawn_cooldown
+
+        # If inactive, check if it should spawn
+        elif current_time >= Bumper.next_spawn_time:
+            current_active_bumpers = sum(1 for bumper in bumpers if bumper.active)
+            if current_active_bumpers < MAX_BUMPERS:
+                if self.reposition(terrain_rect):
+                    self.active = True
+                    self.activation_time = current_time
+                    Bumper.next_spawn_time = current_time + Bumper.global_spawn_cooldown
 
     def check_collision(self, ball):
         if not self.active:
             return None
         center_dist = ((ball.centerx - self.x)**2 + (ball.centery - self.y)**2)**0.5
         if center_dist <= self.radius + ball.width/2:
-            # Calculate bounce direction
             dx = ball.centerx - self.x
             dy = ball.centery - self.y
             norm = (dx**2 + dy**2)**0.5
@@ -371,31 +395,32 @@ class Bumper:
         return None
 
 
-    def update(self, current_time):  # Fixed indentation
-        if self.active:
-            if current_time - self.activation_time >= self.duration:
-                self.active = False
-                Bumper.last_global_vanish_time = current_time
-                Bumper.next_spawn_time = current_time + Bumper.global_spawn_cooldown
-        elif current_time >= Bumper.next_spawn_time:
-            current_active = sum(1 for b in bumpers if b.active)
-            if current_active < 2:
-                if self.reposition(terrain_rect):
-                    self.active = True
-                    self.activation_time = current_time
-                    Bumper.next_spawn_time = current_time + Bumper.global_spawn_cooldown
 # Create and manage bumpers
 bumpers = [Bumper(terrain_rect) for _ in range(3)]
 MAX_BUMPERS = 2
 BUMPER_SPAWN_TIME = 15  # Seconds between spawns
 
-def update_bumpers(current_time):
-    if len(bumpers) < MAX_BUMPERS and current_time % BUMPER_SPAWN_TIME < 0.1:
-        new_bumper = Bumper(terrain_rect, [paddle_left, paddle_right])
-        bumpers.append(new_bumper)
+def count_active_bumpers(bumpers):
+    return sum(1 for bumper in bumpers if bumper.active)
 
 def reset_bumpers():
-    bumpers.clear()
+    current_time = time.time()
+    for bumper in bumpers:
+        bumper.active = False
+        bumper.activation_time = current_time
+    Bumper.next_spawn_time = current_time + random.uniform(7, 12)
+
+def initialize_bumpers():
+    for i, bumper in enumerate(bumpers):
+        if i < MAX_BUMPERS:
+            bumper.active = True
+            bumper.reposition(terrain.rect)
+            bumper.activation_time = time.time()
+        else:
+            bumper.active = False
+            bumper.spawn_start_time = time.time() + (i * BUMPER_SPAWN_TIME)
+
+initialize_bumpers()
 
 # Boucle principale du jeu
 while True:
@@ -408,9 +433,17 @@ while True:
 
     # Mise à jour des power-ups avec le compte des orbes actifs
     active_orbs = count_active_orbs(power_up_orbs)
+    active_bumpers = count_active_bumpers(bumpers)
+
     for orb in power_up_orbs:
         orb.update(current_time, active_orbs)
+
+    for bumper in bumpers:
+        bumper.update(current_time, active_bumpers)
+
     power_up_state.update(current_time)
+
+
 
     # Déplacement des raquettes avec gestion des contrôles inversés
     keys = pygame.key.get_pressed()
@@ -469,13 +502,14 @@ while True:
             ball.x, ball.y = terrain_rect.center
             ball_speed_x, ball_speed_y = -INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
             last_paddle_hit = None
-    update_bumpers(current_time)
+
     for bumper in bumpers:
         bounce = bumper.check_collision(ball)
         if bounce:
             ball_speed_magnitude = (ball_speed_x**2 + ball_speed_y**2)**0.5
-            ball_speed_x = bounce[0] * ball_speed_magnitude
-            ball_speed_y = bounce[1] * ball_speed_magnitude
+            ball_speed_x = bounce[0] * ball_speed_magnitude * 1.1
+            ball_speed_y = bounce[1] * ball_speed_magnitude * 1.1
+
     # Gestion des collisions avec les orbes de power-up
     for orb in power_up_orbs:
         if orb.active and ball.colliderect(orb.rect):
@@ -484,13 +518,6 @@ while True:
                 power_up_state.apply_effect(last_paddle_hit, orb.effect_type, current_time)
                 if orb.effect_type == "shrink":
                     apply_shrink_effect(last_paddle_hit)
-    for bumper in bumpers:
-       bumper.update(current_time)
-       bounce = bumper.check_collision(ball)
-       if bounce:
-           ball_speed_magnitude = (ball_speed_x**2 + ball_speed_y**2)**0.5
-           ball_speed_x = bounce[0] * ball_speed_magnitude
-           ball_speed_y = bounce[1] * ball_speed_magnitude
 
     # Gestion des sorties de balle
     if ball.left <= terrain_rect.left:
@@ -521,7 +548,9 @@ while True:
                              (orb.x + orb.size//2, orb.y + orb.size//2), 
                              orb.size//2)
         for bumper in bumpers:
-            pygame.draw.circle(screen, WHITE, (int(bumper.x), int(bumper.y)), bumper.radius)
+            if bumper.active:
+                # print(f"Drawing bumper at ({bumper.x}, {bumper.y})")  # Debug
+                pygame.draw.circle(screen, WHITE, (int(bumper.x), int(bumper.y)), bumper.radius)
 
     # Affichage des scores
     font = pygame.font.SysFont(None, 36)
