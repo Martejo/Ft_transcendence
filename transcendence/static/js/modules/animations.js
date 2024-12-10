@@ -1,3 +1,4 @@
+//animations.js
 // Ce fichier contient les animations utilisées dans l'application web.
 // Il centralise les effets visuels et les transitions pour une meilleure organisation et réutilisabilité.
 
