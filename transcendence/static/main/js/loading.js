@@ -9,7 +9,7 @@ function initializeGameControls(controlType) {
 	const player = document.querySelector('.player');
 	const gameContainer = document.querySelector('.game-container');
 	let containerWidth = gameContainer.offsetWidth;
-	let containerHeight = gameContainer.offsetHeight;
+	let containerHeight = gameContainer.offsetHeight - 50 ;
 	const collectibleCount = 9;
 	const collectibles = [];
 	let direction = { x: 1, y: 0 }; // Par défaut, déplacement vers la droite

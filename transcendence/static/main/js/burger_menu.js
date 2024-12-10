@@ -270,9 +270,13 @@ function closePopupOnClickOutside(event) {
 
 function handleOption(option) {
     const friendName = document.getElementById('popupFriendName').innerText;
+	const menu = document.getElementById('burger-menu');
+    const overlay = document.getElementById('overlay');
 
     if (option === 'Voir le profil') {
         loadContent('accounts', `friend_profile/${friendName}`);
+ 		menu.style.display = 'none';
+		overlay.style.display = 'none';
     } else {
         alert(`${option} sélectionné`);
     }
