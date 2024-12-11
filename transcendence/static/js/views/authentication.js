@@ -54,6 +54,16 @@ export function initializeLoginView() {
     });
 }
 
+
+
+
+
+
+
+
+
+
+
 export function initializeRegisterView() {
     const form = document.querySelector('#register-form');
     if (!form) return;
@@ -94,6 +104,12 @@ export function initializeRegisterView() {
         });
     });
 }
+
+
+
+
+
+
 
 export function logoutUser() {
     $.ajax({

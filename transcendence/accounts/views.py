@@ -1,6 +1,7 @@
 # accounts/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse  # Vérifier que HttpResponse est bien importé
+from django.template.loader import render_to_string
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -47,16 +48,28 @@ def submit_registration(request):
 
 @csrf_protect
 def register_view(request):
-    form = RegistrationForm() # genere un form vide et le donne au html
-    return render(request, 'accounts/register.html', {'form': form})
+    if request.method == 'GET':
+        form = RegistrationForm()
+        # Génère le HTML du formulaire à partir d'un fragment de template
+        rendered_form = render_to_string('accounts/register_form.html', {'form': form})
+        return JsonResponse({
+            'status': 'success',
+            'html': rendered_form,
+        })
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
 
 
 @csrf_protect
 def login_view(request):
-    logger.debug("Entre dans login_view")
     if request.method == 'GET':
         form = LoginForm()
-        return render(request, 'accounts/login.html', {'form': form})
+        # Render le formulaire dans une chaîne HTML
+        rendered_form = render_to_string('accounts/login_form.html', {'form': form})
+        return JsonResponse({
+            'status': 'success',
+            'html': rendered_form, #Changer le nom de la variable ? 
+        })
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
 @csrf_protect

@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Charger la navbar
     loadNavbar();
 
+    // Charger le contenu de la page initiale (url = /core/home)
+    loadContent("core", "home");
+
     // Initialiser les événements globaux (hashchange, resize, etc.)
     Events.initializeAllEvents();
 
