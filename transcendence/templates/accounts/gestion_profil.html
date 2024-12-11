@@ -2,148 +2,190 @@
 
 
 <div class="container-fluid mt-4" style="height: var(--sin-nav-height);">
-    <h1 class="text-center title mb-3">Gestion de Profil</h1>
+	<h1 class="text-center title mb-3">Gestion de Profil</h1>
 
-        <!-- Change Avatar Section -->
-    <div class="row d-flex justify-content-center mb-3">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
-            <div class="card">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-2">Changer d'avatar</h5>
-                    <form id="change-avatar-form" method="POST" enctype="multipart/form-data" style="color: white">
-                        {% csrf_token %}
-                        {{ avatar_form.as_p }}
-                        <button type="submit" class="btn btn-primary w-90">Valider</button>
-                        <div id="change-avatar-error" class="text-danger mt-2"></div>
-                        <div id="change-avatar-success" class="text-success mt-2"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Change Username Section -->
-    <div class="row d-flex justify-content-center mb-3">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
-            <div class="card">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-2">Changer de pseudo</h5>
-                    <form id="change-username-form" method="POST" style="color: white">
-                        {% csrf_token %}
-                        {{ profile_form.as_p }}
-                        <button type="submit" class="btn btn-primary w-90">Valider</button>
-                        <div id="change-username-error" class="text-danger mt-2"></div>
-                        <div id="change-username-success" class="text-success mt-2"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+		<!-- Change Avatar Section -->
+	<div class="row d-flex justify-content-center mb-3">
+		<div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
+			<div class="card">
+				<div class="card-body p-4">
+					<h5 class="card-title mb-2">Changer d'avatar</h5>
+					<form id="change-avatar-form" method="POST" enctype="multipart/form-data" style="color: white">
+						{% csrf_token %}
+						{{ avatar_form.as_p }}
+						<button type="submit" class="btn btn-primary w-90">Valider</button>
+						<div id="change-avatar-error" class="text-danger mt-2"></div>
+						<div id="change-avatar-success" class="text-success mt-2"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
-    <!-- Change Password Section -->
-    <div class="row d-flex justify-content-center mb-3">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
-            <div class="card w-100">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-2">Changer de mot de passe</h5>
-                    <form id="change-password-form" method="POST" style="color: white">
-                        {% csrf_token %}
-                        {{ password_form.as_p }}
-                        <button type="submit" class="btn btn-primary w-90">Valider</button>
-                        <div id="change-password-error" class="text-danger mt-2"></div>
-                        <div id="change-password-success" class="text-success mt-2"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+	<!-- Change Username Section -->
+	<div class="row d-flex justify-content-center mb-3">
+		<div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
+			<div class="card">
+				<div class="card-body p-4">
+					<h5 class="card-title mb-2">Changer de pseudo</h5>
+					<form id="change-username-form" method="POST" style="color: white">
+						{% csrf_token %}
+						{{ profile_form.as_p }}
+						<button type="submit" class="btn btn-primary w-90">Valider</button>
+						<div id="change-username-error" class="text-danger mt-2"></div>
+						<div id="change-username-success" class="text-success mt-2"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 
-        <!-- 2FA Section -->
-    <div class="row d-flex justify-content-center mb-3">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
-            <div class="card">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-2">Authentification à deux facteurs</h5>
-                    {% if profile_user.is_2fa_enabled %}
-                        <button id="disable-2fa-btn" class="btn btn-primary w-90">Désactiver 2FA</button>
-                    {% else %}
-                        <button id="enable-2fa-btn" class="btn btn-primary w-90">Activer 2FA</button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Delete Account Section -->
+	<!-- Change Password Section -->
+	<div class="row d-flex justify-content-center mb-3">
+		<div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
+			<div class="card w-100">
+				<div class="card-body p-4">
+					<h5 class="card-title mb-2">Changer de mot de passe</h5>
+					<form id="change-password-form" method="POST" style="color: white">
+						{% csrf_token %}
+						{{ password_form.as_p }}
+						<button type="submit" class="btn btn-primary w-90">Valider</button>
+						<div id="change-password-error" class="text-danger mt-2"></div>
+						<div id="change-password-success" class="text-success mt-2"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<!-- 2FA Section -->
+	<div class="row d-flex justify-content-center mb-3">
+		<div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3">
+			<div class="card">
+				<div class="card-body p-4">
+					<h5 class="card-title mb-2">Authentification à deux facteurs</h5>
+					{% if profile_user.is_2fa_enabled %}
+						<button id="disable-2fa-btn" class="btn btn-primary w-90">Désactiver 2FA</button>
+					{% else %}
+						<button id="enable-2fa-btn" class="btn btn-primary w-90">Activer 2FA</button>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Delete Account Section -->
 	<div class="row d-flex justify-content-center mb-4">
 		<div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3 mb-3">
 			<div class="card">
 				<div class="card-body p-4">
 					<h5 class="card-title mb-2 text-danger">Supprimer le compte</h5>
 					<form id="delete-account-form">
-                        <p class="text-white info mb-3">Cette action est irréversible. Votre compte sera définitivement supprimé.</p>
-                        <button type="button" id="delete-account-btn" class="btn btn-danger delete w-90 mt-2 mb-1">Supprimer mon compte</button>
-                    </form>
-                    
+						<p class="text-white info mb-3">Cette action est irréversible. Votre compte sera définitivement supprimé.</p>
+						<button type="button" id="delete-account-btn" class="btn btn-danger delete w-90 mt-2 mb-1">Supprimer mon compte</button>
+					</form>
+
 				</div>
+			</div>
+		</div>
+	</div>
+
+	Overlay
+	<div id="overlay_delete"></div>
+
+	<!-- Confirmation Suppression -->
+	<div id="delete-account-modal" style="display: none;">
+		<div class="modal-content">
+			<p>Êtes-vous sûr de vouloir supprimer le compte ?</p>
+			<div class="d-flex justify-content-around">
+				<button id="cancel-delete" class="btn btn-secondary">Annuler</button>
+				<button id="confirm-delete" class="btn btn-danger">Confirmer</button>
 			</div>
 		</div>
 	</div>
 
 </div>
 
+<style>
+	.html, body {
+		overflow: auto;
+	}
+	.card {
+		background-color: #101A32;
+		border: 2px solid rgb(153, 148, 148);
+		min-width: 250px;
+	}
+	h1, .card-title {
+		color: #2DB4F3;
+	}
+	.card-title {
+		font-size: 1.7rem;
+	}
 
+	.form-label {
+		font-size: 1.4em; /* Adjust font size */
+	}
+	
+	.form-group {
+		margin-bottom: 0.8rem; /* Reduced spacing between form fields */
+	}
+	
+	.w-90, .form-control.input-compact {
+		width: 90%;
+		max-width: 100%;
+		display: block;
+		margin: 0 auto; /* Center the button */
+	}
+	.delete {
+		border-radius: 50px;
+		padding: 5px 10px;
+		font-family: "Jersey 10";
+		font-size: 1.1em;
+	}
 
-    <style>
-        .html, body {
-            overflow: auto;
-        }
-        .card {
-            background-color: #101A32;
-            border: 2px solid rgb(153, 148, 148);
-            min-width: 250px;
-        }
-        h1, .card-title {
-            color: #2DB4F3;
-        }
-        .card-title {
-            font-size: 1.7rem;
-        }
-    
-        .form-label {
-            font-size: 1.4em; /* Adjust font size */
-        }
-       
-        .form-group {
-            margin-bottom: 0.8rem; /* Reduced spacing between form fields */
-        }
-       
-        .w-90, .form-control.input-compact {
-            width: 90%;
-            max-width: 100%;
-            display: block;
-            margin: 0 auto; /* Center the button */
-        }
-        .delete {
-            border-radius: 50px;
-            padding: 5px 10px;
-            font-family: "Jersey 10";
-            font-size: 1.1em;
-        }
-    
-        .form-control.input-compact, .btn-primary {
-            padding: 5px 10px !important; /* Ajustez pour réduire la hauteur */
-            font-size: 1.2em; /* Taille de police plus petite */
-            line-height: 1.5 !important; /* Ligne plus compacte */
-            height: auto !important; /* S'assurer que la hauteur est ajustée */;
-            border-radius: 10px;
-            margin-bottom: 0.8em;
-        }
-    
-        .info {
-            font-size: 1.1em;
-        }
-    </style>
-    
+	.form-control.input-compact, .btn-primary {
+		padding: 5px 10px !important; /* Ajustez pour réduire la hauteur */
+		font-size: 1.2em; /* Taille de police plus petite */
+		line-height: 1.5 !important; /* Ligne plus compacte */
+		height: auto !important; /* S'assurer que la hauteur est ajustée */;
+		border-radius: 10px;
+		margin-bottom: 0.8em;
+	}
+
+	.info {
+		font-size: 1.1em;
+	}
+
+	#delete-account-modal {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 300px;
+		background-color: #101A32;
+		color: white;
+		border-radius: 8px;
+		padding: 20px;
+		border: 2px solid white;
+		z-index: 99  !important; /* Devant l'overlay */
+		display: none; /* Caché par défaut */
+	}
+
+	.modal-content {
+		text-align: center;
+	}
+
+	#overlay_delete {
+		position: fixed;
+		top: 50px; /* Hauteur de la navbar */
+		left: 0;
+		width: 100vw;
+		height: var(--sin-nav-height); /* Hauteur de la page moins la navbar */
+		background-color: rgba(0, 0, 0, 0.5); /* Couleur sombre avec transparence */
+		z-index: 97 !important;/* Doit être derrière le menu burger */
+		display: none;
+	}
+
+</style>
