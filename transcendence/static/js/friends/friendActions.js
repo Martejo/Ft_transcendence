@@ -1,4 +1,6 @@
-// friends/friendActions.js
+//friends/friendActions.js
+//fonctions actuellement inutilisees dans le code
+
 import Api from '../api/api.js';
 
 export async function sendFriendRequest(toUserId) {

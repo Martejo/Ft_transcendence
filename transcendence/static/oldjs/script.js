@@ -145,6 +145,7 @@ function initializeView(app, view) {
     }
 }
 
+//=sendFriendRequest
 $(document).on('submit', '#add-friend-form', function(event) {
     event.preventDefault();
     const formData = $(this).serialize(); // Sérialise les données du formulaire

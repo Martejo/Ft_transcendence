@@ -1,14 +1,21 @@
-import jwt
+# ---- Imports standard ----
+import logging
 from datetime import datetime, timedelta
+
+# ---- Imports tiers ----
+import jwt
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from django.conf import settings
 from django.http import JsonResponse
-from .models import RefreshToken
-import logging
 from django.contrib.auth import get_user_model
 
+# ---- Imports locaux ----
+from .models import RefreshToken
+
+# ---- Configuration ----
 User = get_user_model()
 logger = logging.getLogger(__name__)
+
 
 def refresh_token_view(request):
     """

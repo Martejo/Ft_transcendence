@@ -55,8 +55,8 @@ export async function loadBurgerMenuData() {
                 friendsListContainer.innerHTML = '<p class="text-center">Aucun ami pour le moment.</p>';
             }
 
-            updateFriendRequestsList(data.data.friend_requests);
-            initializeFriendButtons();
+            updateFriendRequestsList(data.data.friend_requests); //mettre a jour et afficher les demandes d'amis non traitees
+            initializeFriendButtons(); //afficher les boutons accepter
         }
     } catch (error) {
         console.error('Erreur chargement burger-menu:', error);

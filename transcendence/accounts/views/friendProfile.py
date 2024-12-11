@@ -1,3 +1,7 @@
+# ---- Imports standard ----
+import logging
+
+# ---- Imports tiers ----
 from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -5,10 +9,15 @@ from django.db.models import Max
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser
-import logging
+from django.contrib.auth import get_user_model
 
+# ---- Imports locaux ----
+
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
+User = get_user_model()
+
+
 
 @method_decorator([csrf_protect, login_required], name='dispatch')
 class FriendProfileView(View):
@@ -21,7 +30,7 @@ class FriendProfileView(View):
         logger.debug(f"Friend_username = {friend_username}")
         try:
             # Retrieve the friend by username
-            friend = get_object_or_404(CustomUser, username=friend_username)
+            friend = get_object_or_404(User, username=friend_username)
             logger.info(f"Friend found: {friend.username}")
 
             # Calculate statistics

@@ -1,13 +1,20 @@
-from django.views import View
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
-from django.template.loader import render_to_string
-from .forms import RegistrationForm
+# ---- Imports standard ----
 import logging
 
+# ---- Imports tiers ----
+from django.views import View
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
+
+# ---- Imports locaux ----
+from .forms import RegistrationForm
+
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
+
 @method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toutes les méthodes de la vue
 class RegisterView(View):
     """

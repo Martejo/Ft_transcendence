@@ -1,12 +1,18 @@
+# ---- Imports standard ----
+import logging
+
+# ---- Imports tiers ----
 from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .models import FriendRequest
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-import logging
 
+# ---- Imports locaux ----
+from .models import FriendRequest
+
+# ---- Configuration ----
 User = get_user_model()
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,6 @@
 // friends/friendButtons.js
+//fonctions actuellement inutilisees dans le code
+
 // Gère l'initialisation des boutons amis et l'affichage du popup.
 
 export function initializeFriendButtons() {

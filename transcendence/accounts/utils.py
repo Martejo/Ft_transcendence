@@ -1,9 +1,15 @@
 # accounts/utils.py
 
-import jwt
+# ---- Imports standard ----
 from datetime import datetime, timedelta
+
+# ---- Imports tiers ----
+import jwt
 from django.conf import settings
+
+# ---- Imports locaux ----
 from .models import RefreshToken
+
 
 
 def generate_jwt_token(user):

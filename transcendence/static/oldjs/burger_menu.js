@@ -159,6 +159,7 @@ function initializeFriendButtons() {
     });
 }
 
+//gere toutes
 function updateFriendRequestsList(friendRequests) {
     console.log('friendRequests reçu :', friendRequests);
     if (!Array.isArray(friendRequests)) {

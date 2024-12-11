@@ -1,6 +1,10 @@
+# ---- Imports standard ----
+import logging
+
+# ---- Imports tiers ----
 from django.urls import path
 
-# ---- Views imports ----
+# ---- Imports locaux ----
 from .views.register import RegisterView
 from .views.profile import (
     ManageProfileView, UpdateProfileView, DeleteAccountView,
@@ -14,10 +18,7 @@ from .views.manageFriends import AddFriendView, HandleFriendRequestView, RemoveF
 from .views import Enable2FAView, Check2FAView, Verify2FALoginView, Disable2FAView
 from .views.tokenManagement import refresh_token_view
 
-
-# ---- Logging configuration ----
-import logging
-
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 logger.debug("Rentre dans urls.py de app accounts")

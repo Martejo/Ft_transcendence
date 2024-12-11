@@ -1,8 +1,8 @@
-// profile/gestionProfile.js
+// profile/viewManageProfile.js
 import Api from '../api/api.js';
 import { initializeProfileFormHandlers } from './formHandlers.js';
 
-export async function initializeGestionProfileView() {
+export async function initializeManageProfileView() {
     try {
         const response = await Api.get('/accounts/gestion_profil/');
         const content = document.querySelector('#content');

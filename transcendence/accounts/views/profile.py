@@ -1,14 +1,19 @@
+# ---- Imports standard ----
+import logging
+
+# ---- Imports tiers ----
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.template.loader import render_to_string
 from django.db.models import Max
-import logging
 from django.contrib.auth import get_user_model
 
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
 
 @method_decorator(csrf_protect, name='dispatch')
 class ProfileView(View):

@@ -3,35 +3,52 @@ import { initializeLoginView, initializeRegisterView, logoutUser } from '../auth
 import { initializeEnable2FAView, initializeLogin2FAView, initializeDisable2FAView } from '../auth/index.js';
 
 // profile views
-import { initializeProfileView, initializeGestionProfileView } from '../profile/index.js';
+import { initializeProfileView, initializeManageProfileView } from '../profile/index.js';
 
 // game views
 import { initializeFriendInvitation } from '../game/index.js';
 
-// load view in #content div
-import { loadContent } from '../contentLoader.js';
+//get views
+import { Api } from '../Api.js'; 
 
+async function getViewData(app, view) {
+    const url = `/${app}/${view}/`;
+
+    try {
+        const data = await Api.get(url);
+        return data; // Retourne les données JSON
+    } catch (error) {
+        console.error(`Erreur lors du chargement de ${app}-${view} :`, error);
+        throw error;
+    }
+}
 
 const Views = {
-    initializeViewFromHash() {
+    async initializeViewFromHash() {
         const hash = window.location.hash.substring(1) || 'core-home'; // Hash par défaut si vide
         const [app, view] = hash.split('-');
     
-        // Si le hash est mal formé, rediriger vers la page par défaut (en changeant le hash cette fonction sera automatiquement rappelee)
+        // Si le hash est mal formé, rediriger vers la page par défaut
         if (!app || !view) {
             window.location.hash = '#core-home';
             return;
         }
     
-        // Charger le contenu de la page avec un appel GET sur la bonne URL
-        loadContent(app, view);
+        // Récupération des données JSON de la vue
+        try {
+            const data = await getViewData(app, view);
+            // Mise à jour du contenu à partir des données reçues
+            document.querySelector('#content').innerHTML = data.html || JSON.stringify(data);
+        } catch (error) {
+            document.querySelector('#content').innerHTML = '<p>Une erreur est survenue lors du chargement du contenu.</p>';
+        }
     
         // Table de correspondance des vues
         const viewInitializers = {
             'accounts-login': initializeLoginView,
             'accounts-register': initializeRegisterView,
             'accounts-profile': initializeProfileView,
-            'accounts-gestion_profil': initializeGestionProfileView,
+            'accounts-gestion_profil': initializeManageProfileView,
             'accounts-enable_2fa': initializeEnable2FAView,
             'accounts-verify_2fa_login': initializeLogin2FAView,
             'accounts-disable_2fa': initializeDisable2FAView,
@@ -45,4 +62,3 @@ const Views = {
 };
 
 export default Views;
-

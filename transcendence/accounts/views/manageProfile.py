@@ -1,16 +1,23 @@
+# ---- Imports standard ----
+import logging
+
+# ---- Imports tiers ----
 from django.template.loader import render_to_string
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Max
-from django.contrib.auth import update_session_auth_hash, logout  # Pour maintenir la session après modification
-from .forms import ProfileForm, PasswordChangeForm, AvatarUpdateForm
-import logging
+from django.contrib.auth import update_session_auth_hash, logout
 from django.contrib.auth import get_user_model
 
+# ---- Imports locaux ----
+from .forms import ProfileForm, PasswordChangeForm, AvatarUpdateForm
+
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
 
 @method_decorator(csrf_protect, name='dispatch')
 class ProfileView(View):

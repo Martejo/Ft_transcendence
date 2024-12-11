@@ -1,16 +1,22 @@
-from django.views import View
+# ---- Imports standard ----
+import base64
+from io import BytesIO
+import logging
+
+# ---- Imports tiers ----
+import pyotp
+import qrcode
+
 from django.http import JsonResponse
+from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
-import pyotp
-import logging
-import base64
-import qrcode
-from io import BytesIO
 
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
 
 class Base2FAView(View):
     """

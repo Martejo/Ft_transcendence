@@ -1,15 +1,13 @@
-# core/urls.py
 from django.urls import path
-from . import views
+from .views import get_navbar, home_view, landing_view
 
 urlpatterns = [
-    path('', views.landing_view, name='landing'),  # Ajoutez ce pattern pour le chemin vide
-    # path('views/<str:view_name>/', views.load_view, name='load_view'),
-    # path('<str:view>/<str:app>/', views.load_view, name='load_view'),
-    path('<str:app>/<str:view_name>/', views.load_view, name='load_view'),
-    path('get_navbar/', views.get_navbar, name='get_navbar'),
-
-    path('home/', views.home_view, name='home_view'),  # Ajouter ceci
-
-    # Autres URL patterns
+    # Route pour la barre de navigation
+    path('navbar/', get_navbar, name='get_navbar'),
+    
+    # Route pour la page d'accueil
+    path('home/', home_view, name='home_view'),
+    
+    # Route pour la page de destination
+    path('landing/', landing_view, name='landing_view'),
 ]

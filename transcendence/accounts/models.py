@@ -1,12 +1,15 @@
 # User/models.py
+# ---- Imports standard ----
+import random
+from datetime import datetime, timedelta
+from pathlib import Path
+
+# ---- Imports tiers ----
 from django.db import models
-from django.conf import settings  
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.timezone import now
-from pathlib import Path
-import random
-from datetime import datetime, timedelta
 
 
 #[DOCUMENTATION] <Django - User & Abstract User>

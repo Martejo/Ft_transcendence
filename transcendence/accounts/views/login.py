@@ -1,3 +1,7 @@
+# ---- Imports standard ----
+import logging
+
+# ---- Imports tiers ----
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -5,10 +9,14 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
 from django.contrib.auth import authenticate, login
+
+# ---- Imports locaux ----
 from .utils import generate_jwt_token
 from .forms import LoginForm
-import logging
+
+# ---- Configuration ----
 logger = logging.getLogger(__name__)
+
 
 @method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toute la classe
 class LoginView(View):

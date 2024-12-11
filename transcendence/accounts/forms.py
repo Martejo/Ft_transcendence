@@ -1,11 +1,13 @@
 # accounts/forms.py
 
+# ---- Imports tiers ----
 from django import forms
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import UserCreationForm  # Gère la création d'un utilisateur
+from django.contrib.auth.forms import UserCreationForm  # Formulaire pour la création d'utilisateur
 from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
+from django.core.exceptions import ValidationError
 
+# ---- Configuration ----
 User = get_user_model()
 
 class RegistrationForm(UserCreationForm):
