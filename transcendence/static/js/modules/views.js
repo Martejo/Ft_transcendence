@@ -1,10 +1,16 @@
+// authentication views
 import { initializeLoginView, initializeRegisterView, logoutUser } from '../auth/index.js';
 import { initializeEnable2FAView, initializeLogin2FAView, initializeDisable2FAView } from '../auth/index.js';
 
-// import { initializeLoginView, initializeRegisterView } from '../views/authentication.js';
-import { initializeProfileView, initializeGestionProfileView } from '../views/profile.js';
-import { initializeEnable2FAView, initializeLogin2FAView, initializeDisable2FAView } from '../views/2fa.js';
-import { initializeFriendInvitation } from '../views/game.js';
+// profile views
+import { initializeProfileView, initializeGestionProfileView } from '../profile/index.js';
+
+// game views
+import { initializeFriendInvitation } from '../game/index.js';
+
+// load view in #content div
+import { loadContent } from '../contentLoader.js';
+
 
 const Views = {
     initializeViewFromHash() {

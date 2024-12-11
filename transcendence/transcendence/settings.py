@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    #'django.contrib.admin', SuperUtilisateur a voir si on en a besoin
+    'django.contrib.admin', #SuperUtilisateur a voir si on en a besoin
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.backends.CustomUserBackend',
+     'django.contrib.auth.backends.ModelBackend',
 ]
 
 
@@ -60,7 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
+    'accounts.middleware.UpdateLastActivityMiddleware', #Notre middleware
+    'transcendence.middleware.JWTAuthenticationMiddleware', # [TAGS] <JWT_tokens>
 	# 'django.template.context_processors.csrf',  # Assurez-vous que celui-ci est présent
 
 ]
@@ -192,7 +193,3 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,  # Utilisez votre clé secrète Django
 }
-# Authentification
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-# ]
