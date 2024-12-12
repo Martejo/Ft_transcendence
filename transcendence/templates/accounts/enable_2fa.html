@@ -1,36 +1,101 @@
-<div class="flex-form-container">
+<!-- <div class="flex-form-container">
     <div class="register-form">
         <h1 class="title mb-4">Activer l'authentification à deux facteurs</h1>
-        <div class="form-group">
-            <div class="qr-container" style="background: white; padding: 20px; display: inline-block; margin-bottom: 20px; border-radius: 10px;">
-                {% if qr_code %}
-                    <img src="data:image/png;base64,{{ qr_code }}" 
-                         alt="QR Code" 
-                         style="display: block; max-width: 200px; height: auto;">
-                {% else %}
-                    <div style="color: red;">QR Code not available</div>
-                {% endif %}
-            </div>
-            
-            <p style="color: white; font-family: 'Jersey 10'; margin: 20px 0;">
-                Code secret: <strong>{{ secret|default:"N/A" }}</strong>
-            </p>
-            
-            <form id="verify-2fa-form" method="POST">
-                {% csrf_token %}
-                {{ 2FA_form.as_p }}  <!-- This renders your form -->
-                <button type="submit" 
-                        class="btn btn-primary btn-70"
-                        style="background-color: #2DB4F3;
-                               border: none;
-                               padding: 10px 20px;
-                               font-family: 'Jersey 10';
-                               font-size: 18px;">
-                    Vérifier
-                </button>
-                <div class="verification-error text-danger mt-2" style="display: none;"></div>
-                <div class="verification-success text-success mt-2" style="display: none;"></div>
-            </form>
-        </div>
+		<div class="form-group">
+			<div class="qr-container" style="background: white; padding: 20px; display: inline-block; margin-bottom: 20px; border-radius: 10px;">
+				{% if qr_code %}
+					<img src="data:image/png;base64,{{ qr_code }}" 
+							alt="QR Code" 
+							style="display: block; max-width: 200px; height: auto;">
+				{% else %}
+					<div style="color: red;">QR Code not available</div>
+				{% endif %}
+			</div>
+			
+			<p style="color: white; font-family: 'Jersey 10'; margin: 20px 0;">
+				Code secret: <strong>{{ secret|default:"N/A" }}</strong>
+			</p>
+			
+			<form id="verify-2fa-form" method="POST">
+				{% csrf_token %}
+				{{ 2FA_form.as_p }}  
+				<button type="submit" 
+						class="btn btn-primary btn-70"
+						style="background-color: #2DB4F3;
+								border: none;
+								padding: 10px 20px;
+								font-family: 'Jersey 10';
+								font-size: 18px;">
+					Vérifier
+				</button>
+				<div class="verification-error text-danger mt-2" style="display: none;"></div>
+				<div class="verification-success text-success mt-2" style="display: none;"></div>
+			</form>
+		</div>
     </div>
+</div> -->
+
+
+
+
+
+
+<div class="container-fluid text-center d-flex flex-column align-items-center col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4" style="height: 100%; padding-top: 20px; z-index: 2;">
+	<h2 class="text-white texte-center mb-0" style="font-size: 2.5em;">Activer l'authentification à deux facteurs</h2>
+
+
+	<div class="register-form mb-4">
+
+		<div class=" dfa-item d-flex flex-column align-items-center justify-content-between text-white p-5 mb-2 w-100">
+				<div class="flex-form-container">
+					<div class="register-form">
+						<h1 class="title mb-4">Activer l'authentification à deux facteurs</h1>
+						<div class="form-group">
+							<div class="qr-container" style="background: white; padding: 20px; display: inline-block; margin-bottom: 20px; border-radius: 10px;">
+								{% if qr_code %}
+									<img src="data:image/png;base64,{{ qr_code }}" 
+											alt="QR Code" 
+											style="display: block; max-width: 200px; height: auto;">
+								{% else %}
+									<div style="color: red;">QR Code not available</div>
+								{% endif %}
+							</div>
+							
+							<p style="color: white; font-family: 'Jersey 10'; margin: 20px 0;">
+								Code secret: <strong>{{ secret|default:"N/A" }}</strong>
+							</p>
+							
+							<form id="verify-2fa-form" method="POST">
+								{% csrf_token %}
+								{{ 2FA_form.as_p }}  
+								<button type="submit" 
+										class="btn btn-primary btn-70"
+										style="background-color: #2DB4F3;
+												border: none;
+												padding: 10px 20px;
+												font-family: 'Jersey 10';
+												font-size: 18px;">
+									Vérifier
+								</button>
+								<div class="verification-error text-danger mt-2" style="display: none;"></div>
+								<div class="verification-success text-success mt-2" style="display: none;"></div>
+							</form>
+						</div>
+					</div>
+				</div>
+		</div>
+
+
+	</div>
+
+
 </div>
+
+<style>
+
+	.dfa-item {
+		background-color:  #101A32;
+		border: 2px solid rgb(153, 148, 148);
+		border-radius: 20px;
+	}
+</style>
