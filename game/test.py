@@ -20,7 +20,7 @@ WINDOW_WIDTH, WINDOW_HEIGHT = 800, 400
 FPS = 60
 INITIAL_BALL_SPEED = 4
 PADDLE_SPEED = 6
-BALL_SPEED_INCREMENT = 0.05
+BALL_SPEED_INCREMENT = 0.03
 
 # Physics constants
 ICE_ACCELERATION = 0.5
@@ -37,6 +37,11 @@ PURPLE = (147, 0, 211)  # Couleur pour l'orbe d'inversion
 RED = (255, 0, 0)      # Couleur pour l'orbe de rétrécissement
 BLUE = (0, 191, 255)   # Couleur pour l'orbe de glace
 YELLOW = (255, 255, 0) # Couleur pour l'orbe de vitesse
+GREEN = (0, 255, 0) # Couleur pour l'orbe sticky
+
+STICKY_DURATION = 5
+ARROW_LENGTH = 40
+ARROW_SPEED = 2
 
 # Initialisation de la fenêtre
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -219,20 +224,33 @@ class PowerUpState:
         self.flash_effect = {"left": False, "right": False}
         self.effect_duration = 5
         self.flash_duration = 0.5
+        self.sticky_ball = {"left": False, "right": False}
+        self.sticky_start_time = {"left": 0, "right": 0}
+        self.sticky_angle = {"left": 0, "right": 0}
+        self.sticky_direction = {"left": 1, "right": 1}  # 1 for down, -1 for up
         self.effect_start_time = {
             "left": {"invert": 0, "shrink": 0, "ice": 0, "speed" : 0}, 
             "right": {"invert": 0, "shrink": 0, "ice": 0, "speed" : 0}
         }
         self.flash_start_time = 0
-        
+    def release_sticky_ball(self, player):
+        """Release the ball from sticky state and return the current angle"""
+        angle = self.sticky_angle[player]
+        self.sticky_ball[player] = False
+        return angle
+
     def apply_effect(self, last_paddle_hit, effect_type, current_time):
-        if effect_type == "speed":
+        if effect_type == "speed" or effect_type == "sticky":
             target_player = last_paddle_hit
         else:
             target_player = "right" if last_paddle_hit == "left" else "left"
         if effect_type == "speed":
             self.speed_boost[target_player] = True
             self.effect_start_time[target_player]["speed"] = current_time
+        if effect_type == "sticky":
+            self.sticky_ball[target_player] = True
+            self.sticky_start_time[target_player] = current_time
+            self.sticky_angle[target_player] = 0
         if effect_type == "invert":
             self.inverted_controls[target_player] = True
             self.effect_start_time[target_player]["invert"] = current_time
@@ -254,6 +272,17 @@ class PowerUpState:
             if self.inverted_controls[player]:
                 if current_time - self.effect_start_time[player]["invert"] >= self.effect_duration:
                     self.inverted_controls[player] = False
+            
+            # Update sticky effect
+            if self.sticky_ball[player]:
+                 # Update arrow angle
+                self.sticky_angle[player] += ARROW_SPEED * self.sticky_direction[player]
+                if self.sticky_angle[player] >= 45:
+                    self.sticky_direction[player] = -1
+                elif self.sticky_angle[player] <= -45:
+                    self.sticky_direction[player] = 1
+                if current_time - self.sticky_start_time[player] >= STICKY_DURATION:
+                    self.release_sticky_ball(player)
 
             # Update shrink effect
             if self.shrunk_paddle[player]:
@@ -279,6 +308,19 @@ class PowerUpState:
             if self.flash_effect:
                 if current_time - self.flash_start_time >= self.flash_duration:
                     self.flash_effect = False
+
+        def release_sticky_ball(self, player):
+            self.sticky_ball[player] = False
+            return self.sticky_angle[player]
+
+def calculate_sticky_release(angle):
+    # Convert angle to radians
+    rad_angle = math.radians(angle)
+    # Calculate new velocities (using current ball speed as base)
+    speed = math.sqrt(ball_speed_x ** 2 + ball_speed_y ** 2)
+    new_speed_x = speed * math.cos(rad_angle)
+    new_speed_y = speed * math.sin(rad_angle)
+    return new_speed_x, new_speed_y
 
 def count_active_orbs(orbs):
     return sum(1 for orb in orbs if orb.active)
@@ -312,7 +354,7 @@ class Bumper:
 
     def reposition(self, terrain_rect):
         max_attempts = 100
-        margin = self.radius + 20
+        margin = self.radius + 100
         
         for _ in range(max_attempts):
             new_x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
@@ -384,7 +426,8 @@ power_up_orbs = [
     PowerUpOrb(terrain_rect, RED, "shrink"),
     PowerUpOrb(terrain_rect, BLUE, "ice"),
     PowerUpOrb(terrain_rect, YELLOW, "speed"),
-    PowerUpOrb(terrain_rect, WHITE, "flash")
+    PowerUpOrb(terrain_rect, WHITE, "flash"),
+    PowerUpOrb(terrain_rect, GREEN, "sticky")
 ]
 
 # Initialize the orbs
@@ -475,6 +518,23 @@ while True:
     # Déplacement des raquettes avec gestion des contrôles inversés
     keys = pygame.key.get_pressed()
     
+    # Handle sticky ball before movement
+    if power_up_state.sticky_ball["left"] and last_paddle_hit == "left":
+        ball.centerx = paddle_left.rect.right
+        ball.centery = paddle_left.rect.centery
+        if keys[pygame.K_SPACE]:  # Left player uses spacebar
+            new_speed_x, new_speed_y = calculate_sticky_release(power_up_state.sticky_angle["left"])
+            ball_speed_x, ball_speed_y = abs(new_speed_x), new_speed_y  # Ensure ball goes right
+            power_up_state.release_sticky_ball("left")
+            
+    elif power_up_state.sticky_ball["right"] and last_paddle_hit == "right":
+        ball.centerx = paddle_right.rect.left
+        ball.centery = paddle_right.rect.centery
+        if keys[pygame.K_RETURN]:  # Right player uses return/enter
+            new_speed_x, new_speed_y = calculate_sticky_release(power_up_state.sticky_angle["right"])
+            ball_speed_x, ball_speed_y = -abs(new_speed_x), new_speed_y  # Ensure ball goes left
+            power_up_state.release_sticky_ball("right")
+    
     # Raquette gauche
     direction_left = 0
     if power_up_state.inverted_controls["left"]:
@@ -499,9 +559,11 @@ while True:
     paddle_right.move(direction_right, power_up_state.ice_physics["right"],
                      terrain_rect.top, terrain_rect.bottom, power_up_state.speed_boost["right"])
 
-    # Déplacement de la balle
-    ball.x += ball_speed_x
-    ball.y += ball_speed_y
+    # Only move ball if not sticky
+    if not (power_up_state.sticky_ball["left"] and last_paddle_hit == "left") and \
+       not (power_up_state.sticky_ball["right"] and last_paddle_hit == "right"):
+        ball.x += ball_speed_x
+        ball.y += ball_speed_y
 
     # First check paddle collisions
     if ball.colliderect(paddle_left.rect):
@@ -524,9 +586,7 @@ while True:
     for bumper in bumpers:
         bounce = bumper.check_collision(ball)
         if bounce:
-            # Reverse and increase x speed (like paddles)
-            ball_speed_x = -ball_speed_x * 1.1  # 10% increase
-            # Calculate y speed based on relative position and x speed (like paddles)
+            ball_speed_x = -ball_speed_x * 1.05  # 10% increase
             ball_speed_y = bounce * abs(ball_speed_x)
 
     # Gestion des collisions avec les orbes de power-up
@@ -570,6 +630,48 @@ while True:
             if bumper.active:
                 pygame.draw.circle(screen, WHITE, (int(bumper.x), int(bumper.y)), bumper.radius)
 
+        # Draw sticky ball arrow if active
+        for player in ["left", "right"]:
+            if power_up_state.sticky_ball[player] and last_paddle_hit == player:
+                # Calculate arrow start point
+                start_pos = (0, 0)
+                if player == "left":
+                    start_pos = (paddle_left.rect.right, paddle_left.rect.centery)
+                    base_angle = 0
+                else:
+                    start_pos = (paddle_right.rect.left, paddle_right.rect.centery)
+                    base_angle = 180
+                
+                # Calculate arrow end point using angle
+                angle = base_angle + power_up_state.sticky_angle[player]
+                rad_angle = math.radians(angle)
+                end_pos = (
+                    start_pos[0] + (ARROW_LENGTH * math.cos(rad_angle)),
+                    start_pos[1] + (ARROW_LENGTH * math.sin(rad_angle))
+                )
+                
+                # Draw the arrow line
+                pygame.draw.line(screen, GREEN, start_pos, end_pos, 2)
+                
+                # Draw arrow head
+                arrow_head_length = 10
+                arrow_head_angle = math.pi / 6  # 30 degrees
+                angle1 = rad_angle + arrow_head_angle
+                angle2 = rad_angle - arrow_head_angle
+                
+                head1_pos = (
+                    end_pos[0] - arrow_head_length * math.cos(angle1),
+                    end_pos[1] - arrow_head_length * math.sin(angle1)
+                )
+                head2_pos = (
+                    end_pos[0] - arrow_head_length * math.cos(angle2),
+                    end_pos[1] - arrow_head_length * math.sin(angle2)
+                )
+                
+                # Draw arrow head lines
+                pygame.draw.line(screen, GREEN, end_pos, head1_pos, 2)
+                pygame.draw.line(screen, GREEN, end_pos, head2_pos, 2)
+
     # Affichage des scores
     font = pygame.font.SysFont(None, 36)
     score_text = font.render(f"{score_left} - {score_right}", True, WHITE)
@@ -586,6 +688,8 @@ while True:
             effects.append("Icy!")
         if power_up_state.speed_boost[player]:
             effects.append("Speedy Gonzales!")
+        if power_up_state.sticky_ball[player]:
+            effects.append("Sticky!")
             
         if effects:
             effect_text = font.render(" & ".join(effects), True, PURPLE)
