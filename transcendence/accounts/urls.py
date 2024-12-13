@@ -15,7 +15,7 @@ from .views.burgerMenu import BurgerMenuDataView, UpdateStatusView
 from .views.friendProfile import FriendProfileView
 from .views.login import LoginView
 from .views.manageFriends import AddFriendView, HandleFriendRequestView, RemoveFriendView
-from .views import Enable2FAView, Check2FAView, Verify2FALoginView, Disable2FAView
+from .views import Enable2FAView, Check2FAView, Login2faView, Disable2FAView
 from .views.tokenManagement import refresh_token_view
 
 # ---- Configuration ----
@@ -38,7 +38,7 @@ urlpatterns = [
     # ---- Manage 2FA ----
     path('2fa/enable/', Enable2FAView.as_view(), name='enable_2fa'),
     path('2fa/check/', Check2FAView.as_view(), name='check_2fa'),
-    path('2fa/verify-login/', Verify2FALoginView.as_view(), name='verify_2fa_login'),
+    path('2fa/login2fa/', Login2faView.as_view(), name='login_2fa'),
     path('2fa/disable/', Disable2FAView.as_view(), name='disable_2fa'),
 
     # ---- Manage Friends ----

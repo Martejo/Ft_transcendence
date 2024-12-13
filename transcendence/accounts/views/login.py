@@ -26,13 +26,16 @@ class LoginView(View):
     - POST : Traite les données du formulaire et connecte l'utilisateur.
     """
 
+    #[IMPROVE] remplacer ce genre de requetes get par des appels a fichiers statiques si on ne prevoit pas d' utilisr les balises
+    # apres a voir si c' est pas plus simple d' envoyer les statiques par json.
     def get(self, request):
         """
         Gère une requête HTTP GET.
         Retourne un formulaire de connexion sous forme de HTML encapsulé dans une réponse JSON.
         """
         form = LoginForm()  # Initialise un formulaire de connexion vide
-        rendered_form = render_to_string('accounts/login_form.html', {'form': form})  # Génère le HTML du formulaire
+        # Le HTML est transforme en string et le formulaire renvoye est lie au regles du back (cf.forms.py) 
+        rendered_form = render_to_string('accounts/login_form.html') #ce retour implique d'utiliser les balises django dans le html
         return JsonResponse({
             'status': 'success',
             'form_html': rendered_form,  # Renommé pour être plus explicite

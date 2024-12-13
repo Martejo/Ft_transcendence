@@ -8,20 +8,6 @@ import { initializeProfileView, initializeManageProfileView } from '../profile/i
 // game views
 import { initializeFriendInvitation } from '../game/index.js';
 
-//get views
-import { Api } from '../Api.js'; 
-
-async function getViewData(app, view) {
-    const url = `/${app}/${view}/`;
-
-    try {
-        const data = await Api.get(url);
-        return data; // Retourne les données JSON
-    } catch (error) {
-        console.error(`Erreur lors du chargement de ${app}-${view} :`, error);
-        throw error;
-    }
-}
 
 const Views = {
     async initializeViewFromHash() {
@@ -33,16 +19,7 @@ const Views = {
             window.location.hash = '#core-home';
             return;
         }
-    
-        // Récupération des données JSON de la vue
-        try {
-            const data = await getViewData(app, view);
-            // Mise à jour du contenu à partir des données reçues
-            document.querySelector('#content').innerHTML = data.html || JSON.stringify(data);
-        } catch (error) {
-            document.querySelector('#content').innerHTML = '<p>Une erreur est survenue lors du chargement du contenu.</p>';
-        }
-    
+
         // Table de correspondance des vues
         const viewInitializers = {
             'accounts-login': initializeLoginView,

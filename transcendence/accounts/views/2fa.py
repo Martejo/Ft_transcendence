@@ -9,8 +9,10 @@ import qrcode
 
 from django.http import JsonResponse
 from django.views import View
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.contrib.auth import get_user_model
 
 # ---- Configuration ----
@@ -90,10 +92,23 @@ from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
 from .utils import generate_jwt_token
 
-class Verify2FALoginView(View):
+class Login2faView(View):
     """
     Verify 2FA code during login.
     """
+
+    def get(self, request):
+        """
+        Gère une requête HTTP GET.
+        Retourne un formulaire de connexion sous forme de HTML encapsulé dans une réponse JSON.
+        """
+        # [IMPROVE] login2fa.html contient une balise DJANGO alors qu' on en utilise pas
+        # Soit ajouter les balises pour tous les form soit modifier le html
+        rendered_form = render_to_string('accounts/login2fa.html')
+        return JsonResponse({
+            'status': 'success',
+            'form_html': rendered_form,  # Renommé pour être plus explicite
+        })
 
     def post(self, request):
         user_id = request.session.get('user_id')

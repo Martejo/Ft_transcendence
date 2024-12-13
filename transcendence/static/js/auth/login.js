@@ -1,7 +1,13 @@
 // auth/login.js
-import Api from '../api/api.js';
-import { loadNavbar } from '../modules/navbar.js';
+//import Api from '../api/api.js';
+export { getViewJson } from './getView.js';
+import { getViewJson } from '../api/getView.js';
+import { loadNavbar } from '../navbar/index.js';
 
+/**
+ * Affiche les erreurs de connexion reçues du serveur dans la zone prévue pour les erreurs.
+ * @param {Object} errors - Un objet contenant les erreurs retournées par le serveur.
+ */
 function displayLoginErrors(errors) {
     const loginError = document.querySelector('#login-error');
     let errorMessages = '';
@@ -13,13 +19,20 @@ function displayLoginErrors(errors) {
     loginError.innerHTML = errorMessages;
 }
 
+
+/**
+ * Gère la réponse du serveur après une tentative de connexion.
+ * Redirige l'utilisateur en fonction du statut de la connexion ou affiche des messages d'erreur.
+ * @param {Object} response - La réponse du serveur après soumission du formulaire de connexion.
+ */
 function handleLoginResponse(response) {
     if (response.status === 'success') {
         if (response.requires_2fa) {
             window.location.hash = '#accounts-verify_2fa_login';
         } else {
-            sessionStorage.setItem('accessToken', response.access);
-            sessionStorage.setItem('refreshToken', response.refresh);
+            localStorage.setItem('accessToken', response.access);
+            //[IMPROVE]Dois t on renvoyer des tokens refresh a chaque nouvelle connexion ?
+            localStorage.setItem('refreshToken', response.refresh);
             setTimeout(() => {
                 window.isAuthenticated = true;
                 loadNavbar();
@@ -35,6 +48,12 @@ function handleLoginResponse(response) {
     }
 }
 
+
+/**
+ * Soumet le formulaire de connexion au serveur via une requête POST.
+ * Désactive le bouton de validation pendant le traitement et gère les erreurs éventuelles.
+ * @param {HTMLFormElement} form - Le formulaire de connexion soumis par l'utilisateur.
+ */
 async function submitLogin(form) {
     const validateBtn = document.querySelector('#validate-btn');
     validateBtn.disabled = true;
@@ -54,12 +73,34 @@ async function submitLogin(form) {
     }
 }
 
+
 export function initializeLoginView() {
+    const data = NULL;
+    try {
+        data = getViewJson('accounts', 'login')
+        updateHtmlContent('#content', data.html)
+    } catch (error) {
+        
+        // [IMPROVE] Faire un gestionnaire d'erreurs 
+        console.error('Erreur lors de la requete API initializeLoginView :', error);
+    }
+
     const form = document.querySelector('#login-form');
     if (!form) return;
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         submitLogin(form);
+    });
+
+
+    const forgotPasswordLink = document.querySelector('#forgot-password-link');
+    if (!forgotPasswordLink) return;
+
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault(); // Empêche le comportement par défaut du lien
+        // Exemple d'action : Redirection ou affichage d'une modale
+        alert("Redirection vers la page de récupération de mot de passe."); // À remplacer par votre logique
+        // window.location.href = '/accounts/forgot_password/';
     });
 }

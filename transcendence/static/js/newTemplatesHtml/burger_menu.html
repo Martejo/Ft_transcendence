@@ -1,0 +1,142 @@
+<!-- templates/burger_menu/template.html -->
+
+<!--
+    Template principal pour le burger menu.
+    Ce fichier inclut les sections statiques et dynamiques du menu.
+    Les sections dynamiques comme la liste des amis et les demandes d'amis sont incluses via {% include 'friends.html' %}.
+-->
+
+<div id="burger-menu" class="position-fixed">
+    <!-- Section de profil avec avatar et pastille de statut -->
+    <div class="profile-section text-center mt-4 position-relative">
+        <div class="position-relative d-inline-block">
+            <!-- Avatar du profil -->
+            <img id="profile-avatar" src="" alt="Avatar" class="rounded-circle mb-2" style="width: 80px; height: 80px;">
+            <!-- Indicateur de statut (en ligne/hors ligne) -->
+            <span id="status-indicator" class="status-indicator offline"></span>
+        </div>
+        <!-- Nom d'utilisateur -->
+        <h5 id="profile-username" class="mb-0">Nom d'utilisateur</h5>
+    </div>
+
+    <!-- Sélecteur pour changer le statut -->
+    <div class="status-selector text-center p-3 border-bottom">
+        <button id="status-online-btn" class="btn btn-success btn-sm me-2" style="width: 100px;">En ligne</button>
+        <button id="status-offline-btn" class="btn btn-danger btn-sm" style="width: 100px;">Hors ligne</button>
+        <button id="profile-btn" class="btn btn-primary mt-3 mb-2" style="width: 80%;">Voir le profil</button>
+    </div>
+
+    <!-- Navigation principale du burger menu -->
+    <div class="nav flex-column border-bottom p-2">
+        <button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="play-btn">Jouer</button>
+        <button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="tournament-link">Tournoi</button>
+        <button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="settings-link">Gestion du compte</button>
+    </div>
+
+
+    <!-- Formulaire pour ajouter un ami -->
+    <div class="add-friend-section p-3 border-bottom">
+        <h5 class="text-center" style="color: white">Ajouter un ami</h5>
+        <form id="add-friend-form" method="POST">
+            <!-- CSRF Token géré via JavaScript ou inclus dans les en-têtes de requête -->
+            <input type="text" id="friend-username" name="friend_username" class="form-control mb-2" placeholder="Nom d'utilisateur" required>
+            <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+        </form>
+        <!-- Messages de retour pour l'ajout d'ami -->
+        <div id="add-friend-error" class="text-danger mt-2"></div>
+        <div id="add-friend-success" class="text-success mt-2"></div>
+    </div>
+
+    <!-- Inclusion des templates dynamiques pour amis et demandes d'amis -->
+    {% include 'burger_menu/friends.html' %}
+
+    <!-- Formulaire de déconnexion -->
+    <div class="nav flex-column p-3">
+        <form id="logout-form" method="POST">
+            <!-- CSRF Token géré via JavaScript ou inclus dans les en-têtes de requête -->
+            <button id="logout-btn" type="button" class="nav-link" style="color: rgb(153, 148, 148)">Déconnexion</button>
+        </form>
+    </div>
+
+    <!-- Popup pour les options d'ami -->
+    <div id="friendPopup" class="friend-popup d-none position-absolute">
+        <p id="popupFriendName" class="fw-bold mb-1 d-flex align-items-center justify-content-center">Options</p>
+        <button id="view-profile-btn" class="btn btn-profil mb-2">Voir profil</button>
+        <button id="invite-game-btn" class="btn btn-invit mb-2">Inviter à jouer</button>
+        <button id="delete-friend-btn" class="btn btn-delete">Supprimer</button>
+    </div>
+</div>
+
+<!-- Overlay pour le popup -->
+<div id="overlay" style="display: none;"></div>
+
+<!-- Styles pour l'indicateur de statut et le positionnement de la pastille -->
+<style>
+    .position-relative {
+        position: relative;
+    }
+    .status-indicator {
+        position: absolute;
+        bottom: 10px;
+        right: 5px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 2px solid white; 
+    }
+    .status-indicator-friend {
+        position: absolute;
+        bottom: 0px;
+        right: 20px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+    .online {
+        background-color: #28a745; /* Vert pour 'en ligne' */
+    }
+    .offline {
+        background-color: #dc3545; /* Rouge pour 'hors ligne' */
+    }
+
+    .btn-profil, .btn-invit, .btn-delete {
+        background-color: #4da9d4;
+        color: white;
+        border: 1px solid rgb(153, 148, 148);
+        width: 100%;
+        border-radius: 50px;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .btn-profil:hover, .btn-invit:hover, .btn-delete:hover{
+        outline: 1px solid rgb(153, 148, 148);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .friend-popup {
+        width: 150px;
+        padding: 10px;
+        background-color: #141b2e;
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+        outline: 1px solid rgb(255, 255, 255);
+        transform: translate(-50%, -100%);
+    }
+    .friend-item:hover {
+        cursor: pointer;
+    }
+
+    @media (max-width: 576px) {
+        #burger-menu {
+            width: 100%; /* Prend toute la largeur de l'écran */
+            height: var(--sin-nav-height); /* Prend toute la hauteur de l'écran */
+            top: 50px; /* Aligne en haut de l'écran */
+            left: 0; /* Aligne à gauche pour couvrir tout l'écran */
+            border-radius: 0; /* Supprime les coins arrondis */
+        }
+    }
+</style>

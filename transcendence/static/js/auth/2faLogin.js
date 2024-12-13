@@ -10,7 +10,8 @@ async function submitLogin2FA(form) {
             localStorage.setItem('refreshToken', response.refresh);
             setTimeout(() => {
                 window.isAuthenticated = true;
-                window.location.hash = '#accounts-profile';
+                loadNavbar();
+                window.location.hash = '#game-play';
             }, 500);
         } else {
             alert(response.message);
@@ -22,6 +23,16 @@ async function submitLogin2FA(form) {
 }
 
 export function initializeLogin2FAView() {
+    const data = NULL;
+    try {
+        data = getViewJson('accounts', 'login2fa')
+        updateHtmlContent('#content', data.html)
+    } catch (error) {
+        
+        // [IMPROVE] Faire un gestionnaire d'erreurs
+        console.error('Erreur lors de la requete API initializeLoginView :', error);
+    }
+    
     document.addEventListener('submit', function(e) {
         if (e.target && e.target.id === 'login-2fa-form') {
             e.preventDefault();

@@ -36,9 +36,9 @@ const Api = {
     
         const contentType = response.headers.get('Content-Type');
         if (contentType && contentType.includes('application/json')) {
-            return response.json();
+            return response.json();// Conversion automatique en objet JS
         } else {
-            // On suppose qu'il s'agit de HTML ou d'un autre format texte
+            // [IMPROVE] on ne devrait pas se retrouver ici car notre back ne retourne que du json
             return response.text();
         }
     },
