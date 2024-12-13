@@ -1,0 +1,32 @@
+<!-- friends.html -->
+
+<!-- il faudra inclure ces templates dans le fichier html de base des templates avec :  -->
+<!-- {% include 'friends.html' %} -->
+
+
+<!-- Template pour un item ami (utilisé dans friendActions.js lors du rafraîchissement de la liste d'amis) -->
+<template id="friend-item-template">
+    <li class="d-flex align-items-center mb-2 friend-item">
+        <div class="position-relative">
+            <img class="rounded-circle me-3 friend-avatar" style="width: 50px; height: 50px;">
+            <span class="status-indicator-friend"></span>
+        </div>
+        <button class="friend-btn"></button>
+    </li>
+</template>
+
+<!-- Template pour un item de demande d'ami (utilisé dans friendRequests.js) -->
+<template id="friend-request-item-template">
+    <li class="d-flex align-items-center mb-2 request-item">
+        <div class="position-relative">
+            <img class="rounded-circle me-3 request-avatar" style="width: 50px; height: 50px;">
+        </div>
+        <div class="d-flex flex-column">
+            <p class="request-from-user"></p>
+            <div class="d-flex">
+                <button class="btn btn-success btn-sm me-2 request-accept-btn">Accepter</button>
+                <button class="btn btn-danger btn-sm request-decline-btn">Refuser</button>
+            </div>
+        </div>
+    </li>
+</template>

@@ -6,8 +6,8 @@ async function submitLogin2FA(form) {
     try {
         const response = await Api.post('/accounts/verify_2fa_login/', formData);
         if (response.status === 'success') {
-            sessionStorage.setItem('accessToken', response.access);
-            sessionStorage.setItem('refreshToken', response.refresh);
+            localStorage.setItem('accessToken', response.access);
+            localStorage.setItem('refreshToken', response.refresh);
             setTimeout(() => {
                 window.isAuthenticated = true;
                 window.location.hash = '#accounts-profile';
