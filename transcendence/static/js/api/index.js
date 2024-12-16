@@ -3,3 +3,4 @@
 
 export { Api } from './api.js';
 export { getViewJson } from './getView.js';
+export { RequestError, HTTPError, ContentTypeError, NetworkError } from './apiErrors.js';

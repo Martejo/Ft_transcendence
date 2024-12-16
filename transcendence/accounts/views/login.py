@@ -13,11 +13,13 @@ from django.contrib.auth import authenticate, login
 # ---- Imports locaux ----
 from accounts.utils import generate_jwt_token
 from accounts.forms import LoginForm
+from transcendence.decorators import user_not_authenticated
+
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
 
-
+@method_decorator(user_not_authenticated, name='dispatch')  # Applique le décorateur user_not_authenticated à toute la classe
 @method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toute la classe
 class LoginView(View):
     """
@@ -73,7 +75,8 @@ class LoginView(View):
                     return JsonResponse({
                         'status': 'success',
                         'jwtToken': token_jwt,
-                        'requires_2fa': False
+                        'requires_2fa': False,
+                        'ís_authenticated': True
                     })
                 else:
                     return JsonResponse({'status': 'error', 'message': 'Compte désactivé'})

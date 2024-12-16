@@ -1,3 +1,5 @@
+//api/api.js
+
 const Api = {
     getCSRFToken() {
         const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
@@ -38,25 +40,40 @@ const Api = {
         if (contentType && contentType.includes('application/json')) {
             return response.json();// Conversion automatique en objet JS
         } else {
-            // [IMPROVE] on ne devrait pas se retrouver ici car notre back ne retourne que du json
-            return response.text();
+            // [IMPROVE] throw une error => le serveur devrait toujours renvoyer un json valide
         }
     },
 
-    get(url) {
-        return this.request(url, 'GET');
+    async get(url) {
+        try {
+            return await this.request(url, 'GET');
+        } catch (error) {
+            throw error;
+        }
     },
-
-    post(url, formData) {
-        return this.request(url, 'POST', formData);
+    
+    async post(url, formData) {
+        try {
+            return await this.request(url, 'POST', formData);
+        } catch (error) {
+            throw error;
+        }
     },
-
-    put(url, formData) {
-        return this.request(url, 'PUT', formData);
+    
+    async put(url, formData) {
+        try {
+            return await this.request(url, 'PUT', formData);
+        } catch (error) {
+            throw error;
+        }
     },
-
-    delete(url, formData) {
-        return this.request(url, 'DELETE', formData);
+    
+    async delete(url, formData) {
+        try {
+            return await this.request(url, 'DELETE', formData);
+        } catch (error) {
+            throw error;
+        }
     }
 };
 

@@ -1,6 +1,9 @@
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.template.loader import render_to_string
 import logging
+from transcendence.decorators import user_not_authenticated
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +30,7 @@ def get_navbar(request):
     })
 
 
+@user_not_authenticated
 def home_view(request):
     """
     Retourne la page d'accueil sous forme de JSON avec son contenu HTML.
@@ -44,10 +48,4 @@ def landing_view(request):
     Retourne la page de destination avec un état d'authentification dans une réponse JSON.
     """
     logger.debug("Entre dans landing_view")
-    is_authenticated = request.user.is_authenticated
-    landing_html = render_to_string('landing.html', {'is_authenticated': is_authenticated})
-    return JsonResponse({
-        'status': 'success',
-        'is_authenticated': is_authenticated,
-        'landing_html': landing_html
-    })
+    return render(request, 'landing.html')
