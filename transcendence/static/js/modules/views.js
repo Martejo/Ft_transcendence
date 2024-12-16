@@ -1,13 +1,3 @@
-// authentication views
-import { initializeLoginView, initializeRegisterView, logoutUser } from '../auth/index.js';
-import { initializeEnable2FAView, initializeLogin2FAView, initializeDisable2FAView } from '../auth/index.js';
-
-// profile views
-import { initializeProfileView, initializeManageProfileView } from '../profile/index.js';
-
-// game views
-import { initializeFriendInvitation } from '../game/index.js';
-
 
 const Views = {
     async initializeViewFromHash() {
@@ -22,6 +12,7 @@ const Views = {
 
         // Table de correspondance des vues avec importation dynamique
         const viewInitializers = {
+            'core-home': async () => (await import('../auth/index.js')).initializeLoginView(),
             'accounts-login': async () => (await import('../auth/index.js')).initializeLoginView(),
             'accounts-register': async () => (await import('../auth/index.js')).initializeRegisterView(),
             'accounts-profile': async () => (await import('../profile/index.js')).initializeProfileView(),

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Charger la navbar
     loadNavbar();
 
+    // Appeler fonction landing
     // Charger le contenu de la page initiale (url = /core/home)
     loadContent("core", "home");
 
