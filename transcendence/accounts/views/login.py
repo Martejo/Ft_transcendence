@@ -11,8 +11,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth import authenticate, login
 
 # ---- Imports locaux ----
-from .utils import generate_jwt_token
-from .forms import LoginForm
+from accounts.utils import generate_jwt_token
+from accounts.forms import LoginForm
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)

@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
 
 # ---- Imports locaux ----
-from .forms import RegistrationForm
+from accounts.forms import RegistrationForm
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)

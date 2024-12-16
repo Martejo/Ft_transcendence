@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 
 # ---- Imports locaux ----
-from .models import RefreshToken
+from accounts.models import RefreshToken
 
 # ---- Configuration ----
 User = get_user_model()

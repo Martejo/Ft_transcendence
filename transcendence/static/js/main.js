@@ -11,12 +11,6 @@ import Views from './modules/views.js';
 import { loadNavbar } from './modules/navbar.js';
 import { initializeFriendButtons } from './modules/friends.js';
 
-// Import des vues spécifiques
-import { initializeLoginView, initializeRegisterView, logoutUser } from './views/authentication.js';
-import { initializeEnable2FAView, initializeLogin2FAView, initializeDisable2FAView } from './views/2fa.js';
-import { initializeProfileView, initializeGestionProfileView } from './views/profile.js';
-import { initializeFriendInvitation, startLoading, displayGame, displayTournamentBracket, initializeGameControls } from './views/game.js';
-
 // Une fois le DOM chargé, vous pouvez initialiser les éléments communs
 document.addEventListener('DOMContentLoaded', () => {
     // Charger la navbar
