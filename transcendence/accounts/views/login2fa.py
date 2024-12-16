@@ -15,6 +15,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.contrib.auth import get_user_model
 
+from django.contrib.auth import login
+from django.shortcuts import get_object_or_404
+from accounts.utils import generate_jwt_token
+
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -88,9 +92,7 @@ class Check2FAView(View):
         return JsonResponse({'status': 'error', 'message': 'Invalid 2FA code.'}, status=400)
 
 
-from django.contrib.auth import login
-from django.shortcuts import get_object_or_404
-from .utils import generate_jwt_token
+
 
 class Login2faView(View):
     """

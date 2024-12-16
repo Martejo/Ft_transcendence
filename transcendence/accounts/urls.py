@@ -6,16 +6,17 @@ from django.urls import path
 
 # ---- Imports locaux ----
 from .views.register import RegisterView
-from .views.profile import (
+from .views.manageProfile import (
     ManageProfileView, UpdateProfileView, DeleteAccountView,
-    ChangePasswordView, UpdateAvatarView, ProfileView
+    ChangePasswordView, UpdateAvatarView
 )
-from .views.auth import LogoutView
+from .views.profile import ProfileView
+from .views.logout import LogoutView
 from .views.burgerMenu import BurgerMenuDataView, UpdateStatusView
 from .views.friendProfile import FriendProfileView
 from .views.login import LoginView
 from .views.manageFriends import AddFriendView, HandleFriendRequestView, RemoveFriendView
-from .views import Enable2FAView, Check2FAView, Login2faView, Disable2FAView
+from .views.login2fa import Enable2FAView, Check2FAView, Login2faView, Disable2FAView
 from .views.tokenManagement import refresh_token_view
 
 # ---- Configuration ----

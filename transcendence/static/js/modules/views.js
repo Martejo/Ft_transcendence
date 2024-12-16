@@ -20,21 +20,21 @@ const Views = {
             return;
         }
 
-        // Table de correspondance des vues
+        // Table de correspondance des vues avec importation dynamique
         const viewInitializers = {
-            'accounts-login': initializeLoginView,
-            'accounts-register': initializeRegisterView,
-            'accounts-profile': initializeProfileView,
-            'accounts-gestion_profil': initializeManageProfileView,
-            'accounts-enable_2fa': initializeEnable2FAView,
-            'accounts-verify_2fa_login': initializeLogin2FAView,
-            'accounts-disable_2fa': initializeDisable2FAView,
-            'game-invite_game': initializeFriendInvitation,
+            'accounts-login': async () => (await import('../auth/index.js')).initializeLoginView(),
+            'accounts-register': async () => (await import('../auth/index.js')).initializeRegisterView(),
+            'accounts-profile': async () => (await import('../profile/index.js')).initializeProfileView(),
+            'accounts-gestion_profil': async () => (await import('../profile/index.js')).initializeManageProfileView(),
+            'accounts-enable_2fa': async () => (await import('../auth/index.js')).initializeEnable2FAView(),
+            'accounts-verify_2fa_login': async () => (await import('../auth/index.js')).initializeLogin2FAView(),
+            'accounts-disable_2fa': async () => (await import('../auth/index.js')).initializeDisable2FAView(),
+            'game-invite_game': async () => (await import('../game/index.js')).initializeFriendInvitation(),
         };
     
         // Appeler l'initialisateur correspondant, ou ne rien faire par défaut
         const initializer = viewInitializers[`${app}-${view}`];
-        if (initializer) initializer();
+        if (initializer) await initializer();
     }
 };
 
