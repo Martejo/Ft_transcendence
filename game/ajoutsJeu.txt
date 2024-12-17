@@ -23,3 +23,7 @@ teleporteurs (toujours 1 en double)
 
 
 
+-hitbox angles
+-plusieurs versions du jeu (avec/sans powerup specifiques)
+-variable de vitesse (donne au moment du lancement)
+-variable de taille (donne au moment du lancement)
