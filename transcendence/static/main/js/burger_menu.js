@@ -234,26 +234,28 @@ function showFriendPopup(event, friendName) {
     const popupHeight = popup.offsetHeight;
 
     const menu = document.getElementById('burger-menu');
-    const menuRect = menu.getBoundingClientRect();
-    const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
-    const mouseY = event.clientY - menuRect.top + menu.scrollTop;
 
     let top, left;
 
-    if (mouseY < 250 && window.innerWidth - mouseX < 175) {
-        top = mouseY + popupHeight;
-        left = mouseX - (popupWidth / 2);
-    } else if (mouseY < 250 && window.innerWidth - mouseX >= 175) {
-        top = mouseY + popupHeight;
-        left = mouseX + (popupWidth / 2);
-    } else if (mouseY >= 250 && window.innerWidth - mouseX >= 175) {
-        top = mouseY;
-        left = mouseX + (popupWidth / 2);
-    } else {
-        top = mouseY;
-        left = mouseX - (popupWidth / 2);
-    }
+	const menuRect = menu.getBoundingClientRect();
+	const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
+	const mouseY = event.clientY - menuRect.top + menu.scrollTop;
 
+
+	if (mouseX >= 240 && event.clientY <= 250) {
+		top = mouseY + popupHeight;
+		left = mouseX - (popupWidth / 2);
+	} else if (mouseX <= 240 && event.clientY <= 250) {
+		top = mouseY + popupHeight;
+		left = mouseX + (popupWidth / 2);
+	} else if (mouseX <= 240 && event.clientY >= 250) {
+		top = mouseY;
+		left = mouseX + (popupWidth / 2);
+	} else {
+		top = mouseY;
+		left = mouseX - (popupWidth / 2);
+	}
+	
     popup.style.top = `${top}px`;
     popup.style.left = `${left}px`;
 
