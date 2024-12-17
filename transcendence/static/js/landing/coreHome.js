@@ -1,16 +1,32 @@
 // auth/login.js
 //import Api from '../api/api.js';
 import { requestGet } from '../api/index.js';
-import { updateHtmlContent } from '../tools/domHandler.js'
+import { updateHtmlContent } from '../tools/index.js'
 
 //[IMPROVE] cette fonction doit rediriger vers la page gane-play lorsque l' utilisateur est authenticated
-export function initializeHomeView() {
 
+export async function initializeHomeView() {
 
-    let data = null;
+    console.log('initializeHomeView');
+    let data;
     try {
-        data = requestGet('core', 'home')
-        updateHtmlContent('#content', data.html)
+        data = await requestGet('core', 'home')
+        
+        if (data && data.html)
+        {
+            updateHtmlContent('#content', data.html)
+        }
+        else
+        {
+            console.error('Les données HTML de la page d\'accueil sont manquantes.');
+        }
+
+         // Vérifier si l'utilisateur est authentifié
+         if (data.isAuthenticated) {
+            // Rediriger vers la page de jeu
+            window.location.hash = "#game-home";
+            return;
+        }
     } 
     catch (error) {
         
@@ -24,7 +40,8 @@ export function initializeHomeView() {
 
     loginBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        window.location.hash= "#account-login"
+        console.log('login clicked');
+        window.location.hash = "#accounts-login"
     });
 
     //event : click on register_btn = change hash => load register view
@@ -33,6 +50,10 @@ export function initializeHomeView() {
 
     registerBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        window.location.hash= "#account-register"
+        console.log('register clicked');
+        window.location.hash = "#accounts-register"
     });
+
+    console.log('Fin de initializeHomeView');
 }
+

@@ -68,9 +68,9 @@ const Api = {
         }
     },
     
-    async delete(url, formData) {
+    async delete(url) {
         try {
-            return await this.request(url, 'DELETE', formData);
+            return await this.request(url, 'DELETE');
         } catch (error) {
             throw error;
         }
@@ -95,6 +95,18 @@ export async function requestPost(app, view, formData) {
         return await Api.post(url, formData);
     } catch (error) {
         console.error(`Erreur lors du chargement de ${app}-${view} :`, error);
+        throw error;
+    }
+}
+
+// [IMPROVE] A voir si la ressource a delete est constamment dans l' url
+export async function requestDelete(app, view, ressourceId) {
+    const url = `/${app}/${view}/${ressourceId}/`;
+
+    try {
+        return await Api.delete(url);
+    } catch (error) {
+        console.error(`Erreur lors de la suppression de ${app}-${view} avec ID ${ressourceId} :`, error);
         throw error;
     }
 }

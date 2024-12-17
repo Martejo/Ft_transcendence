@@ -1,8 +1,10 @@
 // auth/login.js
 //import Api from '../api/api.js';
 
-import { requestGet } from '../api/index.js';
+import { requestGet, requestPost } from '../api/index.js';
 import { loadNavbar } from '../navbar/index.js';
+import { updateHtmlContent } from '../tools/index.js'
+
 
 /**
  * Affiche les erreurs de connexion reçues du serveur dans la zone prévue pour les erreurs.
@@ -25,7 +27,7 @@ function displayLoginErrors(errors) {
  * Redirige l'utilisateur en fonction du statut de la connexion ou affiche des messages d'erreur.
  * @param {Object} response - La réponse du serveur après soumission du formulaire de connexion.
  */
-function handleLoginResponse(response) {
+async function handleLoginResponse(response) {
     if (response.status === 'success') {
         if (response.requires_2fa) {
             window.location.hash = '#accounts-verify_2fa_login';
@@ -33,10 +35,14 @@ function handleLoginResponse(response) {
             localStorage.setItem('accessToken', response.access);
             //[IMPROVE]Dois t on renvoyer des tokens refresh a chaque nouvelle connexion ?
             localStorage.setItem('refreshToken', response.refresh);
-            setTimeout(() => {
+
+            setTimeout(async () => {
                 window.isAuthenticated = true;
-                loadNavbar();
-                window.location.hash = '#game-play';
+
+                // Appel à la fonction async loadNavbar avec await
+                await loadNavbar();
+
+                window.location.hash = '#game-home';
             }, 500);
         }
     } else {
@@ -47,6 +53,7 @@ function handleLoginResponse(response) {
         }
     }
 }
+
 
 
 /**
@@ -62,7 +69,8 @@ async function submitLogin(form) {
     const formData = new FormData(form);
 
     try {
-        const response = await Api.post('/accounts/submit_login/', formData);
+        
+        const response = await requestPost('accounts','submit_login', formData);
         handleLoginResponse(response);
     } catch (error) {
         console.error('Erreur lors de la connexion :', error);
@@ -73,12 +81,21 @@ async function submitLogin(form) {
     }
 }
 
-
-export function initializeLoginView() {
-    const data = NULL;
+// [IMPROVE] Verifier le fonction des nouvelles urls
+export async function initializeLoginView() {
+    let data;
     try {
-        data = requestGet('accounts', 'login')
+        data = await requestGet('accounts', 'login')
         updateHtmlContent('#content', data.html)
+
+        // if (data && data.html)
+        // {
+        //     updateHtmlContent('#content', data.html)
+        // }
+        // else
+        // {
+        //     console.error('Les données HTML de la page d\'accueil sont manquantes.');
+        // }
     } catch (error) {
         
         // [IMPROVE] Faire un gestionnaire d'erreurs 
@@ -103,4 +120,6 @@ export function initializeLoginView() {
         alert("Redirection vers la page de récupération de mot de passe."); // À remplacer par votre logique
         // window.location.href = '/accounts/forgot_password/';
     });
+
+    console.log('Fin de initializeLoginView');
 }

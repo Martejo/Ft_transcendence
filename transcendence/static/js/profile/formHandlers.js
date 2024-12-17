@@ -1,5 +1,6 @@
 // profile/formHandlers.js
-import Api from '../api/api.js';
+export { requestGet, requestPost } from './api.js';
+
 
 function displayErrors(containerSelector, errorsOrMessage) {
     const container = document.querySelector(containerSelector);

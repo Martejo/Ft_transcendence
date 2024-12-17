@@ -115,6 +115,7 @@ class RemoveFriendView(BaseFriendView):
     Handles the removal of a friend.
     """
 
+    #[IMPROVE] Changer pour delete
     def post(self, request):
         user = request.user
         friend_username = request.POST.get('friend_username')

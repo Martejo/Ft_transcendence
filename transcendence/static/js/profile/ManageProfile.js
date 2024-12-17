@@ -1,10 +1,12 @@
 // profile/viewManageProfile.js
-import Api from '../api/api.js';
+import { requestGet, requestPost, requestDelete }  from '../api/index.js';
+
+
 import { initializeProfileFormHandlers } from './formHandlers.js';
 
 export async function initializeManageProfileView() {
     try {
-        const response = await Api.get('/accounts/gestion_profil/');
+        const response = await requestGet('accounts', 'gestion_profil');
         const content = document.querySelector('#content');
         if (content) {
             content.innerHTML = response.html || response; 

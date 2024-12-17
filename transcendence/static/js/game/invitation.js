@@ -1,5 +1,6 @@
 // game/invitations.js
-import Api from '../api/api.js';
+import { requestPost }  from '../api/index.js';
+
 
 let invitedFriends = 0;
 let participantCount = 1;
@@ -13,7 +14,7 @@ async function sendInvitation(button) {
     formData.append('friend_username', friendUsername);
 
     try {
-        const response = await Api.post('/game/send_invitation/', formData);
+        const response = await requestPost('game', 'send_invitation', formData);
         if (response.status === 'success') {
             button.innerHTML = 'Envoyé <span class="cancel-icon">&times;</span>';
             button.classList.add('sent');
@@ -42,7 +43,7 @@ export async function cancelInvitation(button) {
     formData.append('friend_username', friendUsername);
 
     try {
-        const response = await Api.post('/game/cancel_invitation/', formData);
+        const response = await requestPost('game', 'cancel_invitation', formData);
         if (response.status === 'success') {
             button.innerHTML = 'Inviter';
             button.classList.remove('sent');

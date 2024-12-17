@@ -1,5 +1,7 @@
 // auth/register.js
-import Api from '../api/api.js';
+import { requestPost, requestGet } from '../api/index.js';
+import { updateHtmlContent } from '../tools/index.js'
+
 
 function displayRegistrationErrors(errors) {
     const registerError = document.querySelector('#register-error');
@@ -31,7 +33,7 @@ async function submitRegistration(form) {
     const formData = new FormData(form);
 
     try {
-        const response = await Api.post('/accounts/submit_registration/', formData);
+        const response = await requestPost('accounts','submit_register', formData);
         handleRegisterResponse(response);
     } catch (error) {
         console.error('Erreur lors de l\'inscription:', error);
@@ -43,7 +45,17 @@ async function submitRegistration(form) {
 }
 
 // MAIN FUNCTION
-export function initializeRegisterView() {
+export async function initializeRegisterView() {
+    console.log('initializeRegisterView');
+    let data;
+    try {
+        data = await requestGet('accounts', 'register')
+        updateHtmlContent('#content', data.html)
+    } catch (error) {
+        // [IMPROVE] Faire un gestionnaire d'erreurs 
+        console.error('Erreur lors de la requete API initializeRegisterView :', error);
+    }
+
     const form = document.querySelector('#register-form');
     if (!form) return;
 

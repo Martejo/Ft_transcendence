@@ -1,9 +1,9 @@
 // auth/logout.js
-import Api from '../api/api.js';
+import { requestPost } from '../api/index.js';
 
 async function performLogout() {
     try {
-        const response = await Api.post('/accounts/logout/', null);
+        const response = await requestPost('accounts','logout', formData);
         if (response.status === 'success') {
             console.log('Déconnexion réussie');
             document.querySelector('#navbar').innerHTML = '';

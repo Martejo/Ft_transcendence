@@ -1,5 +1,6 @@
 import { loadBurgerMenuData } from '../navbar/loadBurgerMenuData.js';
-import Api from '../api/api.js';
+import { requestGet, requestPost }  from '../api/index.js';
+
 
 /**
  * Vide la liste des demandes d'amis.
@@ -72,7 +73,7 @@ export async function handleFriendRequest(requestId, action) {
     formData.append('action', action);
 
     try {
-        const response = await Api.post('/accounts/handle_friend_request/', formData);
+        const response = await requestPost('/accounts/handle_friend_request/', formData);
         
         if (response.status === 'success') {
             return { success: true, message: `Invitation ${action}ée avec succès.` };

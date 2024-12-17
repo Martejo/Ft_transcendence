@@ -1,4 +1,4 @@
-import { isTouchDevice, resetScrollPosition } from '../api/utility.js';
+import { isTouchDevice, resetScrollPosition } from '../tools/utility.js';
 import Animations from '../modules/animations.js';
 import Api from '../api/api.js';
 

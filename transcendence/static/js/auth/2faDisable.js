@@ -1,11 +1,11 @@
 // auth/2faDisable.js
-import { requestGet, requestPost } from '../api/index.js';
+import { requestPost } from '../api/index.js';
 
-
+// [IMPROVE] Verifier le fonction des nouvelles urls
 async function submitDisable2FA(form) {
     const formData = new FormData(form);
     try {
-        const response = await Api.post('/accounts/disable_2fa/', formData);
+        const response = await requestPost('accounts','disable_2fa', formData);
         if (response.status === 'success') {
             alert(response.message);
             window.location.hash = '#accounts-gestion_profil';

@@ -1,5 +1,6 @@
 // profile/viewProfile.js
 
+// [IMPROVE] effacer les updates et importer depuis tools 
 // Utilitaire pour mettre à jour un élément HTML avec du contenu texte
 function updateTextContent(selector, text) {
     const element = document.querySelector(selector);

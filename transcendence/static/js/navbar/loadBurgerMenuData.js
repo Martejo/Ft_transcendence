@@ -1,4 +1,4 @@
-import Api from '../api/api.js';
+import { requestGet }  from '../api/index.js';
 import { initializeFriendButtons, updateFriendRequestsList } from '../friends/index.js';
 
 // Met à jour les informations de profil (avatar, username)
@@ -86,7 +86,7 @@ function initializeBurgerMenuInteraction() {
 // Fonction principale pour charger et afficher les données du burger menu
 export async function loadBurgerMenuData() {
     try {
-        const response = await Api.get('/accounts/get_burger_menu_data/');
+        const response = await requestGet('accounts', 'get_burger_menu_data');
         if (response.error) {
             console.error('Erreur:', response.error);
             return;

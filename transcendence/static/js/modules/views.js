@@ -1,6 +1,7 @@
 
 const Views = {
     async initializeViewFromHash() {
+        console.log('initializeViewFromHash');
         const hash = window.location.hash.substring(1) || 'core-home'; // Hash par défaut si vide
         const [app, view] = hash.split('-');
     
@@ -10,9 +11,11 @@ const Views = {
             return;
         }
 
+        console.log(app, view);
+
         // Table de correspondance des vues avec importation dynamique
         const viewInitializers = {
-            'core-home': async () => (await import('../auth/index.js')).initializeLoginView(),
+            'core-home': async () => (await import('../landing/coreHome.js')).initializeHomeView(),
             'accounts-login': async () => (await import('../auth/index.js')).initializeLoginView(),
             'accounts-register': async () => (await import('../auth/index.js')).initializeRegisterView(),
             'accounts-profile': async () => (await import('../profile/index.js')).initializeProfileView(),
@@ -21,11 +24,15 @@ const Views = {
             'accounts-verify_2fa_login': async () => (await import('../auth/index.js')).initializeLogin2FAView(),
             'accounts-disable_2fa': async () => (await import('../auth/index.js')).initializeDisable2FAView(),
             'game-invite_game': async () => (await import('../game/index.js')).initializeFriendInvitation(),
+            'game-home': async () => (await import('../game/index.js')).initializeGameHomeView(),
         };
     
         // Appeler l'initialisateur correspondant, ou ne rien faire par défaut
         const initializer = viewInitializers[`${app}-${view}`];
+        console.log(initializer);
         if (initializer) await initializer();
+        else console.error('Aucun initialisateur trouvé pour la vue', app, view);
+        console.log('Fin de initializeViewFromHash');
     }
 };
 

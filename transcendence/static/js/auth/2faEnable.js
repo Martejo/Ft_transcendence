@@ -1,5 +1,5 @@
 // auth/2faEnable.js
-import { Api } from '../api/index.js';
+import { requestPost } from '../api/index.js';
 
 
 function showVerificationSuccess() {
@@ -18,10 +18,11 @@ function showVerificationError(message) {
     }
 }
 
+// [IMPROVE] Verifier le fonction des nouvelles urls (/accounts/2fa/check)
 async function submitEnable2FA(form) {
     const formData = new FormData(form);
     try {
-        const response = await Api.post('/accounts/verify_2fa/', formData);
+        const response = await requestPost('accounts','check2fa', formData);
         if (response.status === 'success') {
             showVerificationSuccess();
             setTimeout(() => {

@@ -27,7 +27,7 @@ def get_navbar(request):
     return JsonResponse({
         'status': 'success',
         'is_authenticated': is_authenticated,
-        'navbar_html': navbar_html
+        'html': navbar_html
     })
 
 
@@ -40,7 +40,7 @@ def home_view(request):
     home_html = render_to_string('core/home.html')
     return JsonResponse({
         'status': 'success',
-        'home_html': home_html
+        'html': home_html
     })
 
 

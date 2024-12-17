@@ -15,7 +15,7 @@ logger.debug("Rentre dans urls.py de app game")
 app_name = 'game'
 
 urlpatterns = [
-    path('play/', views.play_view, name='play'),
+    path('home/', views.play_view, name='home'),
     path('game_menu/', views.game_menu_view, name='game_menu'),
     path('loading/', views.loading_view, name='loading'),
     path('invite_game/', views.invite_game_view, name='invite_game'),

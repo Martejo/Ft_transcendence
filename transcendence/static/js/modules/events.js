@@ -3,6 +3,7 @@ import Views from './views.js';
 
 const Events = {
     initializeGlobalEvents() {
+        console.log('initializeGlobalEvents');
         window.addEventListener('resize', () => {
             Animations.adjustBurgerHeight();
             Animations.adjustSinNavHeight();
@@ -20,6 +21,7 @@ const Events = {
         });
 
         window.addEventListener('hashchange', () => Views.initializeViewFromHash());
+
     },
 
     // [IMPROVE] gerer les boutons directement dans le html
@@ -43,7 +45,7 @@ const Events = {
     //[IMPROVE] fonction inutile si on a deplace la gestion des boutons dans le html
     initializeAllEvents() {
         this.initializeGlobalEvents();
-        this.initializeButtonEvents();
+        //this.initializeButtonEvents();
     }
 };
 

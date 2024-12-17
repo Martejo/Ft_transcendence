@@ -15,7 +15,7 @@ from accounts.forms import RegistrationForm
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
 
-@method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toutes les méthodes de la vue
+# @method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toutes les méthodes de la vue
 class RegisterView(View):
     """
     Class-Based View (CBV) pour gérer l'inscription utilisateur.
@@ -29,7 +29,7 @@ class RegisterView(View):
         Retourne un formulaire d'inscription sous forme de fragment HTML.
         """
         form = RegistrationForm()  # Initialise un formulaire d'inscription vide
-        rendered_form = render_to_string('accounts/register_form.html', {'form': form})  # Génère le HTML du formulaire
+        rendered_form = render_to_string('accounts/register.html')  # Génère le HTML du formulaire
         return JsonResponse({
             'status': 'success',
             'html': rendered_form,  # HTML à injecter côté client
@@ -41,6 +41,7 @@ class RegisterView(View):
         Gère une requête HTTP POST.
         Traite les données du formulaire, crée un nouvel utilisateur et retourne une réponse JSON.
         """
+        logger.debug(f"request.POST: {request.POST}")
         form = RegistrationForm(request.POST)  # Remplit le formulaire avec les données soumises
         if form.is_valid():
             # Crée un nouvel utilisateur sans encore sauvegarder dans la base de données

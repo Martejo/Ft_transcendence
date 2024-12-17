@@ -1,11 +1,12 @@
 // auth/2faLogin.js
-import { Api } from '../api/index.js';
+import { requestPost } from '../api/index.js';
 
+// [IMPROVE] Verifier le fonction des nouvelles urls
 
 async function submitLogin2FA(form) {
     const formData = new FormData(form);
     try {
-        const response = await Api.post('/accounts/verify_2fa_login/', formData);
+        const response = await requestPost('accounts','verify_2fa_login', formData);
         if (response.status === 'success') {
             localStorage.setItem('accessToken', response.access);
             localStorage.setItem('refreshToken', response.refresh);

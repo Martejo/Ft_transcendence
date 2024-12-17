@@ -73,6 +73,9 @@ export function updateAttribute(selector, attribute, value) {
 // Selector = #content ou #navbar 
 //  [IMPROVE] A voir aussi ou inclure le bruger menu 
 export function updateHtmlContent(selector, html) {
+    console.log(`rentre dans updateHtmlContent selector =`, selector);
+    if (!html)
+            console.log('html est vide');
     try {
         // Mise à jour du contenu à partir des données reçues
         document.querySelector(selector).innerHTML = html;

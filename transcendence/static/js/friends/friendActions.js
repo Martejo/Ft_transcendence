@@ -1,7 +1,8 @@
 //friends/friendActions.js
 //fonctions actuellement inutilisees dans le code
 
-import Api from '../api/api.js';
+import { requestGet, requestPost, requestDelete }  from '../api/index.js';
+
 
 /**
  * Envoie une demande d'ami à un utilisateur spécifique.
@@ -11,7 +12,7 @@ import Api from '../api/api.js';
  */
 export async function sendFriendRequest(toUserId) {
     try {
-        const response = await Api.post(`/api/send_friend_request/${toUserId}/`, null);
+        const response = await requestPost('accounts',`send_friend_request/${toUserId}/`, null);
         alert(response.message);
         refreshFriendsList();
     } catch (error) {
@@ -28,7 +29,7 @@ export async function sendFriendRequest(toUserId) {
  */
 export async function removeFriend(friendId) {
     try {
-        const response = await Api.post(`/api/remove_friend/${friendId}/`, null);
+        const response = await requestDelete('accounts', 'remove_friend', friendId);
         alert(response.message);
         refreshFriendsList();
     } catch (error) {
@@ -69,7 +70,7 @@ function createFriendItem(friend) {
  */
 export async function refreshFriendsList() {
     try {
-        const data = await Api.get('/api/get_burger_menu_data/');
+        const data = await requestGet('accounts', 'get_burger_menu_data');
         const friendsListContainer = $('#friends-list-container');
         friendsListContainer.empty();
 

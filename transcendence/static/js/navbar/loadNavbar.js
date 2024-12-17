@@ -1,21 +1,11 @@
 // navbar/loadNavbar.js
-import Api from '../api/api.js';
 import { loadBurgerMenuData } from './loadBurgerMenuData.js';
 import { toggleBurgerMenu } from './toggleBurgerMenu.js';
+import { requestGet } from '../api/index.js';
+import { updateHtmlContent } from '../tools/index.js'
 
-// Fonction pour récupérer les données JSON de la navbar
-async function fetchNavbarData() {
-    return await Api.get('/core/navbar/');
-}
 
-// Fonction pour mettre à jour la navbar dans le DOM à partir de données JSON
-function updateNavbarHtml(data) {
-    const navbarElem = document.querySelector('#navbar');
-    if (navbarElem) {
-        // On suppose que data.html contient la structure HTML à injecter
-        navbarElem.innerHTML = data.html || JSON.stringify(data);
-    }
-}
+
 
 // Fonction pour initialiser le burger menu (événements, rechargements périodiques, etc.)
 async function initializeBurgerMenu() {
@@ -29,11 +19,25 @@ async function initializeBurgerMenu() {
 
 // Fonction principale pour charger et afficher la navbar
 export async function loadNavbar() {
+    console.log('loadNavbar');
+    let data;
     try {
-        const data = await fetchNavbarData();
-        updateNavbarHtml(data);
-        await initializeBurgerMenu();
+        // Faire une requête GET pour obtenir les données de la navbar
+        data = await requestGet('core', 'navbar');
+        
+        // Vérifier si les données HTML existent
+        if (data && data.html) {
+            // Mettre à jour le contenu HTML de la navbar
+            updateHtmlContent('#navbar', data.html);
+            
+            // Initialiser le burger menu
+            await initializeBurgerMenu();
+        } else {
+            console.error('Les données HTML de la navbar sont manquantes.');
+        }
     } catch (error) {
-        console.error('Erreur chargement navbar:', error);
+        // Gérer les erreurs de la requête GET
+        console.error('Erreur lors du chargement de la navbar:', error);
     }
+    console.log('Fin de loadNavbar');
 }

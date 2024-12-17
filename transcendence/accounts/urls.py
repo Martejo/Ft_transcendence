@@ -56,14 +56,14 @@ urlpatterns = [
 
     # ---- Login ----
     path('login/', LoginView.as_view(), name='login'),
-    path('submit-login/', LoginView.as_view(), name='submit_login'),
+    path('submit_login/', LoginView.as_view(), name='submit_login'),
 
     # ---- Logout ----
     path('logout/', LogoutView.as_view(), name='logout'),
 
     # ---- Register ----
     path('register/', RegisterView.as_view(), name='register'),
-    path('submit-register/', RegisterView.as_view(), name='submit_register'),
+    path('submit_register/', RegisterView.as_view(), name='submit_register'),
 
     # ---- User Profile ----
     path('profile/', ProfileView.as_view(), name='user_profile'),

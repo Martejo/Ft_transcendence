@@ -1,13 +1,16 @@
 // game/loading.js
-import Api from '../api/api.js';
+import { requestGet }  from '../api/index.js';
+
+
+// [IMPROVE] verifeir import
 import Animations from '../modules/animations.js';
-import { isTouchDevice } from '../api/utility.js';
+import { isTouchDevice } from '../tools/utility.js';
 import { initializeGameControls } from './controls.js';
 import { displayGame, displayTournamentBracket } from './display.js';
 
 export async function startLoading(participantCount) {
     try {
-        const response = await Api.get('/game/loading/');
+        const response = await requestGet('game', 'loading');
         document.querySelector('#content').innerHTML = response.html || response;
         Animations.animateLoadingText();
         if (isTouchDevice()) {

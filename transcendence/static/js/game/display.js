@@ -1,10 +1,12 @@
 // game/display.js
-import Api from '../api/api.js';
-import { resetScrollPosition } from '../api/utility.js';
+import { requestGet }  from '../api/index.js';
+import { resetScrollPosition } from '../tools/index.js';
 
+
+//[IMPROVE] Voir quoi afficher avec le get
 export async function displayGame() {
     try {
-        const response = await Api.get('game.html');
+        const response = await requestGet('game', 'game');
         document.querySelector('#home').innerHTML = response.html || response;
         resetScrollPosition();
     } catch (error) {
