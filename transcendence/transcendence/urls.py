@@ -20,6 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 import logging
 
+from core.views import landing_view  # Import direct de la view
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
@@ -28,7 +30,9 @@ urlpatterns = [
     #path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('game/', include('game.urls', namespace='game')),
-    path('', include('core.urls')),  #landing page
+    path('core/', include('core.urls', namespace='core')),  # Inclut core.urls pour /core/
+    path('', include(('core.urls', 'core'), namespace='landing')),  # Inclut core.urls pour la racine
+
 ]
 
 if settings.DEBUG:

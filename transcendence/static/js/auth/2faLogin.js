@@ -1,5 +1,6 @@
 // auth/2faLogin.js
-import Api from '../api/api.js';
+import { Api } from '../api/index.js';
+
 
 async function submitLogin2FA(form) {
     const formData = new FormData(form);
@@ -25,7 +26,7 @@ async function submitLogin2FA(form) {
 export function initializeLogin2FAView() {
     const data = NULL;
     try {
-        data = getViewJson('accounts', 'login2fa')
+        data = requestGet('accounts', 'login2fa')
         updateHtmlContent('#content', data.html)
     } catch (error) {
         

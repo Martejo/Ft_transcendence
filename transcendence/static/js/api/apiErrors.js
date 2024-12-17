@@ -1,7 +1,7 @@
 //api/apiErrors.js
 
 // Classe de base pour les erreurs spécifiques à la requête
-class RequestError extends Error {
+export class RequestError extends Error {
     constructor(message, status = null) {
         super(message);
         this.name = "RequestError";
@@ -10,7 +10,7 @@ class RequestError extends Error {
 }
 
 // Erreur pour les réponses HTTP non réussies
-class HTTPError extends RequestError {
+export class HTTPError extends RequestError {
     constructor(message, status) {
         super(message, status);
         this.name = "HTTPError";
@@ -18,7 +18,7 @@ class HTTPError extends RequestError {
 }
 
 // Erreur pour un problème de format inattendu dans la réponse
-class ContentTypeError extends RequestError {
+export class ContentTypeError extends RequestError {
     constructor(message) {
         super(message);
         this.name = "ContentTypeError";
@@ -26,7 +26,7 @@ class ContentTypeError extends RequestError {
 }
 
 // Erreur pour un problème réseau (fetch lui-même échoue)
-class NetworkError extends RequestError {
+export class NetworkError extends RequestError {
     constructor(message) {
         super(message);
         this.name = "NetworkError";

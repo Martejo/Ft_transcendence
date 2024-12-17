@@ -5,7 +5,7 @@ import { toggleBurgerMenu } from './toggleBurgerMenu.js';
 
 // Fonction pour récupérer les données JSON de la navbar
 async function fetchNavbarData() {
-    return await Api.get('/core/get_navbar/');
+    return await Api.get('/core/navbar/');
 }
 
 // Fonction pour mettre à jour la navbar dans le DOM à partir de données JSON

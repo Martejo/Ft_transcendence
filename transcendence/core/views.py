@@ -5,6 +5,7 @@ import logging
 from transcendence.decorators import user_not_authenticated
 
 
+
 logger = logging.getLogger(__name__)
 
 def get_navbar(request):

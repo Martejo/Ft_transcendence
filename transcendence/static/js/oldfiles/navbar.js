@@ -1,9 +1,9 @@
 import Api from '../api/api.js';
-import { initializeFriendButtons, updateFriendRequestsList } from './friends.js';
+import { initializeFriendButtons, updateFriendRequestsList } from '../friends/index.js';
 
 export async function loadNavbar() {
     try {
-        const response = await Api.get('/core/get_navbar/');
+        const response = await Api.get('/core/navbar/');
         $('#navbar').html(response.html || response); 
         if ($('#burger-menu-toggle').length > 0) {
             await loadBurgerMenuData();

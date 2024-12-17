@@ -1,7 +1,7 @@
 // auth/login.js
 //import Api from '../api/api.js';
-export { getViewJson } from './getView.js';
-import { getViewJson } from '../api/getView.js';
+
+import { requestGet } from '../api/index.js';
 import { loadNavbar } from '../navbar/index.js';
 
 /**
@@ -77,7 +77,7 @@ async function submitLogin(form) {
 export function initializeLoginView() {
     const data = NULL;
     try {
-        data = getViewJson('accounts', 'login')
+        data = requestGet('accounts', 'login')
         updateHtmlContent('#content', data.html)
     } catch (error) {
         

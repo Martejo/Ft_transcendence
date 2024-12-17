@@ -1,5 +1,5 @@
 import Api from '../api/api.js';
-import { initializeFriendButtons, updateFriendRequestsList } from '../friends.js';
+import { initializeFriendButtons, updateFriendRequestsList } from '../friends/index.js';
 
 // Met à jour les informations de profil (avatar, username)
 function updateProfileSection(data) {

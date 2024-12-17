@@ -77,4 +77,24 @@ const Api = {
     }
 };
 
-export default Api;
+export async function requestGet(app, view) {
+    const url = `/${app}/${view}/`;
+
+    try {
+        return await Api.get(url);
+    } catch (error) {
+        console.error(`Erreur lors du chargement de ${app}-${view} :`, error);
+        throw error;
+    }
+}
+
+export async function requestPost(app, view, formData) {
+    const url = `/${app}/${view}/`;
+
+    try {
+        return await Api.post(url, formData);
+    } catch (error) {
+        console.error(`Erreur lors du chargement de ${app}-${view} :`, error);
+        throw error;
+    }
+}

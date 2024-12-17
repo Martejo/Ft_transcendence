@@ -1,21 +1,17 @@
 // auth/login.js
 //import Api from '../api/api.js';
-import { getViewJson } from './getView.js';
-import { getViewJson } from '../api/getView.js';
-import { loadNavbar } from '../navbar/index.js';
+import { requestGet } from '../api/index.js';
+import { updateHtmlContent } from '../tools/domHandler.js'
 
 //[IMPROVE] cette fonction doit rediriger vers la page gane-play lorsque l' utilisateur est authenticated
 export function initializeHomeView() {
-    if(isAuthenticate = true){
 
-    }
-    
-    const data = NULL;
+
+    let data = null;
     try {
-        data = getViewJson('core', 'home')
+        data = requestGet('core', 'home')
         updateHtmlContent('#content', data.html)
     } 
-    
     catch (error) {
         
         // [IMPROVE] Faire un gestionnaire d'erreurs 

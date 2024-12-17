@@ -1,5 +1,6 @@
 // auth/2faEnable.js
-import Api from '../api/api.js';
+import { Api } from '../api/index.js';
+
 
 function showVerificationSuccess() {
     const successElem = document.querySelector('.verification-success');

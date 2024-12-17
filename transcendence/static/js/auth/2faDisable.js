@@ -1,5 +1,6 @@
 // auth/2faDisable.js
-import Api from '../api/api.js';
+import { requestGet, requestPost } from '../api/index.js';
+
 
 async function submitDisable2FA(form) {
     const formData = new FormData(form);
