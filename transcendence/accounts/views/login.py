@@ -57,6 +57,7 @@ class LoginView(View):
 
             if user is not None:
                 if user.is_active:
+                    logger.debug("User is active")
                     request.session['user_id'] = user.id
 
                     # Check if 2FA is enabled
@@ -64,17 +65,19 @@ class LoginView(View):
                         request.session['auth_partial'] = True
                         return JsonResponse({'status': 'success', 'requires_2fa': True})
 
-                    # Generate JWT token
+                    # Generate JWT token, contient les deux tokens (access et refresh)
                     token_jwt = generate_jwt_token(user)
 
                     # Update user status and login
                     user.is_online = True
                     user.save()
                     login(request, user)
+                    # logger.debug(request.user.is_authenticated)
 
                     return JsonResponse({
                         'status': 'success',
-                        'jwtToken': token_jwt,
+                        'access_token': token_jwt['access_token'],
+                        'refresh_token': token_jwt['refresh_token'],
                         'requires_2fa': False,
                         'ís_authenticated': True
                     })

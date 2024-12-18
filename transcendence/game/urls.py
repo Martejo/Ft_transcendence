@@ -1,27 +1,26 @@
-# game/urls.py
 from django.urls import path
-from . import views
+
+from .views.gameHome import GameHomeView
+from .views.gameMenu import GameMenuView
+from .views.gameLoading import LoadingView
+from .views.gameSelectTournament import SelectTournamentView
 import logging
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-logger.debug("Rentre dans urls.py de app game")
+logger.debug("Rentre dans urls.py de l'app game")
 
 app_name = 'game'
 
 urlpatterns = [
-    path('home/', views.play_view, name='home'),
-    path('game_menu/', views.game_menu_view, name='game_menu'),
-    path('loading/', views.loading_view, name='loading'),
-    path('invite_game/', views.invite_game_view, name='invite_game'),
-    path('invite_tournament/', views.invite_tournament_view, name='invite_tournament'),
-    path('send_invitation/', views.send_invitation_view, name='send_invitation'),
-    path('cancel_invitation/', views.cancel_invitation_view, name='cancel_invitation'),
-    path('select_tournament/', views.select_tournament_view, name='select_tournament'),
-
+    path('home/', GameHomeView.as_view(), name='home'),  # Mise à jour pour CBV
+    path('game_menu/', GameMenuView.as_view(), name='game_menu'),  # Mise à jour pour CBV
+    path('loading/', LoadingView.as_view(), name='loading'),  # Mise à jour pour CBV
+    path('select_tournament/', SelectTournamentView.as_view(), name='select_tournament'),  # Mise à jour pour CBV
+    # path('invite_game/', invite_game_view, name='invite_game'),  # Vue fonctionnelle
+    # path('invite_tournament/', invite_tournament_view, name='invite_tournament'),  # Vue fonctionnelle
+    # path('send_invitation/', send_invitation_view, name='send_invitation'),  # Vue fonctionnelle
+    # path('cancel_invitation/', cancel_invitation_view, name='cancel_invitation'),  # Vue fonctionnelle
 ]

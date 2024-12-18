@@ -1,5 +1,7 @@
 import { requestGet }  from '../api/index.js';
 import { initializeFriendButtons, updateFriendRequestsList } from '../friends/index.js';
+import { toggleBurgerMenu } from './toggleBurgerMenu.js';
+import { eventsHandlerBurgerMenu } from './eventsBurgerMenu.js';
 
 // Met à jour les informations de profil (avatar, username)
 function updateProfileSection(data) {
@@ -21,6 +23,7 @@ function updateBurgerButton(data) {
 }
 
 // Met à jour l'indicateur de statut (online/offline)
+//Faire requete post pour changer le status
 function updateStatusIndicator(isOnline) {
     const statusIndicator = document.querySelector('#status-indicator');
     if (statusIndicator) {
@@ -67,26 +70,20 @@ function handleFriendRequests(friendRequests) {
 
 // Initialise le burger menu (rafraîchissement périodique, etc.)
 function initializeBurgerMenuInteraction() {
+    //Display/undisplay the burger menu
     const burgerToggle = document.querySelector('#burger-menu-toggle');
     if (burgerToggle) {
-        // On suppose que loadBurgerMenuData est la fonction courante. Si vous souhaitez
-        // actualiser le menu régulièrement, veillez à ce que cela ne crée pas de boucle.
-        // Potentiellement, créer une fonction dédiée au rafraîchissement régulier.
-        
-        // setInterval(loadBurgerMenuData, 10000); 
-        // ATTENTION : Cet appel réappellerait loadBurgerMenuData de façon cyclique, 
-        // ce qui peut ne pas être souhaitable. A ajuster selon le besoin.
-        
-        // Ici on suppose que le toggleBurgerMenu est une fonction importée ailleurs
-        // et qui gère l'ouverture/fermeture du menu.
+        // setInterval(loadBurgerMenuData, 10000);
         burgerToggle.addEventListener('click', toggleBurgerMenu);
     }
+    //initialize every other possible user interactions in the burger menu
+    eventsHandlerBurgerMenu();
 }
 
 // Fonction principale pour charger et afficher les données du burger menu
 export async function loadBurgerMenuData() {
     try {
-        const response = await requestGet('accounts', 'get_burger_menu_data');
+        const response = await requestGet('accounts', 'burgerMenu');
         if (response.error) {
             console.error('Erreur:', response.error);
             return;

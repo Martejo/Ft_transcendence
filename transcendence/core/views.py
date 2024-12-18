@@ -13,6 +13,7 @@ def get_navbar(request):
     Génère et retourne le contenu de la barre de navigation sous forme de JSON.
     """
     logger.debug("Entre dans get_navbar_view")
+    logger.debug(request.user.is_authenticated)
     is_authenticated = request.user.is_authenticated
 
     if is_authenticated:
@@ -20,8 +21,10 @@ def get_navbar(request):
         burger_menu_html = render_to_string('accounts/burger_menu.html', {'user': request.user})
         # Génère le HTML de la navbar pour un utilisateur connecté
         navbar_html = render_to_string('core/navbar_logged_in.html', {'burger_menu': burger_menu_html})
+        logger.debug("Navbar générée pour un utilisateur connecté")
     else:
         # Génère le HTML de la navbar publique
+        logger.debug("Navbar générée pour un utilisateur non connecté")
         navbar_html = render_to_string('core/navbar_public.html')
 
     return JsonResponse({

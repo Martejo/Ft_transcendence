@@ -12,12 +12,12 @@ from .views.manageProfile import (
 )
 from .views.profile import ProfileView
 from .views.logout import LogoutView
-from .views.burgerMenu import BurgerMenuDataView, UpdateStatusView
+from .views.burgerMenu import BurgerMenuView, UpdateStatusView
 from .views.friendProfile import FriendProfileView
 from .views.login import LoginView
 from .views.manageFriends import AddFriendView, HandleFriendRequestView, RemoveFriendView
 from .views.login2fa import Enable2FAView, Check2FAView, Login2faView, Disable2FAView
-from .views.tokenManagement import refresh_token_view
+from .views.tokenManagement import RefreshJwtView
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ urlpatterns = [
     path('friends/remove/', RemoveFriendView.as_view(), name='remove_friend'),
 
     # ---- Burger Menu ----
-    path('burger-menu/data/', BurgerMenuDataView.as_view(), name='burger_menu_data'),
+    path('burgerMenu/', BurgerMenuView.as_view(), name='burgerMenu'),
     path('burger-menu/update-status/', UpdateStatusView.as_view(), name='update_status'),
 
     # ---- Friend Profile ----
@@ -69,7 +69,7 @@ urlpatterns = [
     path('profile/', ProfileView.as_view(), name='user_profile'),
 
     # ---- Token Management ---- #
-    path('token/refresh/', refresh_token_view, name='refresh_token'),
+    path('refreshJwt/', RefreshJwtView.as_view, name='refresh_jwt'),
 
 
     # ---- Token Authentication (commented for now) ----

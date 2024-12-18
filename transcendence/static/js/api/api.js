@@ -1,15 +1,10 @@
 //api/api.js
+import { RequestError, HTTPError, ContentTypeError, NetworkError } from './apiErrors.js';
 
 const Api = {
-    getCSRFToken() {
-        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
-        return cookie ? cookie.trim().substring('csrftoken='.length) : '';
-    },
 
-    getJWTToken() {
-        return localStorage.getItem('jwtToken') || null;
-    },
-
+    
+    
     /**
      * Effectue une requête HTTP avec fetch en utilisant FormData.
      * @param {string} url - L'URL complète de la ressource.
@@ -19,31 +14,143 @@ const Api = {
      * @returns {Promise} - Une promesse résolue avec les données JSON ou rejetée en cas d'erreur.
      */
     async request(url, method = 'GET', formData = null, headers = {}) {
-        const csrfToken = this.getCSRFToken();
-        const jwtToken = this.getJWTToken();
+        const defaultHeaders = this.prepareHeaders();
     
-        const defaultHeaders = {
-            'X-CSRFToken': csrfToken,
-        };
+        try {
+            let response = await this.sendRequest(url, method, formData, { ...defaultHeaders, ...headers });
     
-        if (jwtToken) {
-            defaultHeaders['Authorization'] = `Bearer ${jwtToken}`;
-        }
+            // Gestion des erreurs HTTP non réussies
+            if (!response.ok) {
+                if (response.status === 401) {
+                    response = await this.handleUnauthorized(url, method, formData, headers, defaultHeaders);
+                } else {
+                    throw new HTTPError(
+                        response.statusText || 'Une erreur est survenue',
+                        response.status
+                    );
+                }
+            }
     
-        const response = await fetch(url, {
-            method,
-            headers: { ...defaultHeaders, ...headers },
-            body: (method !== 'GET' && formData instanceof FormData) ? formData : undefined,
-        });
+            return this.handleResponse(response); // Traite la réponse
+        } catch (error) {
+            if (error instanceof TypeError) {
+                throw new NetworkError('Échec réseau : ' + error.message);
+            }
     
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('application/json')) {
-            return response.json();// Conversion automatique en objet JS
-        } else {
-            // [IMPROVE] throw une error => le serveur devrait toujours renvoyer un json valide
+            throw error;
         }
     },
 
+    /**
+     * Prépare les en-têtes pour la requête
+     * @returns {Object} - Les en-têtes préparés
+     */
+    prepareHeaders() {
+        const csrfToken = this.getCSRFToken(); // Utilise `this` pour accéder aux méthodes d'Api
+        const jwtAccessToken = this.getJWTaccessToken();
+
+        const headers = {
+            'X-CSRFToken': csrfToken,
+        };
+        
+        if (jwtAccessToken) {
+            headers['Authorization'] = `Bearer ${jwtAccessToken}`;
+        }
+
+        return headers;
+    },
+    
+    async sendRequest(url, method, formData, headers) {
+        return fetch(url, {
+            method,
+            headers,
+            body: (method !== 'GET' && formData instanceof FormData) ? formData : undefined,
+        });
+    },
+
+    async handleUnauthorized(url, method, formData, headers, defaultHeaders) {
+        console.warn('Access token expiré, tentative de rafraîchissement...');
+        const newAccessToken = await this.handleTokenRefresh();
+    
+        if (newAccessToken) {
+            // Met à jour les en-têtes avec le nouveau token
+            defaultHeaders['Authorization'] = `Bearer ${newAccessToken}`;
+            const response = await this.sendRequest(url, method, formData, { ...defaultHeaders, ...headers });
+    
+            // Vérifie de nouveau la réponse
+            if (!response.ok) {
+                throw new HTTPError(
+                    response.statusText || 'Échec après rafraîchissement du token',
+                    response.status
+                );
+            }
+    
+            return response; // Retourne la nouvelle réponse réussie
+        } else {
+            throw new HTTPError('Impossible de rafraîchir le token.', 401);
+        }
+    },
+    
+
+    async handleTokenRefresh() {
+        const jwtRefreshToken = this.getJWTrefreshToken();
+
+        if (!jwtRefreshToken) {
+            console.error('Aucun refresh token disponible.');
+            return null;
+        }
+
+        try {
+            const response = await fetch('/accounts/refreshJwt/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refresh: jwtRefreshToken }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const newAccessToken = data.access_token;
+
+                // Met à jour l'access token dans le stockage local
+                localStorage.setItem('accessToken', newAccessToken);
+                return newAccessToken;
+            } else {
+                console.error('Erreur lors du rafraîchissement du token :', response.statusText);
+                return null;
+            }
+        } catch (error) {
+            console.error('Échec du rafraîchissement du token :', error);
+            return null;
+        }
+    },
+
+    handleResponse(response) {
+        const contentType = response.headers.get('Content-Type');
+    
+        if (contentType && contentType.includes('application/json')) {
+            return response.json(); // Retourne les données JSON
+        } else {
+            throw new ContentTypeError('Réponse inattendue : le serveur n\'a pas retourné de JSON.');
+        }
+    },
+
+    getCSRFToken() {
+        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+        return cookie ? cookie.trim().substring('csrftoken='.length) : '';
+    },
+
+    getJWTaccessToken() {
+        return localStorage.getItem('access_token') || null;
+    },
+
+    getJWTrefreshToken() {
+        return localStorage.getItem('refresh_token') || null;
+    },
+
+
+    //fonctions correspondantes aux méthodes HTTP
     async get(url) {
         try {
             return await this.request(url, 'GET');
@@ -77,6 +184,10 @@ const Api = {
     }
 };
 
+
+
+
+// fonctions appelables depuis les autres fichiers
 export async function requestGet(app, view) {
     const url = `/${app}/${view}/`;
 

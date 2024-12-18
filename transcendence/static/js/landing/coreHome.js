@@ -1,6 +1,7 @@
 // auth/login.js
 //import Api from '../api/api.js';
 import { requestGet } from '../api/index.js';
+import { HTTPError } from '../api/index.js';
 import { updateHtmlContent } from '../tools/index.js'
 
 //[IMPROVE] cette fonction doit rediriger vers la page gane-play lorsque l' utilisateur est authenticated
@@ -12,26 +13,23 @@ export async function initializeHomeView() {
     try {
         data = await requestGet('core', 'home')
         
+        //[IMPROVE] integrer ce if else directement dans updateHtmlContent ?
         if (data && data.html)
-        {
             updateHtmlContent('#content', data.html)
-        }
         else
-        {
             console.error('Les données HTML de la page d\'accueil sont manquantes.');
-        }
-
-         // Vérifier si l'utilisateur est authentifié
-         if (data.isAuthenticated) {
-            // Rediriger vers la page de jeu
-            window.location.hash = "#game-home";
-            return;
-        }
     } 
     catch (error) {
-        
-        // [IMPROVE] Faire un gestionnaire d'erreurs 
-        console.error('Erreur lors de la requete API initializeHomeView :', error);
+        // [IMPROVE] Faire des gestionnaires d'erreurs specialises pour chaque retour 
+        if (error instanceof HTTPError) {
+            if (error.status === 403) {
+                console.error('Erreur 403 : Utilisateur deja authentifié');
+                window.location.hash = "game-home";
+                return;
+            }
+        }
+        else
+            console.error('Erreur non traitee lors de la récupération de core home :', error);
     }
 
     //event : click on login_btn =  change hash => load login view

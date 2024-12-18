@@ -28,13 +28,16 @@ function displayLoginErrors(errors) {
  * @param {Object} response - La réponse du serveur après soumission du formulaire de connexion.
  */
 async function handleLoginResponse(response) {
+    console.log('handleLoginResponse');
     if (response.status === 'success') {
         if (response.requires_2fa) {
             window.location.hash = '#accounts-verify_2fa_login';
-        } else {
-            localStorage.setItem('accessToken', response.access);
+        } 
+        else {
+            console.log("Access token = ", response.access_token);
+            localStorage.setItem('access_token', response.access_token);
             //[IMPROVE]Dois t on renvoyer des tokens refresh a chaque nouvelle connexion ?
-            localStorage.setItem('refreshToken', response.refresh);
+            // localStorage.setItem('refresh_token', response.refresh_token);
 
             setTimeout(async () => {
                 window.isAuthenticated = true;
@@ -62,6 +65,7 @@ async function handleLoginResponse(response) {
  * @param {HTMLFormElement} form - Le formulaire de connexion soumis par l'utilisateur.
  */
 async function submitLogin(form) {
+    console.log('submitLogin');
     const validateBtn = document.querySelector('#validate-btn');
     validateBtn.disabled = true;
     validateBtn.textContent = 'Connexion...';
@@ -71,6 +75,7 @@ async function submitLogin(form) {
     try {
         
         const response = await requestPost('accounts','submit_login', formData);
+        console.log('Reponse de la requete POST submit_login :', response);
         handleLoginResponse(response);
     } catch (error) {
         console.error('Erreur lors de la connexion :', error);
@@ -107,6 +112,7 @@ export async function initializeLoginView() {
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        console.log('Soumission du formulaire de connexion');
         submitLogin(form);
     });
 

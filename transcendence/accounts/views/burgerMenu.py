@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-class BurgerMenuDataView(View):
+class BurgerMenuView(View):
     """
     Handle retrieval of user data for the burger menu.
     """
@@ -28,6 +28,7 @@ class BurgerMenuDataView(View):
         Fetch user data, friends list, and friend requests for the burger menu.
         """
         user = request.user  # Retrieve the user from the JWT
+        #[IMPROVE] Utilite de refresh_from_db() ?
         user.refresh_from_db()  # Refresh the user profile from the database
         try:
             default_avatar = '/media/avatars/default_avatar.png'
@@ -63,10 +64,11 @@ class BurgerMenuDataView(View):
                 'friend_requests': friend_requests,
             }
 
-            response = JsonResponse({'status': 'success', 'data': response_data})
-            response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-            response['Pragma'] = 'no-cache'
-            return response
+            return JsonResponse({'status': 'success', 'data': response_data})
+            # [IMPROVE] A quoi servent ces lignes ?
+            # response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            # response['Pragma'] = 'no-cache'
+            
 
         except Exception as e:
             logger.error(f"Erreur lors de la récupération des données du menu burger: {e}")
