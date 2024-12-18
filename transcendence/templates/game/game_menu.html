@@ -1,6 +1,6 @@
-<div class="game-menu col-12 col-sm-10 col-md-10 col-lg-8 col-xl-6 col-xxl-6">
-    <div class="container py-4 " style="height: var(--sin-nav-height); font-size: 20px;">
-        <h1 class="text-center mb-4">Menu de Jeu</h1>
+<div class="game-menu col-12 col-sm-10 col-md-10 col-lg-6 col-xl-6 col-xxl-5">
+    <div class="container-fluid py-4 " style="height: var(--sin-nav-height); font-size: 1.2em;">
+        <h1 class="text-center mb-4" style="font-size: 2em;">Menu de Jeu</h1>
 
         <!-- Section de choix de type de partie -->
         <div class="card mb-3 bg-secondary">
@@ -8,7 +8,7 @@
                 <h5 class="card-title">Type de Partie</h5>
                 <div class="d-flex flex-column gap-2">
                     <button class="btn btn-primary w-100" onclick="chooseLocalGame()">Partie Locale</button>
-                    <button id="invite-game" class="btn btn-primary w-100" onclick="window.location.hash='#game-invite_game'">Inviter un Ami</button>
+                    <button id="invite-game" class="btn btn-primary w-100">Inviter un Ami</button>
                 </div>
             </div>
         </div>
@@ -32,6 +32,54 @@
             </div>
         </div>
 
+		<!-- Nouvelle div pour Voir Tuto -->
+		<!-- <div id="tutorial-menu" class="card mb-3 bg-secondary d-none">
+			<div class="card-body">
+				<h5 class="card-title">Tutoriel</h5>
+				<button class="btn btn-primary w-100" onclick="toggleTutorial()">Voir Tuto</button>
+				<div id="tutorial-content" class="collapse mt-3">
+					<p>💥 **Power-Ups Légendaires !** 💥</p>
+					<ul class="list-unstyled">
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusObstacle">
+							<img src="png_game/obstacle.png" alt="Obstacle" class="img-bonus me-2">
+							<span>Attention aux obstacles !</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusSpeed">
+							<img src="png_game/speed.png" alt="Acceleration" class="img-bonus me-2">
+							<span>Accelere la vitesse de ta raquette</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusShrink">
+							<img src="png_game/minus.png" alt="Minus" class="img-bonus me-2">
+							<span>Reduis la taille de la raquette de ton adversaire</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusFrost">
+							<img src="png_game/icy.png" alt="ice-age" class="img-bonus me-2">
+							<span>Fais deraper ton adversaire</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusFlash">
+							<img src="png_game/flash.png" alt="flash" class="img-bonus me-2">
+							<span>Morsure du Soleil</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusMind">
+							<img src="png_game/change.png" alt="reverse-control" class="img-bonus me-2">
+							<span>Inverse les commandes de l'adversaire</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input me-3" type="checkbox" id="bonusCanon">
+							<img src="png_game/canon.png" alt="canon" class="img-bonus me-2">
+							<span>Propulse la balle a toute vitesse</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div> -->
+
         <!-- Menu de personnalisation du gameplay (affiché uniquement pour Jeu Personnalisé) -->
         <div id="customization-menu" class="card mb-3 bg-secondary d-none">
             <div class="card-body">
@@ -39,8 +87,8 @@
                 
                 <!-- Vitesse de la balle -->
                 <div class="mb-3">
-                    <label for="ballSpeed" class="form-label">Vitesse de la Balle (<span id="ballSpeedValue">1</span>)</label>
-                    <input type="range" class="form-range" id="ballSpeed" min="1" max="3" value="1" oninput="updateBallSpeed()">
+                    <label for="ballSpeed" class="form-label">Vitesse de la Balle (x<span id="ballSpeedValue">1</span>)</label>
+                    <input type="range" class="form-range" id="ballSpeed" min="1" max="2" value="1" step="0.01" oninput="updateBallSpeed()">
                 </div>
 
                 <!-- Taille de la raquette -->
@@ -53,17 +101,47 @@
                     </select>
                 </div>
 
-                <!-- Obstacle toggle -->
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="obstacleToggle">
-                    <label class="form-check-label" for="obstacleToggle">Activer Obstacle</label>
-                </div>
-
-                <!-- Bonus/malus toggle -->
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="bonusToggle">
-                    <label class="form-check-label" for="bonusToggle">Activer Bonus/Malus</label>
-                </div>
+                <button class="btn btn-secondary w-100" onclick="toggleTutorial()">Selection des Bonus </button>
+				<div id="tutorial-content" class="collapse mt-3">
+					<p>💥 **Power-Ups Légendaires !** 💥</p>
+					<ul class="list-unstyled">
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusObstacle">
+							<img src="../../static/main/js/png_game/obstacle.png" alt="Obstacle" class="img-bonus me-2">
+							<span>Attention aux obstacles !</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusSpeed">
+							<img src="../../static/main/js/png_game/speed.png" alt="Acceleration" class="img-bonus me-2">
+							<span>Accelere la vitesse de ta raquette</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusShrink">
+							<img src="../../static/main/js/png_game/minus.png" alt="Minus" class="img-bonus me-2">
+							<span>Reduis la taille de la raquette de ton adversaire</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFrost">
+							<img src="../../static/main/js/png_game/icy.png" alt="ice-age" class="img-bonus me-2">
+							<span>Fais deraper ton adversaire</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFlash">
+							<img src="../../static/main/js/png_game/flash.png" alt="flash" class="img-bonus me-2">
+							<span>Morsure du Soleil</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusMind">
+							<img src="../../static/main/js/png_game/change.png" alt="reverse-control" class="img-bonus me-2">
+							<span>Inverse les commandes de l'adversaire</span>
+						</li>
+						<li class="d-flex align-items-center mb-2">
+							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusCanon">
+							<img src="../../static/main/js/png_game/canon.png" alt="canon" class="img-bonus me-2">
+							<span>Propulse la balle a toute vitesse</span>
+						</li>
+					</ul>
+				</div>
 
                 <button class="btn btn-primary w-100 mt-3" onclick="startCustomGame()">Lancer la Partie Personnalisée</button>
             </div>
@@ -89,13 +167,47 @@
 		min-width: 200px;
 	}
 
-    #ground-game, .terrain{
+	#tutorial-content {
+		transition: all 0.4s ease-in-out;
+		overflow: hidden;
+	}
+
+	.img-bonus {
+		width : 30px; 
+		height : 30px;
+		border-radius: 50px;
+		border: 1.5px solid white;
+	}
+
+	.card-title {
+		font-size: 1.3em;
+	}
+
+	.btn-secondary {
+		font-family: "Jersey 10";
+		border: none;
+		font-size: 1.2em;
+		border-radius: 20px;
+		min-width: 100px;
+	}
+
+	#ground-game, .terrain{
         display: none;
     }
-
 </style>
 
 <script>
+
+	// Fonction pour dérouler ou cacher le contenu du tutoriel
+	function toggleTutorial() {
+		const tutorialContent = document.getElementById('tutorial-content');
+		if (tutorialContent.classList.contains('collapse')) {
+			tutorialContent.classList.remove('collapse');
+		} else {
+			tutorialContent.classList.add('collapse');
+		}
+	}
+
     // Affiche les modes de jeu pour une partie locale
     function chooseLocalGame() {
         document.getElementById('game-modes').classList.remove('d-none');
