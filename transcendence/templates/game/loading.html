@@ -1,5 +1,41 @@
 <div class="game-container">
 	<div class="player"></div>
+
+	<div id="tutorial-content" class="tutorial-box">
+		<div class="d-flex justify-content-center mb-2">Tuto Bonus</div>
+		<ul class="list-unstyled">
+			<li class="d-flex align-items-center mb-2">
+				<img src="../../static/main/js/png_game/obstacle.png" alt="Obstacle" class="img-bonus me-2">
+				<span>Attention aux obstacles !</span>
+			</li>
+			<li class="d-flex align-items-center mb-2">
+				<img src="../../static/main/js/png_game/speed.png" alt="Acceleration" class="img-bonus me-2">
+				<span>Accelere la vitesse de ta raquette</span>
+			</li>
+			<li class="d-flex align-items-center mb-2">
+				<img src="../../static/main/js/png_game/minus.png" alt="Minus" class="img-bonus me-2">
+				<span>Raquette mini, chances maxi !</span>
+			</li>
+			<li class="d-flex align-items-center mb-2">
+				<img src="../../static/main/js/png_game/icy.png" alt="ice-age" class="img-bonus me-2">
+				<span>Des glissades, et pas pour toi</span>
+			</li>
+			<li class="d-flex align-items-center mb-2">
+				<img src="../../static/main/js/png_game/flash.png" alt="flash" class="img-bonus me-2">
+				<span>Morsure du Soleil</span>
+			</li>
+			<li class="d-flex align-items-center mb-2">
+				
+				<img src="../../static/main/js/png_game/change.png" alt="reverse-control" class="img-bonus me-2">
+				<span>Quand gauche devient droite...</span>
+			</li>
+			<li class="d-flex align-items-center mb-2">
+				<img src="../../static/main/js/png_game/canon.png" alt="canon" class="img-bonus me-2">
+				<span>Propulse la balle a toute vitesse</span>
+			</li>
+		</ul>
+	</div>
+
 </div>
 
 <div id="loading-screen" class="position-absolute end-0 bottom-0 p-3 me-3 text-primary">
@@ -51,6 +87,28 @@
 		border-radius: 50%;
 		transition: top 0.1s linear, left 0.1s linear; /* Rendre les déplacements fluides */
 	}
+
+	.img-bonus {
+		width : 30px; 
+		height : 30px;
+		border-radius: 50px;
+		border: 1.5px solid white;
+	}
+
+	.tutorial-box {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: #141b2e; /* Fond semi-transparent */
+		border-right: 2px solid #2DB4F3; /* Bordure uniquement à droite */
+		border-bottom: 2px solid #2DB4F3; /* Bordure uniquement en bas */
+		color: white; /* Texte blanc */
+		border-radius: 0 0 8px 0; 
+		padding: 15px; /* Espace intérieur */
+		width: 300px; /* Largeur fixe ou ajustable */
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre */
+	}
+
 </style>
 
 <!-- <script>
