@@ -17,6 +17,7 @@ app_name = 'game'
 urlpatterns = [
     path('play/', views.play_view, name='play'),
     path('game_menu/', views.game_menu_view, name='game_menu'),
+	path('remote_menu/', views.remote_menu_view, name='remote_menu'),
     path('loading/', views.loading_view, name='loading'),
     path('invite_game/', views.invite_game_view, name='invite_game'),
     path('invite_tournament/', views.invite_tournament_view, name='invite_tournament'),

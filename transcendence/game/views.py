@@ -27,6 +27,11 @@ def game_menu_view(request):
         return render(request, 'game/game_menu.html')
     return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
 
+def remote_menu_view(request):
+    if request.method == 'GET':
+        return render(request, 'game/remote_menu.html')
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
 
 def loading_view(request):
     if request.method == 'GET':

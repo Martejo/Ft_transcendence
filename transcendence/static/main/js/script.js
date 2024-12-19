@@ -141,7 +141,11 @@ function initializeView(app, view) {
     } else if (app === 'accounts' && view === 'disable_2fa') {
         initializeDisable2FAView();
     } else if (app === 'game' && view === 'invite_game') {
-        initializeFriendInvitation();
+        initializeFriendInvitation(1);
+	} else if (app === 'game' && view === 'invite_tournament') {
+		initializeFriendInvitation(1);
+    } else if (app === 'game' && view === 'remote_menu') {
+        initializeRemoteMenu(1);
     }
 }
 

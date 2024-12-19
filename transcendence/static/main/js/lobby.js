@@ -29,7 +29,7 @@ $(document).on('click', '.invite-button', function(event) {
                     $('.invite-button').not($button).addClass('disabled');
 
                     // Activer le bouton "Commencer"
-                    $('#start-game-btn').removeAttr('disabled');
+                    $('#setting-game-btn').removeAttr('disabled');
                 }
             },
             error: function(error) {
@@ -56,7 +56,7 @@ function cancelInvitation(button) {
                 invitedFriend = null;
 
                 // Désactiver le bouton "Commencer"
-                $('#start-game-btn').attr('disabled', true);
+                $('#setting-game-btn').attr('disabled', true);
 
                 // Réactiver les autres boutons d'invitation
                 $('.invite-button').removeClass('disabled');

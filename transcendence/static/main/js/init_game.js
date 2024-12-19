@@ -52,9 +52,9 @@
 // }
 
 // Initialisation de l'invitation des amis
-function initializeFriendInvitation() {
+function initializeFriendInvitation(participantCount) {
+
     let invitedFriends = 0;
-	let participantCount = 1;
     // Déléguer l'événement de clic pour le bouton principal et la croix via un parent fixe
     $(document).on('click', '.invite-button', function(event) {
         const $button = $(this);
@@ -87,7 +87,7 @@ function initializeFriendInvitation() {
                             $('.invite-button').not($button).addClass('disabled');
                             // Activer le bouton "Commencer"
                             if (participantCount === 1) {
-                                $('#start-game-btn').removeAttr('disabled');
+                                $('#setting-game-btn').removeAttr('disabled');
                             } else {
                                 $('#start-tournament-btn').removeAttr('disabled');
                             }
@@ -123,7 +123,7 @@ function initializeFriendInvitation() {
                     // Désactiver le bouton "Commencer" si nécessaire et réactiver les autres boutons
                     if (invitedFriends < participantCount) {
                         if (participantCount === 1) {
-                            $('#start-game-btn').attr('disabled', true);
+                            $('#setting-game-btn').attr('disabled', true);
                         } else {
                             $('#start-tournament-btn').attr('disabled', true);
                         }
@@ -136,12 +136,23 @@ function initializeFriendInvitation() {
             }
         });
     }
+		// // Ecoute pour le bouton "Commencer" du tournoi si participantCount != 1
+		// $('#start-tournament-btn, #start-game-btn').click(function() {
+		// 	startLoading(participantCount); // Charger la page d'attente
+		// });
+}
 
-    // Ecoute pour le bouton "Commencer" du tournoi si participantCount != 1
-    $('#start-tournament-btn, #start-game-btn').click(function() {
-        startLoading(participantCount); // Charger la page d'attente
+function initializeRemoteMenu(participantCount) {
+    // Utiliser un gestionnaire d'événements délégué
+    $(document).on('click', '#start-tournament-btn, #start-game-btn', function() {
+
+        // Vérifier que participantCount existe avant d'appeler startLoading
+        if (typeof participantCount !== 'undefined') {
+            startLoading(participantCount); // Charger la page d'attente
+        } else {
+            console.error('participantCount est non défini');
+        }
     });
-
 }
 
 let loadingTimeout;
