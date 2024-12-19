@@ -1,0 +1,81 @@
+OVERALL STRUCTURE:
+
+
+Backend (Django) maintains a persistent WebSocket connection with each client
+Each client (browser) connects to the server when the page loads
+Messages can flow in both directions (server-to-client and client-to-server)
+Different types of messages are handled by the same system
+
+
+CHANNELS AND GROUPS:
+
+
+Users join different "groups" based on what they're doing:
+
+Personal group (for user-specific updates)
+Game group (when playing Pong)
+Friend groups (for friend-related updates)
+
+
+Messages can be broadcast to specific groups
+
+
+MESSAGE FLOW:
+For Menu/Profile:
+
+
+User does something (changes status, sends friend request)
+Browser sends message to server
+Server processes it and broadcasts to relevant users
+Other users' browsers receive and display the update
+
+For Game:
+
+Player moves paddle
+Browser sends movement to server
+Server updates game state
+Server broadcasts new state to both players
+Both players' browsers update their display
+
+
+STATE MANAGEMENT:
+
+
+Server maintains the authoritative game state
+Clients (browsers) maintain a local copy
+Regular updates keep everything synchronized
+Server validates all actions to prevent cheating
+
+
+REAL-TIME FEATURES:
+Game:
+
+
+Ball position
+Paddle movements
+Power-up states
+Score updates
+
+Menu/Profile:
+
+Online status
+Friend requests
+Game invitations
+Chat messages
+
+
+CONNECTION HANDLING:
+
+
+Server keeps track of connected users
+Handles disconnections gracefully
+Maintains game state if player briefly disconnects
+Cleans up resources when session ends
+
+By using a single WebSocket system:
+
+Everything stays synchronized
+Less server overhead
+Simpler code management
+Easier to debug
+More consistent user experience

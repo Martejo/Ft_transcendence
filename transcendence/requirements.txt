@@ -7,3 +7,6 @@ pyotp
 PyJWT==2.8.0
 qrcode
 djangorestframework-simplejwt
+channels>=4.0.0
+channels-redis>=4.1.0
+daphne>=4.0.0

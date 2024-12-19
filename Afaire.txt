@@ -1,1 +1,0 @@
-gerer quand la balle tape la largeur du rectangle paddle

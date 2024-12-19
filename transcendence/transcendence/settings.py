@@ -40,9 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'channels',
     'accounts',
     'core',
     'game',
+    'realgame',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -196,3 +198,27 @@ SIMPLE_JWT = {
 # AUTHENTICATION_BACKENDS = [
 #     'django.contrib.auth.backends.ModelBackend',
 # ]
+
+ASGI_APPLICATION = 'transcendence.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}

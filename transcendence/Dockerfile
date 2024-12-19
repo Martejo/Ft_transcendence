@@ -24,11 +24,18 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+# Installer redis
+RUN apt-get update && apt-get install -y \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copier le code de l'application
 COPY . .
 
 # Exposer le port 8000
 EXPOSE 8000
+
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "transcendence.asgi:application"]
 
 # Définir le script d'entrée
 ENTRYPOINT ["/entrypoint.sh"]

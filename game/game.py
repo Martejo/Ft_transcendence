@@ -9,8 +9,9 @@ pygame.init()
 
 # Power ups specifics
 MAX_ACTIVE_POWERUPS = 2
-POWERUP_SPAWN_COOLDOWN = 5
-INITIAL_SPAWN_DELAY = 5
+POWERUP_SPAWN_COOLDOWN = 7
+INITIAL_SPAWN_DELAY = 10
+MINIMUM_ORB_SPAWN_DELAY = 10
 
 #Paddle's hitbox
 HITBOX_MARGIN = 5
@@ -18,8 +19,9 @@ HITBOX_MARGIN = 5
 #Countdown
 COUNTDOWN_DURATION = 3
 COUNTDOWN_FONT_SIZE = 72
-countdown_start = None
-is_countdown_active = False
+countdown_start = time.time()
+is_countdown_active = True
+last_scorer = None
 
 # Dimensions de la fenêtre et du terrain
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 400
@@ -101,7 +103,8 @@ paddle_right = Paddle(terrain_rect.right - 20,
 # Balle
 ball_size = 15
 ball = pygame.Rect(terrain_rect.centerx, terrain_rect.centery, ball_size, ball_size)
-ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
+ball_speed_x = 0
+ball_speed_y = 0
 
 # Scores
 score_left, score_right = 0, 0
@@ -109,16 +112,16 @@ score_left, score_right = 0, 0
 class PowerUpOrb:
 
     last_global_spawn_time = 0
-    next_spawn_time = time.time() + random.uniform(2, 5)
-    global_spawn_cooldown = random.uniform(2, 5)
+    next_spawn_time = time.time() + random.uniform(10, 15)
+    global_spawn_cooldown = random.uniform(5, 7)
 
     def __init__(self, terrain_rect, color, effect_type):
         self.size = 30
         self.color = color
         self.effect_type = effect_type
         self.active = False  # Start inactive
-        self.respawn_time = random.uniform(2, 5)
-        self.duration = random.uniform(5, 15)
+        self.respawn_time = random.uniform(10, 15)
+        self.duration = random.uniform(10, 15)
         self.spawn_start_time = time.time()
         self.activation_time = 0
         self.x = 0
@@ -128,10 +131,18 @@ class PowerUpOrb:
     def reposition(self, terrain_rect):
         max_attempts = 100
         margin = 50
+        PADDLE_MIN_DISTANCE = 100
         
         for _ in range(max_attempts):
             new_x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
             new_y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
+
+            # Check distance from paddles
+            left_paddle_dist = abs(new_x - paddle_left.rect.right)
+            right_paddle_dist = abs(new_x - paddle_right.rect.left)
+        
+            if left_paddle_dist < PADDLE_MIN_DISTANCE or right_paddle_dist < PADDLE_MIN_DISTANCE:
+                continue  # Too close to paddles, try new position
 
             overlapping = False
             for orb in power_up_orbs:
@@ -166,46 +177,26 @@ class PowerUpOrb:
                 return True
                 
         return False
-    
+
     def update(self, current_time, active_orbs_count):
         if self.active:
             if current_time - self.activation_time >= self.duration:
                 self.active = False
                 self.spawn_start_time = current_time
-                self.respawn_time = random.uniform(5, 10)
+                self.respawn_time = random.uniform(2, 5)
                 PowerUpOrb.last_global_vanish_time = current_time
                 PowerUpOrb.next_spawn_time = current_time + PowerUpOrb.global_spawn_cooldown
 
-        elif current_time >= PowerUpOrb.next_spawn_time:
-            # If this is the sticky orb and we're under the max active orbs
-            if self.effect_type == "sticky" and active_orbs_count < MAX_ACTIVE_POWERUPS:
-                if self.reposition(terrain_rect):
-                    self.active = True
-                    self.activation_time = current_time
-                    PowerUpOrb.next_spawn_time = current_time + PowerUpOrb.global_spawn_cooldown
-            # For other orbs, don't spawn them
-            elif self.effect_type != "sticky":
-                return
-
-    # def update(self, current_time, active_orbs_count):
-    #     if self.active:
-    #         if current_time - self.activation_time >= self.duration:
-    #             self.active = False
-    #             self.spawn_start_time = current_time
-    #             self.respawn_time = random.uniform(2, 5)
-    #             PowerUpOrb.last_global_vanish_time = current_time
-    #             PowerUpOrb.next_spawn_time = current_time + PowerUpOrb.global_spawn_cooldown
-
-    #     elif current_time >= PowerUpOrb.next_spawn_time:
-    #         # Get all inactive orbs
-    #         inactive_orbs = [orb for orb in power_up_orbs if not orb.active]
-    #         if inactive_orbs and active_orbs_count < MAX_ACTIVE_POWERUPS:
-    #             # Randomly choose one of the inactive orbs to try spawning
-    #             if self == random.choice(inactive_orbs):
-    #                 if self.reposition(terrain_rect):
-    #                     self.active = True
-    #                     self.activation_time = current_time
-    #                     PowerUpOrb.next_spawn_time = current_time + PowerUpOrb.global_spawn_cooldown
+        elif (current_time - self.spawn_start_time) >= MINIMUM_ORB_SPAWN_DELAY and current_time >= PowerUpOrb.next_spawn_time:
+            # Get all inactive orbs
+            inactive_orbs = [orb for orb in power_up_orbs if not orb.active]
+            if inactive_orbs and active_orbs_count < MAX_ACTIVE_POWERUPS:
+                # Randomly choose one of the inactive orbs to try spawning
+                if self == random.choice(inactive_orbs):
+                    if self.reposition(terrain_rect):
+                        self.active = True
+                        self.activation_time = current_time
+                        PowerUpOrb.next_spawn_time = current_time + PowerUpOrb.global_spawn_cooldown
 
     def collect(self, current_time):
         self.active = False
@@ -213,34 +204,39 @@ class PowerUpOrb:
         PowerUpOrb.last_global_vanish_time = current_time
 
 def reset_point(to_right=True):
-        global ball_speed_x, ball_speed_y, last_scorer
+        global ball_speed_x, ball_speed_y, last_scorer, countdown_start, is_countdown_active, last_paddle_hit
         ball.x, ball.y = terrain_rect.center
-        if last_scorer == 1:
-            ball_speed_x = -INITIAL_BALL_SPEED
-        else:
-            ball_speed_x = INITIAL_BALL_SPEED
-        ball_speed_y = INITIAL_BALL_SPEED
+        # Don't set ball speed yet - will be set after countdown
+        ball_speed_x = 0
+        ball_speed_y = 0
         last_paddle_hit = None
         current_time = time.time()
-
+        
+        # Start countdown
         countdown_start = current_time
         is_countdown_active = True
-
+        
         # reset all orbs
+        current_time = time.time()
         for orb in power_up_orbs:
             orb.active = False
             orb.spawn_start_time = current_time
             orb.respawn_time = random.uniform(5, 8)
         PowerUpOrb.last_global_spawn_time = current_time
+        PowerUpOrb.next_spawn_time = current_time + MINIMUM_ORB_SPAWN_DELAY  # Set initial spawn time to minimum delay
+        
         #clear effects
         power_up_state.inverted_controls = {"left": False, "right": False}
         power_up_state.shrunk_paddle = {"left": False, "right": False}
         power_up_state.ice_physics = {"left": False, "right": False}
         power_up_state.speed_boost = {"left": False, "right": False}
         power_up_state.flash_effect = False
+        power_up_state.sticky_ball = {"left": False, "right": False}  # Also reset sticky effect
+        
         #reset paddle size
         paddle_left.rect.height = INITIAL_PADDLE_HEIGHT
         paddle_right.rect.height = INITIAL_PADDLE_HEIGHT
+        
         #reset bumpers
         reset_bumpers()
 
@@ -393,11 +389,16 @@ class Bumper:
     def reposition(self, terrain_rect):
         max_attempts = 100
         margin = self.radius + 100
+        BALL_MIN_DISTANCE = self.radius + ball_size + 20
         
         for _ in range(max_attempts):
             new_x = random.randint(terrain_rect.left + margin, terrain_rect.right - margin)
             new_y = random.randint(terrain_rect.top + margin, terrain_rect.bottom - margin)
             
+            ball_dist = math.sqrt((new_x - ball.centerx)**2 + (new_y - ball.centery)**2)
+            if ball_dist < BALL_MIN_DISTANCE:
+                continue  # Too close to ball, try new position
+
             overlapping = False
             for bumper in bumpers:
                 if bumper != self and bumper.active:
@@ -548,15 +549,19 @@ while True:
         if time_left <= 0:
             # Countdown finished, start the point
             is_countdown_active = False
-            if last_scorer == 1:
-                ball_speed_x = -INITIAL_BALL_SPEED
-            else:
+            if last_scorer is None:  # First point of the game
+                # Random direction: True = right, False = left
+                ball_speed_x = INITIAL_BALL_SPEED if random.choice([True, False]) else -INITIAL_BALL_SPEED
+            elif last_scorer == 1:  # Left player scored, ball goes right
                 ball_speed_x = INITIAL_BALL_SPEED
+            else:  # Right player scored
+                ball_speed_x = -INITIAL_BALL_SPEED
             ball_speed_y = INITIAL_BALL_SPEED
         else:
-            # Don't move ball during countdown
+            # Keep ball still during countdown
             ball_speed_x = 0
             ball_speed_y = 0
+            ball.center = terrain_rect.center
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -660,16 +665,14 @@ while True:
     if ball.left <= terrain_rect.left:
         score_right += 1
         last_scorer = 2
-        reset_point(True)
+        reset_point()
         ball.x, ball.y = terrain_rect.center
-        ball_speed_x, ball_speed_y = INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
         last_paddle_hit = None
     if ball.right >= terrain_rect.right:
         score_left += 1
         last_scorer = 1
-        reset_point(True)
+        reset_point()
         ball.x, ball.y = terrain_rect.center
-        ball_speed_x, ball_speed_y = -INITIAL_BALL_SPEED, INITIAL_BALL_SPEED
         last_paddle_hit = None
 
     # Dessin
@@ -756,15 +759,16 @@ while True:
             x_pos = terrain_rect.left if player == "left" else terrain_rect.right - effect_text.get_width()
             screen.blit(effect_text, (x_pos, 10))
 
-
     if is_countdown_active:
-        time_left = COUNTDOWN_DURATION - (current_time - countdown_start)
-        if time_left > 0:
-            countdown_number = str(min(3, int(time_left) + 1))  # +1 so it shows 3,2,1 instead of 2,1,0
-            font = pygame.font.SysFont(None, COUNTDOWN_FONT_SIZE)
-            count_text = font.render(countdown_number, True, WHITE)
-            text_rect = count_text.get_rect(center=terrain_rect.center)
-            screen.blit(count_text, text_rect)
+            time_left = COUNTDOWN_DURATION - (current_time - countdown_start)
+            if time_left > 0:
+                countdown_number = str(min(3, int(time_left) + 1))
+                font = pygame.font.SysFont(None, COUNTDOWN_FONT_SIZE)
+                count_text = font.render(countdown_number, True, WHITE)
+                # Move the text up by setting the center 50 pixels above the terrain center
+                text_rect = count_text.get_rect(center=(terrain_rect.centerx, terrain_rect.centery - 50))
+                screen.blit(count_text, text_rect)
+
 
     pygame.display.flip()
     clock.tick(FPS)
