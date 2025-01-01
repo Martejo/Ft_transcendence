@@ -7,6 +7,8 @@ from accounts.views import manage_profile_view
 from django.apps import apps
 import logging
 import inspect
+from django.views.i18n import set_language
+
 
 
 
@@ -112,6 +114,13 @@ loader = ViewLoader()
 def load_view(request, app: str, view_name: str):
     logger.debug("Entre dans load view")
     """Dynamic view loader that handles both regular and form views"""
+	
+    # Exclure explicitement les requêtes i18n/setlang
+    if app == "i18n" and view_name == "setlang":
+        logger.debug("Requête i18n/setlang ignorée pour permettre à Django de la gérer")
+        # Appelle directement la vue set_language de Django
+        return set_language(request)
+    
     try:
         # Initialize basic context
         context = {

@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
+	'django.middleware.locale.LocaleMiddleware',
 	# 'django.template.context_processors.csrf',  # Assurez-vous que celui-ci est présent
 
 ]
@@ -78,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+				'django.template.context_processors.i18n',
             ],
         },
     },
@@ -125,6 +127,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 from django.utils.translation import gettext_lazy as _
 
+LANGUAGE_CODE = 'fr'
+
 LANGUAGES = [
     ('fr', _('French')),
     ('en', _('English')),
@@ -134,8 +138,6 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
-
-LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 

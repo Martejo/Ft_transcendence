@@ -29,6 +29,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('game/', include('game.urls', namespace='game')),
     path('', include('core.urls')),  #landing page
+    path('i18n/', include('django.conf.urls.i18n')),
+    
 ]
 
 if settings.DEBUG:

@@ -21,6 +21,17 @@
         <button class="nav-link d-flex justify-content-start" style="color: rgb(153, 148, 148)" id="settings-link"  onclick="window.location.hash='#accounts-gestion_profil'">Gestion du compte</button>
     </div>
 
+	<!-- <div class="nav flex-column border-bottom p-2">
+		<p>Langue actuelle : {{ LANGUAGE_CODE }}</p>
+		{% load i18n %}
+		<form method="post" action="{% url 'set_language' %}">
+			{% csrf_token %}
+			<button type="submit" name="language" value="en">English</button>
+			<button type="submit" name="language" value="fr">Français</button>
+			<button type="submit" name="language" value="es">Español</button>
+		</form>
+	</div> -->
+
     <!-- Formulaire pour ajouter un ami -->
     <div class="add-friend-section p-3 border-bottom">
         <h5 class="text-center" style="color: white">Ajouter un ami</h5>
