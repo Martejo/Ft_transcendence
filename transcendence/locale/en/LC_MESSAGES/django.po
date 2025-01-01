@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 20:08+0000\n"
+"POT-Creation-Date: 2025-01-01 21:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1225,6 +1225,78 @@ msgstr ""
 msgid "Connect, get help, or contribute"
 msgstr ""
 
+#: templates/accounts/burger_menu.html:14
+msgid "En ligne"
+msgstr "Online"
+
+#: templates/accounts/burger_menu.html:15
+msgid "Hors ligne"
+msgstr "Offline"
+
+#: templates/accounts/burger_menu.html:16
+msgid "Voir le profile"
+msgstr "View profile"
+
+#: templates/accounts/burger_menu.html:20
+msgid "Jouer"
+msgstr "Play"
+
+#: templates/accounts/burger_menu.html:21
+msgid "Tournoi"
+msgstr "Tournament"
+
+#: templates/accounts/burger_menu.html:22
+msgid "Gestion du compte"
+msgstr "Account management"
+
+#: templates/accounts/burger_menu.html:38
+msgid "Ajouter un ami"
+msgstr "Add a friend"
+
+#: templates/accounts/burger_menu.html:42
+msgid "Ajouter"
+msgstr "Add"
+
+#: templates/accounts/burger_menu.html:51
+msgid "Amis"
+msgstr "Friends"
+
+#: templates/accounts/burger_menu.html:62
+msgid "Aucun ami pour le moment."
+msgstr "No friends yet."
+
+#: templates/accounts/burger_menu.html:69
+msgid "Invitations d'amis"
+msgstr "Friend Invitations"
+
+#: templates/accounts/burger_menu.html:79
+msgid "Accepter"
+msgstr "Accept"
+
+#: templates/accounts/burger_menu.html:80
+msgid "Refuser"
+msgstr "Refuse"
+
+#: templates/accounts/burger_menu.html:85
+msgid "Aucune invitation pour le moment."
+msgstr "No invitations yet."
+
+#: templates/accounts/burger_menu.html:94
+msgid "Déconnexion"
+msgstr "Logout"
+
+#: templates/accounts/burger_menu.html:103
+msgid "Voir profil"
+msgstr "View profile"
+
+#: templates/accounts/burger_menu.html:104
+msgid "Inviter à jouer"
+msgstr "Invite to play"
+
+#: templates/accounts/burger_menu.html:105
+msgid "Supprimer"
+msgstr "Delete"
+
 #: templates/core/home.html:6
 msgid "Connexion"
 msgstr "Login"
@@ -1233,15 +1305,15 @@ msgstr "Login"
 msgid "Inscription"
 msgstr "Register"
 
-#: transcendence/settings.py:132
+#: transcendence/settings.py:133
 msgid "French"
 msgstr ""
 
-#: transcendence/settings.py:133
+#: transcendence/settings.py:134
 msgid "English"
 msgstr ""
 
-#: transcendence/settings.py:134
+#: transcendence/settings.py:135
 msgid "Spanish"
 msgstr ""
 

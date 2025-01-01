@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 20:08+0000\n"
+"POT-Creation-Date: 2025-01-01 21:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1225,6 +1225,78 @@ msgstr ""
 msgid "Connect, get help, or contribute"
 msgstr ""
 
+#: templates/accounts/burger_menu.html:14
+msgid "En ligne"
+msgstr "Conectado"
+
+#: templates/accounts/burger_menu.html:15
+msgid "Hors ligne"
+msgstr "Desconectado"
+
+#: templates/accounts/burger_menu.html:16
+msgid "Voir le profile"
+msgstr "Ver perfil"
+
+#: templates/accounts/burger_menu.html:20
+msgid "Jouer"
+msgstr "Jugar"
+
+#: templates/accounts/burger_menu.html:21
+msgid "Tournoi"
+msgstr "Torneo"
+
+#: templates/accounts/burger_menu.html:22
+msgid "Gestion du compte"
+msgstr "Gestión de cuentas"
+
+#: templates/accounts/burger_menu.html:38
+msgid "Ajouter un ami"
+msgstr "Añadir un amigo"
+
+#: templates/accounts/burger_menu.html:42
+msgid "Ajouter"
+msgstr "Añadir"
+
+#: templates/accounts/burger_menu.html:51
+msgid "Amis"
+msgstr "Amigos"
+
+#: templates/accounts/burger_menu.html:62
+msgid "Aucun ami pour le moment."
+msgstr "Aún no hay amigos."
+
+#: templates/accounts/burger_menu.html:69
+msgid "Invitations d'amis"
+msgstr "Invitaciones de amigos"
+
+#: templates/accounts/burger_menu.html:79
+msgid "Accepter"
+msgstr "Aceptar"
+
+#: templates/accounts/burger_menu.html:80
+msgid "Refuser"
+msgstr "Rechazar"
+
+#: templates/accounts/burger_menu.html:85
+msgid "Aucune invitation pour le moment."
+msgstr "Aún no hay invitaciones."
+
+#: templates/accounts/burger_menu.html:94
+msgid "Déconnexion"
+msgstr "Desconexión"
+
+#: templates/accounts/burger_menu.html:103
+msgid "Voir profil"
+msgstr "Ver perfil"
+
+#: templates/accounts/burger_menu.html:104
+msgid "Inviter à jouer"
+msgstr "Invitar a jugar"
+
+#: templates/accounts/burger_menu.html:105
+msgid "Supprimer"
+msgstr "Borrar"
+
 #: templates/core/home.html:6
 msgid "Connexion"
 msgstr "Conexión"
@@ -1233,15 +1305,15 @@ msgstr "Conexión"
 msgid "Inscription"
 msgstr "Registro"
 
-#: transcendence/settings.py:132
+#: transcendence/settings.py:133
 msgid "French"
 msgstr ""
 
-#: transcendence/settings.py:133
+#: transcendence/settings.py:134
 msgid "English"
 msgstr ""
 
-#: transcendence/settings.py:134
+#: transcendence/settings.py:135
 msgid "Spanish"
 msgstr ""
 
