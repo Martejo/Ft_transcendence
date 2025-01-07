@@ -19,7 +19,6 @@ const Views = {
             'accounts-login': async () => (await import('../auth/index.js')).initializeLoginView(),
             'accounts-register': async () => (await import('../auth/index.js')).initializeRegisterView(),
             'accounts-profile': async () => (await import('../profile/index.js')).initializeProfileView(),
-            'accounts-gestion_profil': async () => (await import('../profile/index.js')).initializeManageProfileView(),
             'accounts-enable_2fa': async () => (await import('../auth/index.js')).initializeEnable2FAView(),
             'accounts-verify_2fa_login': async () => (await import('../auth/index.js')).initializeLogin2FAView(),
             'accounts-disable_2fa': async () => (await import('../auth/index.js')).initializeDisable2FAView(),

@@ -79,7 +79,7 @@ export function updateHtmlContent(selector, html) {
     try {
         // Mise à jour du contenu à partir des données reçues
         document.querySelector(selector).innerHTML = html;
-    } catch (error) {
+    } catch {
         //[IMPROVE] faire un autre throw ici pour gerer l' erreur dans les fonctions specialisees
         document.querySelector(selector).innerHTML = '<p>Une erreur est survenue lors du chargement du contenu.</p>';
     }

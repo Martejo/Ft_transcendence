@@ -33,8 +33,8 @@ urlpatterns = [
     path('profile/', ManageProfileView.as_view(), name='manage_profile'),
     path('profile/update/', UpdateProfileView.as_view(), name='update_profile'),
     path('profile/delete/', DeleteAccountView.as_view(), name='delete_account'),
-    path('profile/change-password/', ChangePasswordView.as_view(), name='change_password'),
-    path('profile/update-avatar/', UpdateAvatarView.as_view(), name='update_avatar'),
+    path('profile/change_password/', ChangePasswordView.as_view(), name='change_password'),
+    path('profile/update_avatar/', UpdateAvatarView.as_view(), name='update_avatar'),
 
     # ---- Manage 2FA ----
     path('2fa/enable/', Enable2FAView.as_view(), name='enable_2fa'),
@@ -66,10 +66,10 @@ urlpatterns = [
     path('submit_register/', RegisterView.as_view(), name='submit_register'),
 
     # ---- User Profile ----
-    path('profile/', ProfileView.as_view(), name='user_profile'),
+    #path('profile/', ProfileView.as_view(), name='user_profile'),
 
     # ---- Token Management ---- #
-    path('refreshJwt/', RefreshJwtView.as_view, name='refresh_jwt'),
+    path('refreshJwt/', RefreshJwtView.as_view(), name='refresh_jwt'),
 
 
     # ---- Token Authentication (commented for now) ----

@@ -1,10 +1,6 @@
-//api/api.js
-import { RequestError, HTTPError, ContentTypeError, NetworkError } from './apiErrors.js';
+import { HTTPError, ContentTypeError, NetworkError } from './apiErrors.js';
 
 const Api = {
-
-    
-    
     /**
      * Effectue une requête HTTP avec fetch en utilisant FormData.
      * @param {string} url - L'URL complète de la ressource.
@@ -14,11 +10,19 @@ const Api = {
      * @returns {Promise} - Une promesse résolue avec les données JSON ou rejetée en cas d'erreur.
      */
     async request(url, method = 'GET', formData = null, headers = {}) {
+        const jwtAccessToken = this.getJWTaccessToken();
+
+        // Vérifie si le token expire bientôt et le renouvelle si nécessaire
+        if (jwtAccessToken && this.isTokenExpiringSoon(jwtAccessToken)) {
+            console.warn('Access token sur le point d\'expirer, tentative de renouvellement...');
+            await this.handleTokenRefresh();
+        }
+
         const defaultHeaders = this.prepareHeaders();
-    
+
         try {
             let response = await this.sendRequest(url, method, formData, { ...defaultHeaders, ...headers });
-    
+
             // Gestion des erreurs HTTP non réussies
             if (!response.ok) {
                 if (response.status === 401) {
@@ -30,36 +34,53 @@ const Api = {
                     );
                 }
             }
-    
+
             return this.handleResponse(response); // Traite la réponse
         } catch (error) {
             if (error instanceof TypeError) {
                 throw new NetworkError('Échec réseau : ' + error.message);
             }
-    
+
             throw error;
         }
     },
 
     /**
-     * Prépare les en-têtes pour la requête
-     * @returns {Object} - Les en-têtes préparés
+     * Prépare les en-têtes pour la requête.
+     * @returns {Object} - Les en-têtes préparés.
      */
     prepareHeaders() {
-        const csrfToken = this.getCSRFToken(); // Utilise `this` pour accéder aux méthodes d'Api
+        const csrfToken = this.getCSRFToken();
         const jwtAccessToken = this.getJWTaccessToken();
 
         const headers = {
             'X-CSRFToken': csrfToken,
         };
-        
+
         if (jwtAccessToken) {
             headers['Authorization'] = `Bearer ${jwtAccessToken}`;
         }
 
         return headers;
     },
-    
+
+    /**
+     * Vérifie si le token expire bientôt.
+     * @param {string} token - Le token JWT.
+     * @returns {boolean} - True si le token expire dans moins de 5 minutes.
+     */
+    isTokenExpiringSoon(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1])); // Décodage du payload JWT
+            const currentTime = Math.floor(Date.now() / 1000); // Temps actuel en secondes
+            const expiryTime = payload.exp;
+            return expiryTime - currentTime < 300; // Expire dans moins de 5 minutes
+        } catch (error) {
+            console.error('Erreur lors de la vérification de l\'expiration du token :', error);
+            return true; // Si une erreur survient, considérer le token comme expiré
+        }
+    },
+
     async sendRequest(url, method, formData, headers) {
         return fetch(url, {
             method,
@@ -71,12 +92,12 @@ const Api = {
     async handleUnauthorized(url, method, formData, headers, defaultHeaders) {
         console.warn('Access token expiré, tentative de rafraîchissement...');
         const newAccessToken = await this.handleTokenRefresh();
-    
+
         if (newAccessToken) {
             // Met à jour les en-têtes avec le nouveau token
             defaultHeaders['Authorization'] = `Bearer ${newAccessToken}`;
             const response = await this.sendRequest(url, method, formData, { ...defaultHeaders, ...headers });
-    
+
             // Vérifie de nouveau la réponse
             if (!response.ok) {
                 throw new HTTPError(
@@ -84,13 +105,12 @@ const Api = {
                     response.status
                 );
             }
-    
+
             return response; // Retourne la nouvelle réponse réussie
         } else {
             throw new HTTPError('Impossible de rafraîchir le token.', 401);
         }
     },
-    
 
     async handleTokenRefresh() {
         const jwtRefreshToken = this.getJWTrefreshToken();
@@ -101,12 +121,14 @@ const Api = {
         }
 
         try {
+            const csrfToken = this.getCSRFToken();
             const response = await fetch('/accounts/refreshJwt/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken, // Inclure le CSRF token
                 },
-                body: JSON.stringify({ refresh: jwtRefreshToken }),
+                body: JSON.stringify({ refresh_token: jwtRefreshToken }),
             });
 
             if (response.ok) {
@@ -114,7 +136,7 @@ const Api = {
                 const newAccessToken = data.access_token;
 
                 // Met à jour l'access token dans le stockage local
-                localStorage.setItem('accessToken', newAccessToken);
+                localStorage.setItem('access_token', newAccessToken);
                 return newAccessToken;
             } else {
                 console.error('Erreur lors du rafraîchissement du token :', response.statusText);
@@ -128,7 +150,7 @@ const Api = {
 
     handleResponse(response) {
         const contentType = response.headers.get('Content-Type');
-    
+
         if (contentType && contentType.includes('application/json')) {
             return response.json(); // Retourne les données JSON
         } else {
@@ -149,45 +171,25 @@ const Api = {
         return localStorage.getItem('refresh_token') || null;
     },
 
-
-    //fonctions correspondantes aux méthodes HTTP
+    // Méthodes pour les requêtes HTTP spécifiques
     async get(url) {
-        try {
-            return await this.request(url, 'GET');
-        } catch (error) {
-            throw error;
-        }
+        return await this.request(url, 'GET');
     },
-    
+
     async post(url, formData) {
-        try {
-            return await this.request(url, 'POST', formData);
-        } catch (error) {
-            throw error;
-        }
+        return await this.request(url, 'POST', formData);
     },
-    
+
     async put(url, formData) {
-        try {
-            return await this.request(url, 'PUT', formData);
-        } catch (error) {
-            throw error;
-        }
+        return await this.request(url, 'PUT', formData);
     },
-    
+
     async delete(url) {
-        try {
-            return await this.request(url, 'DELETE');
-        } catch (error) {
-            throw error;
-        }
+        return await this.request(url, 'DELETE');
     }
 };
 
-
-
-
-// fonctions appelables depuis les autres fichiers
+// Fonctions appelables depuis les autres fichiers
 export async function requestGet(app, view) {
     const url = `/${app}/${view}/`;
 
@@ -210,7 +212,6 @@ export async function requestPost(app, view, formData) {
     }
 }
 
-// [IMPROVE] A voir si la ressource a delete est constamment dans l' url
 export async function requestDelete(app, view, ressourceId) {
     const url = `/${app}/${view}/${ressourceId}/`;
 

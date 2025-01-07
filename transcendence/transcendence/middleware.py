@@ -16,14 +16,14 @@ class JWTAuthenticationMiddleware:
 
         if auth_header:
 
-            logger.debug(f"Auth_header = : {auth_header}")
+            #logger.debug(f"Auth_header = : {auth_header}")
             try:
                 logger.debug("Validation du jeton JWT")
 
                 # Extrait le jeton
                 token = auth_header.split(' ')[1]
 
-                logger.debug(f"Jeton JWT extrait : {token}")
+                #logger.debug(f"Jeton JWT extrait : {token}")
                 
                 # Décode le jeton
                 payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])

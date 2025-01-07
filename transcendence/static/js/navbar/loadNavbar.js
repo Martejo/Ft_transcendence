@@ -13,7 +13,7 @@ async function initializeBurgerMenu() {
     if (burgerToggle) {
         await loadBurgerMenuData();
         burgerToggle.addEventListener('click', toggleBurgerMenu);
-        setInterval(loadBurgerMenuData, 10000);
+        setInterval(loadBurgerMenuData, 20000);
     }
 }
 
@@ -29,6 +29,7 @@ export async function loadNavbar() {
         if (data && data.html) {
             // Mettre à jour le contenu HTML de la navbar
             updateHtmlContent('#navbar', data.html);
+            
             
             // Initialiser le burger menu
             await initializeBurgerMenu();

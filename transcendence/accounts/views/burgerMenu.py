@@ -56,10 +56,8 @@ class BurgerMenuView(View):
             # Build the response data
             response_data = {
                 'username': user.username,
-                'email': user.email,
                 'avatar_url': user.avatar.url if user.avatar else default_avatar,
                 'is_online': user.is_online,
-                'bio': user.bio,
                 'friends': friends,
                 'friend_requests': friend_requests,
             }

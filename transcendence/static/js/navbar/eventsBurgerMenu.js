@@ -1,3 +1,7 @@
+import { logoutUser } from '../auth/index.js';
+import { initializeProfileView } from '../profile/index.js';
+
+
 // Initialise tous les gestionnaires d'événements pour les interactions utilisateur
 export function eventsHandlerBurgerMenu() {
 	// Gestion du clic sur le profil utilisateur (avatar ou nom)
@@ -125,6 +129,8 @@ function handleTournamentClick() {
 }
 function handleSettingsClick() {
 	console.log('handleSettingsClick');
+    initializeProfileView();
+
 }
 function handleAddFriend(friendUsername) {
 	console.log('handleAddFriend');
@@ -137,6 +143,7 @@ function handleFriendRequest(requestId, action) {
 }
 function handleLogout() {
 	console.log('handleLogout');
+    logoutUser();
 }
 function handleFriendOption(action, friendName) {
 	console.log('handleFriendOption');

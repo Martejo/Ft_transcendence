@@ -37,7 +37,7 @@ async function handleLoginResponse(response) {
             console.log("Access token = ", response.access_token);
             localStorage.setItem('access_token', response.access_token);
             //[IMPROVE]Dois t on renvoyer des tokens refresh a chaque nouvelle connexion ?
-            // localStorage.setItem('refresh_token', response.refresh_token);
+            localStorage.setItem('refresh_token', response.refresh_token);
 
             setTimeout(async () => {
                 window.isAuthenticated = true;

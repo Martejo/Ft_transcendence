@@ -24,7 +24,6 @@ class CustomUser(AbstractUser):
         blank=True,
         default='avatars/default_avatar.png'
     )
-    bio = models.TextField(max_length=500, blank=True)
     is_online = models.BooleanField(default=False)
     def __str__(self):
         return self.username
@@ -99,10 +98,15 @@ class RefreshToken(models.Model):
     token = models.CharField(max_length=255, unique=True)  # Le token JWT
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
+    is_blacklisted = models.BooleanField(default=False)  # Permet de marquer un token comme blacklisté (déconnecté) avoir si utile
+
 
     def is_expired(self):
         """Vérifie si le token a expiré"""
         return now() > self.expires_at
+    
+    def is_valid(self):
+        return not self.is_expired() and not self.is_blacklisted
 
     def __str__(self):
         return f"RefreshToken(user={self.user}, expires_at={self.expires_at})"

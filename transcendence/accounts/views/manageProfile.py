@@ -12,7 +12,7 @@ from django.contrib.auth import update_session_auth_hash, logout
 from django.contrib.auth import get_user_model
 
 # ---- Imports locaux ----
-from accounts.forms import ProfileForm, PasswordChangeForm, AvatarUpdateForm
+from accounts.forms import UserNameForm, PasswordChangeForm, AvatarUpdateForm
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
@@ -81,10 +81,9 @@ class ManageProfileView(View):
 
     def get(self, request):
         user = request.user
-        profile_form = ProfileForm(instance=user)
-        password_form = PasswordChangeForm()
+        profile_form = UserNameForm(instance=user)
+        password_form = PasswordChangeForm(user=user)
         avatar_form = AvatarUpdateForm(instance=user)
-
         # Render HTML as a string
         rendered_html = render_to_string('accounts/gestion_profil.html', {
             'profile_form': profile_form,
@@ -106,7 +105,7 @@ class UpdateProfileView(View):
 
     def post(self, request):
         user = request.user
-        form = ProfileForm(request.POST, request.FILES, instance=user)
+        form = UserNameForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
             return JsonResponse({'status': 'success', 'message': 'Profil mis à jour avec succès.'})

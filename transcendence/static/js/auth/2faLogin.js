@@ -1,6 +1,7 @@
 // auth/2faLogin.js
-import { requestPost } from '../api/index.js';
-
+import { requestPost, requestGet } from '../api/index.js';
+import { loadNavbar } from '../navbar/index.js'; // Adjust the import path as necessary
+import { updateHtmlContent } from '../tools/index.js'; // Adjust the import path as necessary
 // [IMPROVE] Verifier le fonction des nouvelles urls
 
 async function submitLogin2FA(form) {
@@ -24,10 +25,9 @@ async function submitLogin2FA(form) {
     }
 }
 
-export function initializeLogin2FAView() {
-    const data = NULL;
+export async function initializeLogin2FAView() {
     try {
-        data = requestGet('accounts', 'login2fa')
+        const data = await requestGet('accounts', 'login2fa');
         updateHtmlContent('#content', data.html)
     } catch (error) {
         

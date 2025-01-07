@@ -11,11 +11,9 @@ from django.core.exceptions import ValidationError
 User = get_user_model()
 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'password1', 'password2')
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, label="Nom d'utilisateur")
@@ -30,15 +28,12 @@ class TwoFactorLoginForm(forms.Form):
             raise forms.ValidationError("Le code doit contenir uniquement des chiffres")
         return code
 
-class ProfileForm(forms.ModelForm):
+class UserNameForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'avatar', 'bio']
+        fields = ['username']  # Retirer 'avatar'
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Nom d'utilisateur"}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
-            'bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Bio'}),
-            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
 
     def clean_username(self):
@@ -46,21 +41,6 @@ class ProfileForm(forms.ModelForm):
         if User.objects.exclude(id=self.instance.id).filter(username=username).exists():
             raise forms.ValidationError("Ce nom d'utilisateur est déjà pris.")
         return username
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.exclude(id=self.instance.id).filter(email=email).exists():
-            raise forms.ValidationError("Cet email est déjà utilisé.")
-        return email
-
-    def clean_avatar(self):
-        avatar = self.cleaned_data.get('avatar')
-        if avatar:
-            if avatar.size > 4 * 1024 * 1024:
-                raise forms.ValidationError("L'image ne doit pas dépasser 4 Mo.")
-            if avatar.content_type not in ["image/jpeg", "image/png", "image/gif"]:
-                raise forms.ValidationError("Seules les images JPEG, PNG et GIF sont autorisées.")
-        return avatar
 
 class PasswordChangeForm(DjangoPasswordChangeForm):
     class Meta:

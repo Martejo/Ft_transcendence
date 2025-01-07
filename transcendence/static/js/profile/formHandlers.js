@@ -1,6 +1,8 @@
 // profile/formHandlers.js
-export { requestGet, requestPost } from './api.js';
+import { requestPost } from '../api/index.js';
 
+
+// [IMPROVE] Si l'utilisateur change son username, en théorie il faudrait le déconnecter puis le faire reconnecter pour générer un nouveau token avec le nouveau username.
 
 function displayErrors(containerSelector, errorsOrMessage) {
     const container = document.querySelector(containerSelector);
@@ -18,103 +20,47 @@ function displayErrors(containerSelector, errorsOrMessage) {
     container.style.display = 'block';
 }
 
-async function handleChangeUsername(form) {
+async function handleFormSubmit(form, app, view, successMessage, successSelector, errorSelector) {
     const formData = new FormData(form);
     try {
-        const response = await Api.post('/accounts/update_profile/', formData);
-        if (response.success) {
-            const successElem = document.querySelector('#change-username-success');
-            if (successElem) {
-                successElem.textContent = 'Pseudo mis à jour!';
-                successElem.style.display = 'block';
-                setTimeout(() => {
-                    successElem.style.display = 'none';
-                }, 3000);
-            }
-            form.reset();
-            window.location.hash = '#accounts-gestion_profil';
-        } else {
-            if (response.errors) {
-                displayErrors('#change-username-error', response.errors);
-            } else if (response.error) {
-                displayErrors('#change-username-error', response.error);
-            }
-        }
-    } catch (error) {
-        console.error('Erreur changement pseudo:', error);
-        displayErrors('#change-username-error', 'Une erreur est survenue.');
-    }
-}
-
-async function handleChangePassword(form) {
-    const formData = new FormData(form);
-    try {
-        const response = await Api.post('/accounts/change_password/', formData);
+        const response = await requestPost(app, view, formData);
         if (response.status === 'success') {
-            const successElem = document.querySelector('#change-password-success');
+            const successElem = document.querySelector(successSelector);
             if (successElem) {
-                successElem.textContent = response.message;
+                successElem.textContent = successMessage;
                 successElem.style.display = 'block';
                 setTimeout(() => {
                     successElem.style.display = 'none';
                 }, 3000);
             }
             form.reset();
-            window.location.hash = '#accounts-gestion_profil';
+            window.location.hash = '#accounts-profile';
         } else {
-            if (response.errors) {
-                displayErrors('#change-password-error', response.errors);
-            } else if (response.message) {
-                displayErrors('#change-password-error', response.message);
-            }
+            const errors = response.errors || response.error || 'Une erreur est survenue.';
+            displayErrors(errorSelector, errors);
         }
     } catch (error) {
-        console.error('Erreur changement mot de passe:', error);
-        displayErrors('#change-password-error', 'Erreur survenue.');
-    }
-}
-
-async function handleChangeAvatar(form) {
-    const formData = new FormData(form);
-    try {
-        const response = await Api.post('/accounts/update_avatar/', formData);
-        if (response.success) {
-            const successElem = document.querySelector('#change-avatar-success');
-            if (successElem) {
-                successElem.textContent = 'Avatar mis à jour!';
-                successElem.style.display = 'block';
-                setTimeout(() => {
-                    successElem.style.display = 'none';
-                }, 3000);
-            }
-            window.location.hash = '#accounts-gestion_profil';
-        } else {
-            if (response.errors) {
-                displayErrors('#change-avatar-error', response.errors);
-            } else if (response.error) {
-                displayErrors('#change-avatar-error', response.error);
-            }
-        }
-    } catch (error) {
-        console.error('Erreur changement avatar:', error);
-        displayErrors('#change-avatar-error', 'Erreur survenue.');
+        console.error(`Erreur lors de la requête vers ${app}/${view}:`, error);
+        displayErrors(errorSelector, 'Erreur réseau ou serveur.');
     }
 }
 
 export function initializeProfileFormHandlers() {
-    document.addEventListener('submit', async function(e) {
-        const form = e.target;
-        if (!form) return;
+    document.querySelectorAll('form').forEach((form) => {
+        if (!form.hasAttribute('data-handled')) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-        if (form.id === 'change-username-form') {
-            e.preventDefault();
-            handleChangeUsername(form);
-        } else if (form.id === 'change-password-form') {
-            e.preventDefault();
-            handleChangePassword(form);
-        } else if (form.id === 'change-avatar-form') {
-            e.preventDefault();
-            handleChangeAvatar(form);
+                if (form.id === 'change-username-form') {
+                    handleFormSubmit(form, 'accounts', 'profile/update', 'Pseudo mis à jour!', '#change-username-success', '#change-username-error');
+                } else if (form.id === 'change-password-form') {
+                    handleFormSubmit(form, 'accounts', 'profile/change_password', 'Mot de passe mis à jour!', '#change-password-success', '#change-password-error');
+                } else if (form.id === 'change-avatar-form') {
+                    handleFormSubmit(form, 'accounts', 'profile/update_avatar', 'Avatar mis à jour!', '#change-avatar-success', '#change-avatar-error');
+                }
+            });
+            form.setAttribute('data-handled', 'true'); // Marque le formulaire comme traité
         }
     });
+
 }

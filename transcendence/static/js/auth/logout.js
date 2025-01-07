@@ -1,11 +1,28 @@
-// auth/logout.js
 import { requestPost } from '../api/index.js';
 
-async function performLogout() {
+export async function logoutUser() {
     try {
-        const response = await requestPost('accounts','logout', formData);
+        const formData = new FormData();
+        
+        // Ajouter le refresh token au formulaire
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+            console.error('Aucun refresh token trouvé');
+            return;
+        }
+        formData.append('refresh_token', refreshToken);
+
+        // Envoyer la requête de déconnexion
+        const response = await requestPost('accounts', 'logout', formData);
+        
         if (response.status === 'success') {
             console.log('Déconnexion réussie');
+            
+            // Supprimer les tokens du localStorage
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+
+            // Nettoyer l'interface utilisateur
             document.querySelector('#navbar').innerHTML = '';
             const burgerMenu = document.querySelector('#burger-menu');
             if (burgerMenu) burgerMenu.innerHTML = '';
@@ -17,8 +34,4 @@ async function performLogout() {
     } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);
     }
-}
-
-export function logoutUser() {
-    performLogout();
 }

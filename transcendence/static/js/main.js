@@ -4,7 +4,6 @@
 // Import des modules transverses
 import Events from './modules/events.js';
 import { loadNavbar } from './navbar/index.js';
-import { initializeHomeView } from './landing/coreHome.js';
 
 // Une fois le DOM chargé, vous pouvez initialiser les éléments communs
 document.addEventListener('DOMContentLoaded', async () => {

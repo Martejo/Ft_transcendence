@@ -21,6 +21,12 @@ dist/
 build/
 *.egg
 
+# Ignorer tous les dossiers __pycache__
+__pycache__/
+
+# ignorer les migrations Django 
+migrations/
+
 # Django stuff:
 *.log
 *.pot
@@ -110,5 +116,16 @@ cython_debug/
 
 # Windows
 Thumbs.db
+
+# Ignorer le dossier node_modules
+node_modules/
+
+# Ignorer le fichier package-lock.json
+package-lock.json
+package.json
+# Ignorer eslint
+.eslintcache/
+eslint.config.mjs
+
 
 >>>>>>> origin/main
