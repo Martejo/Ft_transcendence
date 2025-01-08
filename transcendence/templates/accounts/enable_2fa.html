@@ -11,14 +11,11 @@
                     <div style="color: red;">QR Code not available</div>
                 {% endif %}
             </div>
-            
-            <p style="color: white; font-family: 'Jersey 10'; margin: 20px 0;">
-                Code secret: <strong>{{ secret|default:"N/A" }}</strong>
-            </p>
-            
+
             <form id="verify-2fa-form" method="POST">
                 {% csrf_token %}
-                {{ 2FA_form.as_p }}  <!-- This renders your form -->
+                <label for="code">Code 2FA :</label>
+                <input type="text" name="code" id="code" required class="form-control" placeholder="Entrez votre code 2FA">
                 <button type="submit" 
                         class="btn btn-primary btn-70"
                         style="background-color: #2DB4F3;

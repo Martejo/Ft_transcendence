@@ -203,7 +203,7 @@ export async function requestGet(app, view) {
 
 export async function requestPost(app, view, formData) {
     const url = `/${app}/${view}/`;
-
+    console.log('POST request URL:', url);
     try {
         return await Api.post(url, formData);
     } catch (error) {

@@ -7,15 +7,19 @@ import { updateHtmlContent } from '../tools/index.js'; // Adjust the import path
 async function submitLogin2FA(form) {
     const formData = new FormData(form);
     try {
-        const response = await requestPost('accounts','verify_2fa_login', formData);
+        const response = await requestPost('accounts','2fa/login2fa', formData);
         if (response.status === 'success') {
-            localStorage.setItem('accessToken', response.access);
-            localStorage.setItem('refreshToken', response.refresh);
-            setTimeout(() => {
+            console.log("2fa success");
+            localStorage.setItem('access_Token', response.access_token);
+            localStorage.setItem('refresh_Token', response.refresh_token);
+            setTimeout(async () => {
                 window.isAuthenticated = true;
-                loadNavbar();
-                window.location.hash = '#game-play';
-            }, 500);
+                // Appel à la fonction async loadNavbar avec await
+                await loadNavbar();
+
+
+                window.location.hash = '#game-home';
+            }, 1000);
         } else {
             alert(response.message);
         }
@@ -27,7 +31,7 @@ async function submitLogin2FA(form) {
 
 export async function initializeLogin2FAView() {
     try {
-        const data = await requestGet('accounts', 'login2fa');
+        const data = await requestGet('accounts', '2fa/login2fa');
         updateHtmlContent('#content', data.html)
     } catch (error) {
         

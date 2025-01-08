@@ -1,8 +1,67 @@
 // profile/formHandlers.js
 import { requestPost } from '../api/index.js';
+import { initializeEnable2FAView, initializeDisable2FAView, handleDeleteAccount } from '../auth/index.js';
 
 
 // [IMPROVE] Si l'utilisateur change son username, en théorie il faudrait le déconnecter puis le faire reconnecter pour générer un nouveau token avec le nouveau username.
+
+
+
+// attache les evenements aux boutons 2FA et de suppression de compte une seule fois
+function attachProfileEvents() {
+    // Bouton Activer 2FA
+    const enable2FABtn = document.querySelector('#enable-2fa-btn');
+    if (enable2FABtn) {
+        enable2FABtn.addEventListener('click', () => {
+            console.log('Enable 2FA button clicked');
+            handle2FA('enable');
+        });
+    }
+
+    // Bouton Désactiver 2FA
+    const disable2FABtn = document.querySelector('#disable-2fa-btn');
+    if (disable2FABtn) {
+        disable2FABtn.addEventListener('click', () => {
+            console.log('Disable 2FA button clicked');
+            handle2FA('disable');
+        });
+    }
+
+    // Bouton Supprimer le compte
+    const deleteAccountBtn = document.querySelector('#delete-account-btn');
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', () => {
+            console.log('Delete account button clicked');
+            handleDeleteAccount();
+        });
+    }
+}
+
+
+async function handle2FA(action) {
+    if (action === 'enable') 
+        initializeEnable2FAView();
+    else if (action === 'disable')
+        initializeDisable2FAView();
+
+}
+
+// async function handleDeleteAccount() {
+//     if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
+//         return;
+//     }
+//     try {
+//         const response = await requestPost('accounts', 'profile/delete_account');
+//         if (response.status === 'success') {
+//             alert('Compte supprimé avec succès.');
+//             window.location.href = '/logout/'; // Redirection après suppression
+//         } else {
+//             alert(`Erreur lors de la suppression du compte: ${response.message}`);
+//         }
+//     } catch (error) {
+//         console.error('Erreur réseau lors de la suppression du compte:', error);
+//     }
+// }
 
 function displayErrors(containerSelector, errorsOrMessage) {
     const container = document.querySelector(containerSelector);
@@ -62,5 +121,7 @@ export function initializeProfileFormHandlers() {
             form.setAttribute('data-handled', 'true'); // Marque le formulaire comme traité
         }
     });
+     // Appelle la fonction pour attacher les événements des boutons
+    attachProfileEvents();
 
 }

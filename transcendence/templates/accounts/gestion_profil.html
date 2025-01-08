@@ -1,5 +1,3 @@
-<!-- templates/accounts/manage_profile.html -->
-
 <div class="container-fluid mt-4" style="height: var(--sin-nav-height);">
     <h1 class="text-center title mb-3">Gestion de Profil</h1>
 
@@ -81,15 +79,36 @@
             <div class="card">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-2 text-danger">Supprimer le compte</h5>
-                    <form id="delete-account-form">
-                        <p class="text-white info mb-3">Cette action est irréversible. Votre compte sera définitivement supprimé.</p>
-                        <button type="button" id="delete-account-btn" class="btn btn-danger delete w-90 mt-2 mb-1">Supprimer mon compte</button>
-                    </form>
+                    <p class="text-white info mb-3">Cette action est irréversible. Votre compte sera définitivement supprimé.</p>
+                    <button type="button" id="delete-account-btn" class="btn btn-danger delete w-90 mt-2 mb-1">Supprimer mon compte</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modale pour la suppression de compte -->
+<div id="delete-account-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="container_delete_account">
+            <h3>Supprimer le compte</h3>
+            <p>Pour des raisons de sécurité, veuillez entrer votre mot de passe pour confirmer la suppression de votre compte.</p>
+            <form id="delete-account-form" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+            </form>
+            <!-- Messages dynamiques -->
+            <div class="delete-success text-success mt-3" style="display: none;"></div>
+            <div class="delete-error text-danger mt-3" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
 
 
     <style>
@@ -141,5 +160,85 @@
         .info {
             font-size: 1.1em;
         }
+
+        /* Styles pour la modale */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* Couleur d'arrière-plan semi-transparente */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Assure que la modale est au-dessus de tout */
+    }
+
+    .modal-content {
+        background: #101A32; /* Couleur de fond similaire aux cartes */
+        color: white; /* Texte en blanc */
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre légère */
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #fff;
+        cursor: pointer;
+        background: none;
+        border: none;
+    }
+
+    .close-btn:hover {
+        color: #ff4d4d; /* Rouge clair au survol */
+    }
+
+    .container_delete_account h3 {
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        color: #2DB4F3; /* Couleur cohérente avec les titres de section */
+    }
+
+    .container_delete_account p {
+        margin-bottom: 20px;
+        font-size: 1rem;
+    }
+
+    .btn-danger {
+        background-color: #ff4d4d;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-family: "Jersey 10";
+        transition: background-color 0.3s;
+    }
+
+    .btn-danger:hover {
+        background-color: #ff6666; /* Rouge plus clair au survol */
+    }
+
+    /* Masque la modale lorsqu'elle est fermée */
+    .modal[style*="display: none;"] {
+        display: none !important;
+    }
+
+    .text-success {
+        color: #28a745; /* Couleur verte pour succès */
+    }
+
+    .text-danger {
+        color: #dc3545; /* Couleur rouge pour erreur */
+    }
     </style>
     

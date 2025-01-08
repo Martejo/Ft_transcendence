@@ -13,8 +13,9 @@ def get_navbar(request):
     Génère et retourne le contenu de la barre de navigation sous forme de JSON.
     """
     logger.debug("Entre dans get_navbar_view")
-    logger.debug(request.user.is_authenticated)
     is_authenticated = request.user.is_authenticated
+
+    logger.debug("is_authenticated : " + str(is_authenticated))
 
     if is_authenticated:
         # Génère le HTML du burger-menu

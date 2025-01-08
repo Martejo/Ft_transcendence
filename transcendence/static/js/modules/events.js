@@ -25,22 +25,22 @@ const Events = {
     },
 
     // [IMPROVE] gerer les boutons directement dans le html
-    initializeButtonEvents() {
-        document.addEventListener('click', event => {
-            if (event.target.id === 'logout-btn') {
-                event.preventDefault();
-                window.location.hash = '#accounts-logout';
-            }
-            if (event.target.id === 'enable-2fa-btn') {
-                event.preventDefault();
-                window.location.hash = '#accounts-enable_2fa';
-            }
-            if (event.target.id === 'disable-2fa-btn') {
-                event.preventDefault();
-                window.location.hash = '#accounts-disable_2fa';
-            }
-        });
-    },
+    // initializeButtonEvents() {
+    //     document.addEventListener('click', event => {
+    //         if (event.target.id === 'logout-btn') {
+    //             event.preventDefault();
+    //             window.location.hash = '#accounts-logout';
+    //         }
+    //         // if (event.target.id === 'enable-2fa-btn') {
+    //         //     event.preventDefault();
+    //         //     window.location.hash = '#accounts-enable_2fa';
+    //         // }
+    //         // if (event.target.id === 'disable-2fa-btn') {
+    //         //     event.preventDefault();
+    //         //     window.location.hash = '#accounts-disable_2fa';
+    //         // }
+    //     });
+    // },
 
     //[IMPROVE] fonction inutile si on a deplace la gestion des boutons dans le html
     initializeAllEvents() {

@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm  # Formulaire pour la création d'utilisateur
 from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
 from django.core.exceptions import ValidationError
+from django.contrib.auth import authenticate
 
 # ---- Configuration ----
 User = get_user_model()
@@ -63,3 +64,21 @@ class AvatarUpdateForm(forms.ModelForm):
             if avatar.content_type not in ["image/jpeg", "image/png", "image/gif"]:
                 raise forms.ValidationError("Seules les images JPEG, PNG et GIF sont autorisées.")
         return avatar
+    
+
+class DeleteAccountForm(forms.Form):
+    password = forms.CharField(
+        max_length=128,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Entrez votre mot de passe'}),
+        label="Mot de passe"
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        if not authenticate(username=self.user.username, password=password):
+            raise forms.ValidationError("Mot de passe incorrect.")
+        return password

@@ -9,3 +9,5 @@ export { logoutUser } from './logout.js';
 export { initializeEnable2FAView } from './2faEnable.js';
 export { initializeLogin2FAView } from './2faLogin.js';
 export { initializeDisable2FAView } from './2faDisable.js';
+
+export { handleDeleteAccount } from './deleteAccount.js';

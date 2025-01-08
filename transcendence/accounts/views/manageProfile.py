@@ -12,7 +12,8 @@ from django.contrib.auth import update_session_auth_hash, logout
 from django.contrib.auth import get_user_model
 
 # ---- Imports locaux ----
-from accounts.forms import UserNameForm, PasswordChangeForm, AvatarUpdateForm
+from accounts.forms import UserNameForm, PasswordChangeForm, AvatarUpdateForm, DeleteAccountForm
+
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
@@ -84,11 +85,13 @@ class ManageProfileView(View):
         profile_form = UserNameForm(instance=user)
         password_form = PasswordChangeForm(user=user)
         avatar_form = AvatarUpdateForm(instance=user)
+        delete_form = DeleteAccountForm(user=user)
         # Render HTML as a string
         rendered_html = render_to_string('accounts/gestion_profil.html', {
             'profile_form': profile_form,
             'password_form': password_form,
             'avatar_form': avatar_form,
+            'delete_form': delete_form,
             'profile_user': user,
         })
 
@@ -118,11 +121,15 @@ class DeleteAccountView(View):
     Handle account deletion.
     """
 
-    def delete(self, request):
+    def post(self, request):
         user = request.user
-        user.delete()
-        logout(request)
-        return JsonResponse({'status': 'success', 'message': 'Votre compte a été supprimé avec succès.'})
+        form = DeleteAccountForm(user, data=request.POST)
+        if form.is_valid():
+            logout(request)
+            user.delete()
+            return JsonResponse({'status': 'success', 'message': 'Votre compte a été supprimé avec succès.'})
+        else:
+            return JsonResponse({'status': 'error', 'message': form.errors['password'][0]}, status=400)
 
 class ChangePasswordView(View):
     """

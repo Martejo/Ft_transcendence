@@ -19,6 +19,8 @@ from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
 from accounts.utils import generate_jwt_token
 
+from accounts.forms import TwoFactorLoginForm
+
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -42,7 +44,7 @@ class Base2FAView(View):
         qr_code = base64.b64encode(buffered.getvalue()).decode()
         
         return qr_code
-
+# [IMPROVE] le code secret ne doit pas être envoyé au client
 @method_decorator(login_required, name='dispatch')
 class Enable2FAView(Base2FAView):
     """
@@ -53,17 +55,24 @@ class Enable2FAView(Base2FAView):
         if request.user.is_2fa_enabled:
             return JsonResponse({'status': 'error', 'message': '2FA is already enabled on your account.'}, status=400)
 
+        # Génération du secret et du QR code
         secret = pyotp.random_base32()
         qr_code = self.generate_totp_qr(request.user, secret)
 
-        # Store the secret in the session (expires in 5 minutes)
+        # Stockage du secret dans la session (expire en 5 minutes)
         request.session['totp_secret'] = secret
         request.session.set_expiry(300)
 
+        # Générer le HTML pour le formulaire
+        html_content = render_to_string('accounts/enable_2fa.html', {
+            'qr_code': qr_code,
+            '2FA_form': TwoFactorLoginForm()  # Méthode qui retourne le formulaire
+        })
+
+        # Renvoyer le JSON avec le HTML inclus
         return JsonResponse({
             'status': 'success',
-            'qr_code': qr_code,
-            'secret': secret
+            'html': html_content
         })
 
 @method_decorator(login_required, name='dispatch')
@@ -104,12 +113,20 @@ class Login2faView(View):
         Gère une requête HTTP GET.
         Retourne un formulaire de connexion sous forme de HTML encapsulé dans une réponse JSON.
         """
-        # [IMPROVE] login2fa.html contient une balise DJANGO alors qu' on en utilise pas
-        # Soit ajouter les balises pour tous les form soit modifier le html
-        rendered_form = render_to_string('accounts/login2fa.html')
+      
+        # Créez une instance de TwoFactorLoginForm
+        login2fa_form = TwoFactorLoginForm()
+
+         # Générer le HTML pour le formulaire
+          # Générer le HTML pour le formulaire avec RequestContext
+        html_content = render_to_string(
+            'accounts/login2fa.html',
+            {'login2fa_form': login2fa_form},
+            request=request  # Inclut le RequestContext pour le token CSRF
+        )
         return JsonResponse({
             'status': 'success',
-            'form_html': rendered_form,  # Renommé pour être plus explicite
+            'html': html_content,  # Renommé pour être plus explicite
         })
 
     def post(self, request):
@@ -125,21 +142,26 @@ class Login2faView(View):
         if not code:
             return JsonResponse({'status': 'error', 'message': 'Code is required.'}, status=400)
 
+        logger.debug(f"Received 2FA code: {code}")
+
         totp = pyotp.TOTP(user.totp_secret)
         if totp.verify(code):
-            del request.session['auth_partial']
 
             token_jwt = generate_jwt_token(user)
             user.is_online = True
             user.save()
             login(request, user)
+            del request.session['auth_partial']
+
+            logger.debug(f"Utilisateur connecté après login: {request.user.is_authenticated}")
 
             return JsonResponse({
                 'status': 'success',
-                'access': token_jwt,
+                'access_token': token_jwt['access_token'],
+                'refresh_token': token_jwt['refresh_token'],
+                'ís_authenticated': True,
                 'message': '2FA verified successfully. Login successful.'
             })
-
         return JsonResponse({'status': 'error', 'message': 'Invalid 2FA code.'}, status=400)
 
 
@@ -148,6 +170,22 @@ class Disable2FAView(View):
     """
     Disable 2FA for the authenticated user.
     """
+
+    def get(self, request):
+        if not request.user.is_2fa_enabled:
+            return JsonResponse({'status': 'error', 'message': '2FA is not enabled on your account.'}, status=400)
+
+        # Créez une instance de TwoFactorLoginForm
+        disable_form = TwoFactorLoginForm()
+
+         # Générer le HTML pour le formulaire
+        html_content = render_to_string('accounts/disable_2fa.html', {
+            'disable_form': disable_form,
+        })
+        return JsonResponse({
+            'status': 'success',
+            'html': html_content
+        })
 
     def post(self, request):
         if not request.user.is_2fa_enabled:
