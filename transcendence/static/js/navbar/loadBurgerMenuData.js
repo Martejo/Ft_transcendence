@@ -89,13 +89,13 @@ export async function loadBurgerMenuData() {
             return;
         }
 
-        const data = response.data;
+        // const data = response.data;
 
-        updateProfileSection(data);
-        updateBurgerButton(data);
-        updateStatusIndicator(data.is_online);
-        updateFriendsList(data.friends);
-        handleFriendRequests(data.friend_requests);
+        // updateProfileSection(data);
+        // updateBurgerButton(data);
+        // updateStatusIndicator(data.is_online);
+        // updateFriendsList(data.friends);
+        // handleFriendRequests(data.friend_requests);
         initializeBurgerMenuInteraction();
 
     } catch (error) {

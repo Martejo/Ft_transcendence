@@ -27,7 +27,7 @@ export async function logoutUser() {
             const burgerMenu = document.querySelector('#burger-menu');
             if (burgerMenu) burgerMenu.innerHTML = '';
             document.querySelector('#content').innerHTML = '';
-            window.location.href = '/';
+            window.location.href = 'core-home';
         } else {
             console.error('Erreur: Réponse inattendue lors de la déconnexion.');
         }

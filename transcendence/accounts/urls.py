@@ -49,7 +49,7 @@ urlpatterns = [
 
     # ---- Burger Menu ----
     path('burgerMenu/', BurgerMenuView.as_view(), name='burgerMenu'),
-    path('burger-menu/update-status/', UpdateStatusView.as_view(), name='update_status'),
+    path('burgerMenu/update-status/', UpdateStatusView.as_view(), name='update_status'),
 
     # ---- Friend Profile ----
     path('friend/<str:friend_username>/', FriendProfileView.as_view(), name='friend_profile'),
@@ -66,7 +66,7 @@ urlpatterns = [
     path('submit_register/', RegisterView.as_view(), name='submit_register'),
 
     # ---- User Profile ----
-    #path('profile/', ProfileView.as_view(), name='user_profile'),
+    path('userProfile/', ProfileView.as_view(), name='user_profile'),
 
     # ---- Token Management ---- #
     path('refreshJwt/', RefreshJwtView.as_view(), name='refresh_jwt'),

@@ -63,9 +63,13 @@ export function updateTextContent(selector, text) {
  * Après : <img class="profile-info" src="/path/to/image.jpg" alt="">
  */
 export function updateAttribute(selector, attribute, value) {
-    const element = document.querySelector(selector); // Sélectionne le premier élément correspondant au sélecteur
+    const element = document.querySelector(selector);
+    console.log(`Sélecteur : ${selector}, Élément trouvé :`, element);
     if (element) {
-        element.setAttribute(attribute, value); // Modifie la valeur de l'attribut spécifié
+        element.setAttribute(attribute, value);
+        console.log(`Attribut ${attribute} mis à jour avec la valeur : ${value}`);
+    } else {
+        console.error(`Élément non trouvé pour le sélecteur : ${selector}`);
     }
 }
 

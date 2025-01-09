@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
 
 # ---- Imports locaux ----
 
@@ -29,11 +30,11 @@ class FriendProfileView(View):
         logger.debug("Entering FriendProfileView.get()")
         logger.debug(f"Friend_username = {friend_username}")
         try:
-            # Retrieve the friend by username
+            # Récupérer l'ami par son nom d'utilisateur
             friend = get_object_or_404(User, username=friend_username)
-            logger.info(f"Friend found: {friend.username}")
+            logger.info(f"User found: {friend.username}")
 
-            # Calculate statistics
+            # Calcul des statistiques supplémentaires pour l'ami
             match_count = friend.match_histories.count() if hasattr(friend, 'match_histories') else 0
             victories = friend.match_histories.filter(result='win').count() if hasattr(friend, 'match_histories') else 0
             defeats = friend.match_histories.filter(result='loss').count() if hasattr(friend, 'match_histories') else 0
@@ -42,22 +43,19 @@ class FriendProfileView(View):
                 if hasattr(friend, 'games_as_player1')
                 else 0
             )
-            best_score = best_score if best_score is not None else 0  # Ensure best_score is always defined
-
-            friends_count = (
-                friend.profile.friends.count() if hasattr(friend, 'profile') and hasattr(friend.profile, 'friends') else 0
-            )
+            best_score = best_score or 0  # Valeur par défaut pour le meilleur score
+            friends_count = friend.friends.count()
 
             logger.info(
                 f"Statistics calculated: match_count={match_count}, victories={victories}, "
                 f"defeats={defeats}, best_score={best_score}, friends_count={friends_count}"
             )
 
-            # Prepare response data
+            # Préparer le contexte pour rendre le template
             default_avatar = '/media/avatars/default_avatar.png'
-            response_data = {
-                'username': friend.username,
-                'avatar_url': friend.profile.avatar.url if friend.profile.avatar else default_avatar,
+            context = {
+                'friend': friend,
+                'avatar_url': friend.avatar.url if friend.avatar else default_avatar,
                 'match_count': match_count,
                 'victories': victories,
                 'defeats': defeats,
@@ -65,8 +63,16 @@ class FriendProfileView(View):
                 'friends_count': friends_count,
             }
 
-            return JsonResponse({'status': 'success', 'data': response_data})
+            # Rendre le template en HTML
+            rendered_html = render_to_string('accounts/friend_profile.html', context)
+
+            return JsonResponse({
+                'status': 'success',
+                'html': rendered_html,
+            }, status=200)
 
         except Exception as e:
             logger.error(f"Error loading friend profile: {e}")
             return JsonResponse({'status': 'error', 'message': 'Erreur lors du chargement du profil de l\'ami.'}, status=500)
+
+

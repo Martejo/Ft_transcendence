@@ -2,7 +2,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 import logging
+import json
 from transcendence.decorators import user_not_authenticated
+from accounts.views.burgerMenu import get_burger_menu_context
+
 
 
 
@@ -18,22 +21,26 @@ def get_navbar(request):
     logger.debug("is_authenticated : " + str(is_authenticated))
 
     if is_authenticated:
-        # Génère le HTML du burger-menu
-        burger_menu_html = render_to_string('accounts/burger_menu.html', {'user': request.user})
-        # Génère le HTML de la navbar pour un utilisateur connecté
-        navbar_html = render_to_string('core/navbar_logged_in.html', {'burger_menu': burger_menu_html})
+        # Utilise le contexte du burger menu pour obtenir les données
+        burger_menu_context = get_burger_menu_context(request.user)
+        burger_menu_html = render_to_string('accounts/burger_menu.html', burger_menu_context)
+
+        # Inclure avatar_url explicitement dans le contexte
+        navbar_html = render_to_string('core/navbar_logged_in.html', {
+            'burger_menu': burger_menu_html,
+            'avatar_url': burger_menu_context['avatar_url'],  # Passer l'URL de l'avatar
+        })
         logger.debug("Navbar générée pour un utilisateur connecté")
     else:
-        # Génère le HTML de la navbar publique
-        logger.debug("Navbar générée pour un utilisateur non connecté")
+        # Génération de la navbar publique
         navbar_html = render_to_string('core/navbar_public.html')
+        logger.debug("Navbar générée pour un utilisateur non connecté")
 
     return JsonResponse({
         'status': 'success',
         'is_authenticated': is_authenticated,
         'html': navbar_html
     })
-
 
 @user_not_authenticated
 def home_view(request):

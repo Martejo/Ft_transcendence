@@ -14,7 +14,7 @@ from accounts.models import RefreshToken
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toutes les méthodes de la classe
+#@method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toutes les méthodes de la classe
 @method_decorator(login_required, name='dispatch')  # Restreint l'accès à la vue aux utilisateurs connectés
 class LogoutView(View):
     """

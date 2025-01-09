@@ -8,6 +8,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.shortcuts import render
+from django.template.loader import render_to_string
+
 
 # ---- Imports locaux ----
 from accounts.models import FriendRequest
@@ -16,6 +19,17 @@ from accounts.models import FriendRequest
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
+def get_burger_menu_context(user):
+    """
+    Retourne le contexte nécessaire pour le template du burger menu.
+    """
+    default_avatar = '/media/avatars/default_avatar.png'
+    return {
+        'user': user,
+        'friends': user.friends.all(),
+        'friend_requests': FriendRequest.objects.filter(to_user=user),
+        'avatar_url': user.avatar.url if user.avatar else default_avatar,
+    }
 
 class BurgerMenuView(View):
     """
@@ -25,49 +39,12 @@ class BurgerMenuView(View):
     @method_decorator(login_required)
     def get(self, request):
         """
-        Fetch user data, friends list, and friend requests for the burger menu.
+        Render the burger menu with user data, friends list, and friend requests.
         """
-        user = request.user  # Retrieve the user from the JWT
-        #[IMPROVE] Utilite de refresh_from_db() ?
-        user.refresh_from_db()  # Refresh the user profile from the database
         try:
-            default_avatar = '/media/avatars/default_avatar.png'
-
-            # Build the friends list
-            friends = [
-                {
-                    'username': friend.username,
-                    'avatar_url': friend.avatar.url if friend.avatar else default_avatar,
-                    'status': 'online' if friend.is_online else 'offline'
-                }
-                for friend in user.friends.all()
-            ]
-
-            # Build the friend requests list
-            friend_requests = [
-                {
-                    'id': friend_request.id,
-                    'from_user': friend_request.from_user.username,
-                    'avatar_url': friend_request.from_user.avatar.url if friend_request.from_user.avatar else default_avatar
-                }
-                for friend_request in FriendRequest.objects.filter(to_user=user)
-            ]
-
-            # Build the response data
-            response_data = {
-                'username': user.username,
-                'avatar_url': user.avatar.url if user.avatar else default_avatar,
-                'is_online': user.is_online,
-                'friends': friends,
-                'friend_requests': friend_requests,
-            }
-
-            return JsonResponse({'status': 'success', 'data': response_data})
-            # [IMPROVE] A quoi servent ces lignes ?
-            # response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-            # response['Pragma'] = 'no-cache'
-            
-
+            context = get_burger_menu_context(request.user)
+            burger_menu_html = render_to_string('accounts/burger_menu.html', context)
+            return JsonResponse({'status': 'success', 'html': burger_menu_html})
         except Exception as e:
             logger.error(f"Erreur lors de la récupération des données du menu burger: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
@@ -85,6 +62,8 @@ class UpdateStatusView(View):
         """
         user = request.user
         status = request.POST.get('status')
+
+        logger.info(f"--Requête de mise à jour du statut pour {user.username}: {status}")
 
         if status not in ['online', 'offline']:
             return JsonResponse({'status': 'error', 'message': 'Statut non valide'}, status=400)

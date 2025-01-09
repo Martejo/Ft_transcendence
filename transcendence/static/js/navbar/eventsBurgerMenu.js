@@ -1,36 +1,42 @@
 import { logoutUser } from '../auth/index.js';
 import { initializeProfileView } from '../profile/index.js';
+import { updateUserStatus } from './status.js';
+import { handleViewProfile } from './profile.js';
+import { handleAddFriend } from './addFriend.js';
+import { requestPost } from '../api/index.js';
+import { handleFriendRequest } from './handleFriend.js';
+import { viewFriendProfile } from './viewFriendProfile.js';
 
+// Fonctions utilitaires pour afficher les messages d'erreur et de succès
+function displayErrorMessage(elementId, message) {
+    const errorElement = document.querySelector(`#${elementId}`);
+    if (errorElement) {
+        errorElement.textContent = message;
+    }
+}
 
 // Initialise tous les gestionnaires d'événements pour les interactions utilisateur
 export function eventsHandlerBurgerMenu() {
-	// Gestion du clic sur le profil utilisateur (avatar ou nom)
-    const profileAvatar = document.querySelector('#profile-avatar');
-    const profileUsername = document.querySelector('#profile-username');
-
-    if (profileAvatar) {
-        profileAvatar.addEventListener('click', () => {
-            console.log('Avatar cliqué');
-            handleProfileClick();
-        });
-    }
-
-    if (profileUsername) {
-        profileUsername.addEventListener('click', () => {
-            console.log('Nom d\'utilisateur cliqué');
-            handleProfileClick();
-        });
-    }
+    console.log('Initialisation des gestionnaires d\'événements...');
 
     // Gestion du changement de statut (en ligne / hors ligne)
-    const statusButtons = document.querySelectorAll('.status-selector button');
+    const statusButtons = document.querySelectorAll('.status-selector button[data-status]');
     statusButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            const status = e.target.textContent.toLowerCase();
-            console.log(`Changement de statut : ${status}`);
-            handleStatusChange(status);
+            const status = e.target.dataset.status;
+            if (status) {
+                console.log(`Changement de statut : ${status}`);
+                handleStatusChange(status);
+            }
         });
     });
+
+    // Gestion du clic sur "Voir le profil"
+    const profileBtn = document.querySelector('#profile-btn');
+    if (profileBtn) {
+        profileBtn.removeEventListener('click', handleViewProfile);
+        profileBtn.addEventListener('click', handleViewProfile);
+    }
 
     // Gestion des liens de navigation
     const navigationButtons = [
@@ -38,7 +44,6 @@ export function eventsHandlerBurgerMenu() {
         { selector: '#tournament-link', action: handleTournamentClick },
         { selector: '#settings-link', action: handleSettingsClick }
     ];
-
     navigationButtons.forEach(nav => {
         const button = document.querySelector(nav.selector);
         if (button) {
@@ -53,12 +58,8 @@ export function eventsHandlerBurgerMenu() {
     // Gestion du formulaire pour ajouter un ami
     const addFriendForm = document.querySelector('#add-friend-form');
     if (addFriendForm) {
-        addFriendForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const friendUsername = document.querySelector('#friend-username').value;
-            console.log(`Ajout d'ami : ${friendUsername}`);
-            handleAddFriend(friendUsername);
-        });
+        addFriendForm.removeEventListener('submit', handleAddFriendFormSubmit);
+        addFriendForm.addEventListener('submit', handleAddFriendFormSubmit);
     }
 
     // Gestion des clics sur les boutons des amis
@@ -67,9 +68,11 @@ export function eventsHandlerBurgerMenu() {
         friendsListContainer.addEventListener('click', (e) => {
             const friendButton = e.target.closest('.friend-btn');
             if (friendButton) {
-                const username = friendButton.getAttribute('data-username');
-                console.log(`Ami cliqué : ${username}`);
-                handleFriendClick(username);
+                const username = friendButton.innerText.trim();
+                if (username) {
+                    console.log(`Ami cliqué : ${username}`);
+                    showFriendPopup(e, username);
+                }
             }
         });
     }
@@ -77,74 +80,179 @@ export function eventsHandlerBurgerMenu() {
     // Gestion des invitations d'amis
     const friendRequestsContainer = document.querySelector('#friend-requests-list-container');
     if (friendRequestsContainer) {
-        friendRequestsContainer.addEventListener('click', (e) => {
+        friendRequestsContainer.addEventListener('click', async (e) => {
             const button = e.target.closest('button');
             if (button) {
                 const requestId = button.getAttribute('data-request-id');
-                const action = button.classList.contains('btn-success') ? 'accept' : 'decline';
-                console.log(`Invitation d'ami : ${requestId}, action : ${action}`);
-                handleFriendRequest(requestId, action);
+                const action = button.getAttribute('data-action');
+                if (requestId) {
+                    console.log(`Invitation d'ami : ${requestId}, action : ${action}`);
+                    const result = await handleFriendRequest(requestId, action);
+                    if (result.success) {
+                        console.log(result.message);
+                    } else {
+                        console.error(result.message);
+                    }
+                }
             }
         });
     }
 
-    // Gestion du formulaire de déconnexion
-    const logoutButton = document.querySelector('#logout-btn');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            console.log('Déconnexion demandée');
-            handleLogout();
+    // Gestion des boutons dans le popup
+    const viewProfileBtn = document.getElementById('view-profile-btn');
+    const inviteToPlayBtn = document.getElementById('invite-to-play-btn');
+    const removeFriendBtn = document.getElementById('remove-friend-btn');
+
+    if (viewProfileBtn) {
+        viewProfileBtn.addEventListener('click', () => handleOption('Voir le profil'));
+    }
+
+    if (inviteToPlayBtn) {
+        inviteToPlayBtn.addEventListener('click', () => handleOption('Inviter à jouer'));
+    }
+
+    if (removeFriendBtn) {
+        removeFriendBtn.addEventListener('click', () => {
+            const friendName = document.getElementById('popupFriendName').innerText.trim();
+            handleRemoveFriend(friendName);
         });
     }
 
-    // Gestion des options d'ami dans le popup
-    const friendPopup = document.querySelector('#friendPopup');
-    if (friendPopup) {
-        friendPopup.addEventListener('click', (e) => {
-            const optionButton = e.target.closest('button');
-            if (optionButton) {
-                const action = optionButton.textContent;
-                const friendName = document.querySelector('#popupFriendName').innerText;
-                console.log(`Option sélectionnée : ${action} pour ${friendName}`);
-                handleFriendOption(action, friendName);
-            }
-        });
-    }
+    // Ferme le popup si on clique en dehors
+    document.addEventListener('click', closePopupOnClickOutside);
 
     console.log('Tous les gestionnaires d\'événements ont été initialisés.');
 }
 
-// Fonctions vides à implémenter
-function handleProfileClick() {
-	console.log('handleProfileClick');
-}
-function handleStatusChange(status) {
-	console.log('handleStatusChange');
-}
-function handlePlayClick() {
-	console.log('handlePlayClick');
-}
-function handleTournamentClick() {
-	console.log('handleTournamentClick');
-}
-function handleSettingsClick() {
-	console.log('handleSettingsClick');
-    initializeProfileView();
+// Fonction qui affiche le popup pour un ami
+function showFriendPopup(event, friendName) {
+    event.stopPropagation();
 
+    const popup = document.getElementById('friendPopup');
+    document.getElementById('popupFriendName').innerText = friendName;
+
+    popup.classList.remove('d-none');
+
+    const popupWidth = popup.offsetWidth;
+    const popupHeight = popup.offsetHeight;
+
+    const menu = document.getElementById('burger-menu');
+    const menuRect = menu.getBoundingClientRect();
+    const mouseX = event.clientX - menuRect.left + menu.scrollLeft;
+    const mouseY = event.clientY - menuRect.top + menu.scrollTop;
+
+    let top, left;
+
+    if (mouseY < 250 && window.innerWidth - mouseX < 175) {
+        top = mouseY + popupHeight;
+        left = mouseX - (popupWidth / 2);
+    } else if (mouseY < 250 && window.innerWidth - mouseX >= 175) {
+        top = mouseY + popupHeight;
+        left = mouseX + (popupWidth / 2);
+    } else if (mouseY >= 250 && window.innerWidth - mouseX >= 175) {
+        top = mouseY;
+        left = mouseX + (popupWidth / 2);
+    } else {
+        top = mouseY;
+        left = mouseX - (popupWidth / 2);
+    }
+
+    popup.style.top = `${top}px`;
+    popup.style.left = `${left}px`;
 }
-function handleAddFriend(friendUsername) {
-	console.log('handleAddFriend');
+
+// Fonction pour fermer le popup en cliquant en dehors
+function closePopupOnClickOutside(event) {
+    const popup = document.getElementById('friendPopup');
+    if (!popup.contains(event.target) && !event.target.closest('.friend-item')) {
+        popup.classList.add('d-none');
+    }
 }
+
+// Fonction pour gérer les options sélectionnées
+function handleOption(option) {
+    const friendName = document.getElementById('popupFriendName').innerText.trim();
+    if (option === 'Voir le profil') {
+        viewFriendProfile(friendName);
+    } else {
+        console.log(`Option sélectionnée : ${option}`);
+    }
+}
+
+// Fonction pour supprimer un ami
+async function handleRemoveFriend(friendName) {
+    console.log(`Suppression de l'ami : ${friendName}`);
+    
+    try {
+        const formData = new FormData();
+        formData.append('friend_username', friendName);
+
+        const response = await requestPost('accounts', 'friends/remove', formData);
+
+        if (response.status === 'success') {
+            console.log(response.message);
+
+            // Met à jour l'interface utilisateur
+            const friendItem = document.querySelector(`.friend-btn:contains('${friendName}')`);
+            if (friendItem) {
+                friendItem.closest('.friend-item').remove();
+            }
+
+            // Ferme le popup
+            document.getElementById('friendPopup').classList.add('d-none');
+        } else {
+            console.error(response.message);
+            displayErrorMessage('friend-popup-error', response.message);
+        }
+    } catch (error) {
+        console.error(`Erreur lors de la suppression de l'ami : ${error.message}`);
+        displayErrorMessage('friend-popup-error', 'Une erreur est survenue lors de la suppression de l\'ami.');
+    }
+}
+
+// Fonction pour gérer le formulaire d'ajout d'amis
+function handleAddFriendFormSubmit(e) {
+    e.preventDefault();
+    const friendUsername = document.querySelector('#friend-username').value.trim();
+    if (friendUsername) {
+        console.log(`Ajout d'ami : ${friendUsername}`);
+        handleAddFriend(friendUsername);
+    } else {
+        displayErrorMessage('add-friend-error', 'Le nom d\'utilisateur ne peut pas être vide.');
+    }
+}
+
+function handleProfileClick() {
+    console.log('handleProfileClick');
+}
+
+function handleStatusChange(status) {
+    console.log('handleStatusChange:', status);
+    updateUserStatus(status);
+}
+
+function handlePlayClick() {
+    console.log('handlePlayClick');
+}
+
+function handleTournamentClick() {
+    console.log('handleTournamentClick');
+}
+
+function handleSettingsClick() {
+    console.log('handleSettingsClick');
+    initializeProfileView();
+}
+
 function handleFriendClick(username) {
-	console.log('handleFriendClick');
+    console.log('handleFriendClick:', username);
 }
-function handleFriendRequest(requestId, action) {
-	console.log('handleFriendRequest');
-}
+
 function handleLogout() {
-	console.log('handleLogout');
+    console.log('handleLogout');
     logoutUser();
 }
+
 function handleFriendOption(action, friendName) {
-	console.log('handleFriendOption');
+    console.log('handleFriendOption:', action, friendName);
 }
