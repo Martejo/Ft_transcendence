@@ -1,37 +1,41 @@
+
 import { requestPost } from '../api/index.js';
 
-export async function logoutUser() {
+async function logoutUser() {
     try {
         const formData = new FormData();
         
-        // Ajouter le refresh token au formulaire
+        // Vérification du refresh token
         const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) {
-            console.error('Aucun refresh token trouvé');
-            return;
+            throw new Error('Aucun refresh token trouvé.');
         }
         formData.append('refresh_token', refreshToken);
 
-        // Envoyer la requête de déconnexion
+        // Requête pour déconnexion
         const response = await requestPost('accounts', 'logout', formData);
-        
-        if (response.status === 'success') {
-            console.log('Déconnexion réussie');
-            
-            // Supprimer les tokens du localStorage
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
 
-            // Nettoyer l'interface utilisateur
-            document.querySelector('#navbar').innerHTML = '';
-            const burgerMenu = document.querySelector('#burger-menu');
-            if (burgerMenu) burgerMenu.innerHTML = '';
-            document.querySelector('#content').innerHTML = '';
-            window.location.href = 'core-home';
-        } else {
-            console.error('Erreur: Réponse inattendue lors de la déconnexion.');
+        if (response.status !== 'success') {
+            throw new Error('La déconnexion a échoué côté serveur.');
         }
     } catch (error) {
+        console.error('Erreur lors de logoutUser :', error);
+        throw error; // Relancer l'erreur pour que handleLogout puisse la gérer
+    }
+}
+
+
+
+export async function handleLogout() {
+    console.log('Déconnexion en cours...');
+    try {
+        await logoutUser(); // Appel de la logique technique
+        clearSessionAndUI(); // Nettoie la session et l'interface utilisateur
+        console.log('Déconnexion réussie.');
+    } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);
+
+        // Afficher un message d'erreur personnalisé à l'utilisateur
+        displayErrorMessage('logout-error', 'La déconnexion a échoué. Veuillez réessayer.');
     }
 }
