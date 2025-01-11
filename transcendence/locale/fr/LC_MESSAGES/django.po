@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 21:25+0000\n"
+"POT-Creation-Date: 2025-01-11 19:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1258,10 +1258,11 @@ msgid "Ajouter"
 msgstr ""
 
 #: templates/accounts/burger_menu.html:51
+#: templates/accounts/friend_profile.html:45 templates/accounts/profile.html:47
 msgid "Amis"
 msgstr ""
 
-#: templates/accounts/burger_menu.html:62
+#: templates/accounts/burger_menu.html:62 templates/game/invite_game.html:35
 msgid "Aucun ami pour le moment."
 msgstr ""
 
@@ -1297,12 +1298,313 @@ msgstr ""
 msgid "Supprimer"
 msgstr ""
 
-#: templates/core/home.html:6
+#: templates/accounts/disable_2fa.html:5
+msgid "Désactiver l'authentification à deux facteurs"
+msgstr ""
+
+#: templates/accounts/disable_2fa.html:8
+msgid "Entrez le code généré par votre application d'authentification."
+msgstr ""
+
+#: templates/accounts/disable_2fa.html:12 templates/accounts/enable_2fa.html:67
+#: templates/accounts/verify_2fa_login.html:13
+msgid "Code 2FA :"
+msgstr ""
+
+#: templates/accounts/disable_2fa.html:15
+#: templates/accounts/gestion_profil.html:70
+msgid "Désactiver 2FA"
+msgstr ""
+
+#: templates/accounts/enable_2fa.html:45
+msgid "Activer l'authentification à deux facteurs"
+msgstr ""
+
+#: templates/accounts/enable_2fa.html:56
+msgid "QR Code non disponible"
+msgstr ""
+
+#: templates/accounts/enable_2fa.html:61
+msgid "Code secret"
+msgstr ""
+
+#: templates/accounts/enable_2fa.html:76
+msgid "Vérifier"
+msgstr ""
+
+#: templates/accounts/friend_profile.html:5
+msgid "Profil de"
+msgstr ""
+
+#: templates/accounts/friend_profile.html:18
+msgid "Pseudo :"
+msgstr ""
+
+#: templates/accounts/friend_profile.html:19 templates/accounts/profile.html:21
+msgid "Nombre de matchs joués : "
+msgstr ""
+
+#: templates/accounts/friend_profile.html:31 templates/accounts/profile.html:33
+msgid "Statistiques Générales"
+msgstr ""
+
+#: templates/accounts/friend_profile.html:33 templates/accounts/profile.html:35
+msgid "Victoires : "
+msgstr ""
+
+#: templates/accounts/friend_profile.html:34 templates/accounts/profile.html:36
+msgid "Défaites : "
+msgstr ""
+
+#: templates/accounts/friend_profile.html:35 templates/accounts/profile.html:37
+msgid "Meilleur score : "
+msgstr ""
+
+#: templates/accounts/friend_profile.html:46 templates/accounts/profile.html:48
+msgid "Nombre d'amis : "
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:5 templates/accounts/profile.html:57
+msgid "Gestion de Profil"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:12
+msgid "Changer d'avatar"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:16
+#: templates/accounts/gestion_profil.html:35
+#: templates/accounts/gestion_profil.html:54 templates/accounts/login.html:20
+#: templates/accounts/verify_2fa.html:11
+#: templates/accounts/verify_2fa_login.html:16
+msgid "Valider"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:31
+msgid "Changer de pseudo"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:50
+msgid "Changer de mot de passe"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:68
+msgid "Authentification à deux facteurs"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:72
+msgid "Activer 2FA"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:84
+msgid "Supprimer le compte"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:86
+msgid ""
+"Cette action est irréversible. Votre compte sera définitivement supprimé."
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:87
+msgid "Supprimer mon compte"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:100
+msgid "Êtes-vous sûr de vouloir supprimer le compte ?"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:102
+msgid "Annuler"
+msgstr ""
+
+#: templates/accounts/gestion_profil.html:103
+msgid "Confirmer"
+msgstr ""
+
+#: templates/accounts/login.html:5 templates/core/home.html:6
 msgid "Connexion"
 msgstr ""
 
-#: templates/core/home.html:7
+#: templates/accounts/login.html:10 templates/accounts/register.html:10
+msgid "Nom d'utilisateur :"
+msgstr ""
+
+#: templates/accounts/login.html:14 templates/accounts/register.html:18
+msgid "Mot de passe :"
+msgstr ""
+
+#: templates/accounts/login.html:18
+msgid "Mot de passe oublié ?"
+msgstr ""
+
+#: templates/accounts/profile.html:5
+msgid "Profil Utilisateur"
+msgstr ""
+
+#: templates/accounts/profile.html:20
+msgid "Pseudo : "
+msgstr ""
+
+#: templates/accounts/register.html:6 templates/core/home.html:7
 msgid "Inscription"
+msgstr ""
+
+#: templates/accounts/register.html:22
+msgid "Confirmer le mot de passe :"
+msgstr ""
+
+#: templates/accounts/register.html:26
+msgid "S'inscrire"
+msgstr ""
+
+#: templates/accounts/show_qr.html:5
+msgid "Configurer 2FA"
+msgstr ""
+
+#: templates/accounts/show_qr.html:36
+msgid "Scannez le QR Code"
+msgstr ""
+
+#: templates/accounts/show_qr.html:37
+msgid ""
+"Scannez ce QR code avec votre application d'authentification (Google "
+"Authenticator, Authy, ..)"
+msgstr ""
+
+#: templates/accounts/show_qr.html:39
+msgid "Ou saisissez ce code manuellement :"
+msgstr ""
+
+#: templates/accounts/show_qr.html:41
+msgid "Continuer la vérification"
+msgstr ""
+
+#: templates/accounts/verify_2fa.html:3
+msgid "Vérification 2FA"
+msgstr ""
+
+#: templates/accounts/verify_2fa.html:4
+msgid ""
+"Entrez le code de votre application d'authentification pour terminer la "
+"configuration 2FA."
+msgstr ""
+
+#: templates/accounts/verify_2fa.html:8
+msgid "Code d'authentication"
+msgstr ""
+
+#: templates/accounts/verify_2fa_login.html:7
+msgid "Entrez Code 2FA"
+msgstr ""
+
+#: templates/accounts/verify_2fa_login.html:9
+msgid ""
+"Pour vous connecter, veuillez saisir le code 2FA depuis votre application "
+"d'authentification"
+msgstr ""
+
+#: templates/game/game_menu.html:4
+msgid "Menu de Jeu"
+msgstr ""
+
+#: templates/game/game_menu.html:9
+msgid "Type de Partie"
+msgstr ""
+
+#: templates/game/game_menu.html:11
+msgid "Partie Locale"
+msgstr ""
+
+#: templates/game/game_menu.html:12
+msgid "Inviter un Ami"
+msgstr ""
+
+#: templates/game/game_menu.html:20 templates/game/remote_menu.html:8
+msgid "Modes de Jeu"
+msgstr ""
+
+#: templates/game/game_menu.html:22 templates/game/remote_menu.html:10
+msgid "Lancer Partie Standard"
+msgstr ""
+
+#: templates/game/game_menu.html:23 templates/game/remote_menu.html:11
+msgid "Personnaliser Partie"
+msgstr ""
+
+#: templates/game/game_menu.html:32 templates/game/remote_menu.html:67
+msgid "Personnalisation du Gameplay"
+msgstr ""
+
+#: templates/game/game_menu.html:36 templates/game/remote_menu.html:71
+msgid "Vitesse de la Balle"
+msgstr ""
+
+#: templates/game/game_menu.html:42 templates/game/remote_menu.html:77
+msgid "Taille de la Raquette"
+msgstr ""
+
+#: templates/game/game_menu.html:44 templates/game/remote_menu.html:79
+msgid "Petite"
+msgstr ""
+
+#: templates/game/game_menu.html:45 templates/game/remote_menu.html:80
+msgid "Moyenne"
+msgstr ""
+
+#: templates/game/game_menu.html:46 templates/game/remote_menu.html:81
+msgid "Grande"
+msgstr ""
+
+#: templates/game/game_menu.html:50
+msgid "Selection des Bonus"
+msgstr ""
+
+#: templates/game/game_menu.html:52 templates/game/remote_menu.html:87
+msgid "**Power-Ups Légendaires !**"
+msgstr ""
+
+#: templates/game/game_menu.html:92 templates/game/remote_menu.html:127
+msgid "Lancer Partie Personnalisée"
+msgstr ""
+
+#: templates/game/invite_game.html:2
+msgid "Invitez un ami"
+msgstr ""
+
+#: templates/game/invite_game.html:30 templates/game/invite_tournament.html:30
+msgid "Inviter"
+msgstr ""
+
+#: templates/game/invite_game.html:42 templates/game/invite_tournament.html:42
+msgid "Continuer"
+msgstr ""
+
+#: templates/game/invite_tournament.html:2
+msgid "Invitez vos amis"
+msgstr ""
+
+#: templates/game/loading.html:42
+msgid "Chargement"
+msgstr ""
+
+#: templates/game/remote_menu.html:3
+msgid "Jeu en Ligne"
+msgstr ""
+
+#: templates/game/remote_menu.html:85
+msgid "Selection des Bonus "
+msgstr ""
+
+#: templates/game/select_tournament.html:4
+msgid "Choisissez le nombre de participants"
+msgstr ""
+
+#: templates/game/select_tournament.html:6
+msgid "Tournoi à 4 joueurs"
+msgstr ""
+
+#: templates/game/select_tournament.html:7
+msgid "Tournoi à 8 joueurs"
 msgstr ""
 
 #: transcendence/settings.py:133

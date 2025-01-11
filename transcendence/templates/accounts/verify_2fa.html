@@ -1,12 +1,13 @@
+{% load i18n %}
 <div class="container">
-    <h3>Verify 2FA</h3>
-    <p>Enter the code from your authenticator app to complete the 2FA setup.</p>
+    <h3>{% trans "Vérification 2FA" %}</h3>
+    <p>{% trans "Entrez le code de votre application d'authentification pour terminer la configuration 2FA." %}</p>
     <form id="2fa-code-form" method="post">
         {% csrf_token %}
         <div class="mb-3">
-            <label for="code" class="form-label">Authentication Code</label>
+            <label for="code" class="form-label">{% trans "Code d'authentication" %}</label>
             <input type="text" id="code" name="code" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
     </form>
 </div>

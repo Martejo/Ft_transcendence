@@ -1,22 +1,22 @@
+{% load i18n %}
 <!-- templates/core/navbar_logged_in.html -->
 <nav id="navbar" class="navbar navbar-expand">
     <div class="container-fluid">
         <a id="home-btn" class="navbar-brand text-white" onclick="window.location.hash='#game-play'">PONGAME</a>
-        
-		<p>Langue actuelle : {{ LANGUAGE_CODE }}</p>
-		{% load i18n %}
-		<form method="post" action="{% url 'set_language' %}">
-			{% csrf_token %}
-			<button type="submit" name="language" value="en">English</button>
-			<button type="submit" name="language" value="fr">Français</button>
-			<button type="submit" name="language" value="es">Español</button>
-		</form>
 
         <div class="d-flex ms-auto" id="navbar-right">
-            <!-- Bouton burger visible uniquement pour les utilisateurs connectés -->
-            <button id="burger-menu-toggle" class="navbar-toggler rounded-circle" type="button" src="{{ user.profile.avatar.url }}" alt="Avatar" style="width: 40px; height: 40px;">
-               
-            </button>
+
+			<!-- Bouton langages -->
+            <form method="post" action="{% url 'set_language' %}">
+				{% csrf_token %}
+				<button type="submit" name="language" value="fr" style="border: none; background: none;">🇫🇷</button>
+				<button type="submit" name="language" value="es" style="border: none; background: none;">🇪🇸</button>
+				<button type="submit" name="language" value="en" style="border: none; background: none;">🇬🇧</button>	
+			</form>
+
+			<!-- Bouton burger visible uniquement pour les utilisateurs connectés -->
+            <button id="burger-menu-toggle" class="navbar-toggler rounded-circle" type="button" src="{{ user.profile.avatar.url }}" alt="Avatar" style="width: 40px; height: 40px;"></button>
+
         </div>
     </div>
 </nav>

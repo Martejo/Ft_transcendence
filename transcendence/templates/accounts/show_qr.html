@@ -1,7 +1,8 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Set up 2FA</title>
+    <title>{% trans "Configurer 2FA" %}</title>
     <style>
         body { 
             font-family: Arial, sans-serif;
@@ -32,11 +33,11 @@
     </style>
 </head>
 <body>
-    <h1>Scan QR Code</h1>
-    <p>Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
+    <h1>{% trans "Scannez le QR Code" %}</h1>
+    <p>{% trans "Scannez ce QR code avec votre application d'authentification" %} (Google Authenticator, Authy, ..)</p>
     <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
-    <p>Or enter this code manually:</p>
+    <p>{% trans "Ou saisissez ce code manuellement :" %}</p>
     <div class="secret">{{ secret }}</div>
-    <a href="{% url 'User:verify_2fa' %}" class="next">Continue to verification</a>
+    <a href="{% url 'User:verify_2fa' %}" class="next">{% trans "Continuer la vérification" %}</a>
 </body>
 </html>

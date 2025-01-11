@@ -1,14 +1,15 @@
+{% load i18n %}
 <div class="game-menu col-12 col-sm-10 col-md-10 col-lg-6 col-xl-6 col-xxl-5">
     <div class="container-fluid py-4 " style="height: var(--sin-nav-height); font-size: 1.2em;">
-        <h1 class="text-center mb-4" style="font-size: 2em;">Menu de Jeu</h1>
+        <h1 class="text-center mb-4" style="font-size: 2em;">{% trans "Menu de Jeu" %}</h1>
 
         <!-- Section de choix de type de partie -->
         <div class="card mb-3 bg-secondary">
             <div class="card-body">
-                <h5 class="card-title">Type de Partie</h5>
+                <h5 class="card-title">{% trans "Type de Partie" %}</h5>
                 <div class="d-flex flex-column gap-2">
-                    <button class="btn btn-primary w-100" onclick="chooseLocalGame()">Partie Locale</button>
-                    <button id="invite-game" class="btn btn-primary w-100" onclick="window.location.hash='#game-invite_game'">Inviter un Ami</button>
+                    <button class="btn btn-primary w-100" onclick="chooseLocalGame()">{% trans "Partie Locale" %}</button>
+                    <button id="invite-game" class="btn btn-primary w-100" onclick="window.location.hash='#game-invite_game'">{% trans "Inviter un Ami" %}</button>
                 </div>
             </div>
         </div>
@@ -16,10 +17,10 @@
         <!-- Section des modes de jeu (affichée après le choix du type de partie) -->
         <div id="game-modes" class="card mb-3 bg-secondary d-none">
             <div class="card-body">
-                <h5 class="card-title">Modes de Jeu</h5>
+                <h5 class="card-title">{% trans "Modes de Jeu" %}</h5>
                 <div class="d-flex flex-column gap-2">
-                    <button id="start-game-btn" class="btn btn-primary w-100" onclick="initializeRemoteMenu(1)">Lancer Partie Standard</button>
-                    <button class="btn btn-primary w-100" onclick="showCustomization()">Personnaliser Partie</button>
+                    <button id="start-game-btn" class="btn btn-primary w-100" onclick="initializeRemoteMenu(1)">{% trans "Lancer Partie Standard" %}</button>
+                    <button class="btn btn-primary w-100" onclick="showCustomization()">{% trans "Personnaliser Partie" %}</button>
                 </div>
             </div>
         </div>
@@ -28,27 +29,27 @@
         <!-- Menu de personnalisation du gameplay (affiché uniquement pour Jeu Personnalisé) -->
         <div id="customization-menu" class="card mb-3 bg-secondary d-none">
             <div class="card-body">
-                <h5 class="card-title">Personnalisation du Gameplay</h5>
+                <h5 class="card-title">{% trans "Personnalisation du Gameplay" %}</h5>
                 
                 <!-- Vitesse de la balle -->
                 <div class="mb-3">
-                    <label for="ballSpeed" class="form-label">Vitesse de la Balle (x<span id="ballSpeedValue">1</span>)</label>
+                    <label for="ballSpeed" class="form-label">{% trans "Vitesse de la Balle" %} (x<span id="ballSpeedValue">1</span>)</label>
                     <input type="range" class="form-range" id="ballSpeed" min="1" max="2" value="1" step="0.01" oninput="updateBallSpeed()">
                 </div>
 
                 <!-- Taille de la raquette -->
                 <div class="mb-3">
-                    <label for="paddleSizeSelect" class="form-label">Taille de la Raquette</label>
+                    <label for="paddleSizeSelect" class="form-label">{% trans "Taille de la Raquette" %}</label>
                     <select id="paddleSizeSelect" class="form-select" onchange="updatePaddleSize()">
-                        <option value="small">Petite</option>
-                        <option value="medium" selected>Moyenne</option>
-                        <option value="large">Grande</option>
+                        <option value="small">{% trans "Petite" %}</option>
+                        <option value="medium" selected>{% trans "Moyenne" %}</option>
+                        <option value="large">{% trans "Grande" %}</option>
                     </select>
                 </div>
 
-                <button class="btn btn-secondary w-100" onclick="toggleTutorial()">Selection des Bonus </button>
+                <button class="btn btn-secondary w-100" onclick="toggleTutorial()">{% trans "Selection des Bonus" %} </button>
 				<div id="tutorial-content" class="collapse mt-3">
-					<p>💥 **Power-Ups Légendaires !** 💥</p>
+					<p>💥 {% trans "**Power-Ups Légendaires !**" %} 💥</p>
 					<ul class="list-unstyled">
 						<li class="d-flex align-items-center mb-2">
 							<input class="form-check-input ms-2 me-3" type="checkbox" id="bonusObstacle">
@@ -88,7 +89,7 @@
 					</ul>
 				</div>
 
-                <button id="start-game-btn" class="btn btn-primary w-100 mt-3" onclick="initializeRemoteMenu(1)">Lancer Partie Personnalisée</button>
+                <button id="start-game-btn" class="btn btn-primary w-100 mt-3" onclick="initializeRemoteMenu(1)">{% trans "Lancer Partie Personnalisée" %}</button>
             </div>
         </div>
 		<div class="test mt-0 " style="font-size: 1px;"><p> .</p></div>  <!-- Pour qu'il y ait une marge en bas -->

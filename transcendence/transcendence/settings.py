@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.OnlineStatusMiddleware', #Notre middleware
 	'django.middleware.locale.LocaleMiddleware',
+	'core.middleware.SetLanguageRedirectMiddleware',
 	# 'django.template.context_processors.csrf',  # Assurez-vous que celui-ci est présent
 
 ]

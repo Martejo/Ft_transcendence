@@ -1,5 +1,6 @@
+{% load i18n %}
 <div id="invite-container" class="container-fluid text-center d-flex flex-column align-items-center col-12" style="height: 100%; padding-top: 20px; z-index: 2;">
-	<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez vos amis</h2>
+	<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">{% trans "Invitez vos amis" %}</h2>
 
 
 		<!-- Liste d'amis -->
@@ -27,7 +28,7 @@
 								<span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
 							</div>
 							<button class="friend-btn me-3" onclick="showFriendPopup(event, '{{ friend.username }}')">{{ friend.username }}</button>
-							<button class="btn invite-button">Inviter
+							<button class="btn invite-button">{% trans "Inviter" %}
 								<span class="cancel-icon d-none">&times;</span>
 							</button>
 						</li>
@@ -39,7 +40,7 @@
 
 			<!-- Bouton pour commencer le tournoi -->
 			<div class=" col-11">
-				<button id="setting-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3" onclick="window.location.hash='#game-remote_menu'" >Continuer</button>
+				<button id="setting-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3" onclick="window.location.hash='#game-remote_menu'" >{% trans "Continuer" %}</button>
 			</div>
 		</div>
 	</div>
