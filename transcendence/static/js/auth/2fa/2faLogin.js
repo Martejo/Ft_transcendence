@@ -1,7 +1,7 @@
 // auth/2faLogin.js
-import { requestPost, requestGet } from '../api/index.js';
-import { loadNavbar } from '../navbar/index.js'; // Adjust the import path as necessary
-import { updateHtmlContent } from '../tools/index.js'; // Adjust the import path as necessary
+import { requestPost, requestGet } from '../../api/index.js';
+import { handleNavbar } from '../../navbar/index.js'; // Adjust the import path as necessary
+import { updateHtmlContent } from '../../tools/index.js'; // Adjust the import path as necessary
 // [IMPROVE] Verifier le fonction des nouvelles urls
 
 async function submitLogin2FA(form) {
@@ -15,7 +15,7 @@ async function submitLogin2FA(form) {
             setTimeout(async () => {
                 window.isAuthenticated = true;
                 // Appel à la fonction async loadNavbar avec await
-                await loadNavbar();
+                await handleNavbar();
 
 
                 window.location.hash = '#game-home';

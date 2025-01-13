@@ -1,6 +1,5 @@
-import { requestGet, requestPost } from '../api/index.js';
-import { updateHtmlContent } from '../tools/index.js';
-import { displayErrors, showDisableSuccess, showDisableError } from './notifications.js';
+import { requestGet, requestPost } from '/static/js/api/index.js';
+import { updateHtmlContent, displayErrorMessage, displaySuccessMessage } from '/static/js/tools/index.js';
 
 // Gestionnaire principal pour désactiver la 2FA
 export async function handleDisable2FA() {
@@ -8,9 +7,10 @@ export async function handleDisable2FA() {
     try {
         // Charge la vue de désactivation de la 2FA
         await loadDisable2FAView();
+        window.location.hash = '#accounts-gestion_profil';
     } catch (error) {
         console.error('Erreur dans handleDisable2FA:', error);
-        displayErrors('#content', 'Erreur lors de la désactivation de la 2FA.');
+        displayErrorMessage('#content', 'Erreur lors de la désactivation de la 2FA.');
     }
 }
 
@@ -41,7 +41,7 @@ function attachDisable2FAEvent() {
                 await submitDisable2FA(disable2FAForm);
             } catch (error) {
                 console.error('Erreur dans submitDisable2FA:', error);
-                showDisableError('Une erreur est survenue lors de la soumission.');
+                displayErrorMessage('Une erreur est survenue lors de la soumission.');
             }
         });
     } else {
@@ -56,7 +56,8 @@ async function submitDisable2FA(form) {
     try {
         const response = await requestPost('accounts', '2fa/disable', formData);
         if (response.status === 'success') {
-            showDisableSuccess(); // Affiche le message de succès
+            displaySuccessMessage(); // Affiche le message de succès
+            window.location.hash = '#accounts-gestion_profil';
         } else {
             throw new Error(response.message || 'Échec de la désactivation de la 2FA.');
         }

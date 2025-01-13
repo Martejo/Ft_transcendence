@@ -1,5 +1,5 @@
 import { requestPost } from '../api/index.js';
-import { displayErrors } from './utils.js';
+import { displayErrorMessage } from '../tools/index.js';
 import { attachProfileEvents } from './events.js';
 
 // Fonction pour gérer la soumission des formulaires
@@ -18,16 +18,16 @@ async function handleFormSubmit(form, app, view, successMessage, successSelector
             window.location.hash = '#accounts-profile';
         } else {
             const errors = response.errors || response.error || 'Une erreur est survenue.';
-            displayErrors(errorSelector, errors);
+            displayErrorMessage(errorSelector, errors);
         }
     } catch (error) {
         console.error(`Erreur lors de la requête vers ${app}/${view}:`, error);
-        displayErrors(errorSelector, 'Erreur réseau ou serveur.');
+        displayErrorMessage(errorSelector, 'Erreur réseau ou serveur.');
     }
 }
 
 // Initialise les gestionnaires pour les formulaires
-export function initializeProfileFormHandlers() {
+export function initializeaccountsManagementFormHandlers() {
     document.querySelectorAll('form').forEach((form) => {
         if (!form.hasAttribute('data-handled')) {
             form.addEventListener('submit', async function(e) {
@@ -54,3 +54,4 @@ export function initializeProfileFormHandlers() {
     // Attache les événements spécifiques aux boutons du profil
     attachProfileEvents();
 }
+    

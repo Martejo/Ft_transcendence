@@ -16,14 +16,14 @@ export function toggleBurgerMenu() {
         menu.style.display = 'block';
         overlay.style.display = 'block';
 
-        //quand on clique sur un bouton du menu, il se ferme, et effectue l'action associée
-        document.querySelectorAll('#profile-btn, #logout-btn, #tournament-link, #settings-link, #play-btn')
-            .forEach(button => {
-                button.addEventListener('click', () => {
-                    menu.style.display = 'none';
-                    overlay.style.display = 'none';
-                });
-            });
+        // //quand on clique sur un bouton du menu, il se ferme, et effectue l'action associée
+        // document.querySelectorAll('#profile-btn, #logout-btn, #tournament-link, #settings-link, #play-btn')
+        //     .forEach(button => {
+        //         button.addEventListener('click', () => {
+        //             menu.style.display = 'none';
+        //             overlay.style.display = 'none';
+        //         });
+        //     });
 
         //quand on clique a coté du menu, il se ferme
         function handleOutsideClick(event) {

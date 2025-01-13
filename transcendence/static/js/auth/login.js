@@ -2,7 +2,7 @@
 //import Api from '../api/api.js';
 
 import { requestGet, requestPost } from '../api/index.js';
-import { loadNavbar } from '../navbar/index.js';
+import { handleNavbar } from '../navbar/index.js';
 import { updateHtmlContent } from '../tools/index.js'
 
 
@@ -43,7 +43,7 @@ async function handleLoginResponse(response) {
                 window.isAuthenticated = true;
 
                 // Appel à la fonction async loadNavbar avec await
-                await loadNavbar();
+                await handleNavbar();
 
                 window.location.hash = '#game-home';
             }, 500);

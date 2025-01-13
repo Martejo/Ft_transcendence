@@ -1,7 +1,9 @@
+import { handleFriendProfile, handleRemoveFriend } from '../index.js';
+
 export function handleOptionPopup(option) {
     const friendName = document.getElementById('popupFriendName').innerText.trim();
     if (option === 'Voir le profil') {
-        viewFriendProfile(friendName);
+        handleFriendProfile(friendName);
     } 
     else if (option === 'Inviter à jouer') {
 

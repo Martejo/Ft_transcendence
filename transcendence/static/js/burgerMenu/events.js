@@ -1,15 +1,15 @@
-import { handleStatusChange, handleViewProfile, handleAddFriendFormSubmit, handleLogout } from './functions.js';
-import { showFriendPopup, closePopupOnClickOutside, handleOption } from './popup.js';
-import { handleRemoveFriend } from './friendActions.js';
-import { handleFriendRequest } from './friendActions.js';
-import { initializeProfileView } from '../profile/profile.js';
-
+import { showFriendPopup, closePopupOnClickOutside, handleOptionPopup,  handleAddFriend, handleFriendInvitation  } from '../friends/index.js';
+import { handleStatusChange } from './index.js';
+import { handleViewProfile } from '../userProfile/index.js';
+import { handleAccountsManagement } from '../accountManagement/index.js';
+import { handleLogout } from '../auth/index.js';
+import {handleGameMenu} from '../game/index.js';
 
 // Gestionnaire principal des événements pour le menu burger
 export function eventsHandlerBurgerMenu() {
     console.log('Initialisation des gestionnaires d\'événements...');
 
-    // Initialise les événements spécifiques
+    // Initialise les événements spécifiques au menu burger
     setupStatusChangeEvents();  // Gestion du changement de statut (en ligne/hors ligne)
     setupProfileViewEvent();    // Gestion du clic sur le bouton "Voir le profil"
     setupNavigationEvents();    // Gestion des boutons de navigation (Jouer, Tournoi, Paramètres)
@@ -52,14 +52,15 @@ function setupProfileViewEvent() {
 // Gestion des boutons de navigation (Jouer, Tournoi, Paramètres)
 function setupNavigationEvents() {
     const navigationButtons = [
-        { selector: '#play-btn', action: handlePlayClick },
-        { selector: '#tournament-link', action: handleTournamentClick },
-        { selector: '#settings-link', action: handleViewProfile() },
+        { selector: '#play-btn', action: handleGameMenu },
+        //{ selector: '#tournament-link', action: handleTournamentClick },
+        { selector: '#settings-link', action:  handleAccountsManagement },
     ];
 
     navigationButtons.forEach(nav => {
         const button = document.querySelector(nav.selector);
         if (button && !button.dataset.bound) {
+            console.log('bouton trouvé :', button);
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 nav.action();
@@ -113,20 +114,17 @@ function setupPopupEvents() {
     const removeFriendBtn = document.getElementById('remove-friend-btn');
 
     if (viewProfileBtn && !viewProfileBtn.dataset.bound) {
-        viewProfileBtn.addEventListener('click', () => handleOption('Voir le profil'));
+        viewProfileBtn.addEventListener('click', () => handleOptionPopup('Voir le profil'));
         viewProfileBtn.dataset.bound = true;
     }
 
     if (inviteToPlayBtn && !inviteToPlayBtn.dataset.bound) {
-        inviteToPlayBtn.addEventListener('click', () => handleOption('Inviter à jouer'));
+        inviteToPlayBtn.addEventListener('click', () => handleOptionPopup('Inviter à jouer'));
         inviteToPlayBtn.dataset.bound = true;
     }
 
     if (removeFriendBtn && !removeFriendBtn.dataset.bound) {
-        removeFriendBtn.addEventListener('click', () => {
-            const friendName = document.getElementById('popupFriendName').innerText.trim();
-            handleRemoveFriend(friendName);
-        });
+        removeFriendBtn.addEventListener('click', () => handleOptionPopup('Supprimer'));
         removeFriendBtn.dataset.bound = true;
     }
 }

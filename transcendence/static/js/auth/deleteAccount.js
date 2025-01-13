@@ -1,4 +1,6 @@
 import { requestPost } from '../api/index.js';
+import { clearSessionAndUI, displaySuccessMessage, displayErrorMessage } from '../tools/index.js';
+
 
 // Charge et affiche la modale de suppression
 async function loadDeleteAccountView() {
@@ -58,11 +60,10 @@ async function submitDeleteAccount(form) {
     try {
         const response = await requestPost('accounts', 'profile/delete_account', formData);
         if (response.status !== 'success') {
-            showDeleteError(response.message || 'Erreur lors de la suppression du compte.');
+            displayErrorMessage(response.message || 'Erreur lors de la suppression du compte.');
         } 
     } catch (error) {
-        console.error('Erreur réseau lors de la suppression du compte:', error);
-        showDeleteError('Erreur réseau ou serveur.');
+        displayErrorMessage('delete-error', error.message);
     }
 }
 
@@ -72,9 +73,12 @@ export async function handleDeleteAccount() {
     try {
         await loadDeleteAccountView(); // Charge et affiche la modale de suppression
         await attachDeleteAccountEvents();
-        clearSessionAndUI(); // Attache les événements nécessaires à la modale
+        displaySuccessMessage('delete-success', 'Votre compte a été supprimé avec succès.');
+        setTimeout(() => {
+            clearSessionAndUI(); // Attache les événements nécessaires à la modale
+        }, 5000);
     } catch (error) {
         console.error('Erreur dans handleDeleteAccount:', error);
-        displayError('#content', 'Erreur lors de la tentative de suppression du compte.');
+        displayErrorMessage('delete-error', 'Erreur lors de la tentative de suppression du compte.');
     }
 }

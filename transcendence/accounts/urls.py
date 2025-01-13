@@ -30,7 +30,7 @@ app_name = 'accounts'
 # ---- URL patterns ----
 urlpatterns = [
     # ---- Manage Profile ----
-    path('profile/', ManageProfileView.as_view(), name='manage_profile'),
+    path('gestion_profil/', ManageProfileView.as_view(), name='manage_profile'),
     path('profile/update/', UpdateProfileView.as_view(), name='update_profile'),
     path('profile/delete_account/', DeleteAccountView.as_view(), name='delete_account'),
     path('profile/change_password/', ChangePasswordView.as_view(), name='change_password'),

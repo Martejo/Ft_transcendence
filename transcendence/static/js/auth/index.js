@@ -1,13 +1,15 @@
 // auth/index.js
-// contient uniquement les fonctions que l' on souhaite appeler depuis d'autres fichiers
+
+// Fonctions de déconnexion et suppression de compte
+// Appelle une fonction générique pour nettoyer la session utilisateur
+export { handleLogout} from './logout.js';
+export { handleDeleteAccount } from './deleteAccount.js';
 
 export { initializeLoginView } from './login.js';
 export { initializeRegisterView } from './register.js';
-export { logoutUser } from './logout.js';
+
 
 // Export des vues 2FA
-export { initializeEnable2FAView } from './2faEnable.js';
-export { initializeLogin2FAView } from './2faLogin.js';
-export { initializeDisable2FAView } from './2faDisable.js';
-
-export { handleDeleteAccount } from './deleteAccount.js';
+export { handleEnable2FA} from './2fa//2faEnable.js';
+export { initializeLogin2FAView } from './2fa/2faLogin.js';
+export { handleDisable2FA } from './2fa/2faDisable.js';

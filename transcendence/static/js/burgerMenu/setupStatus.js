@@ -1,3 +1,6 @@
+import { requestPost } from '../api/index.js';
+import { displayErrorMessage } from '../tools/index.js';
+
 async function updateUserStatus(status) {
     console.log('Mise à jour du statut utilisateur :', status);
 

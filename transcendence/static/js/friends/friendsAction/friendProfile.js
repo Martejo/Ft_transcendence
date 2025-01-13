@@ -1,5 +1,5 @@
-import { requestGet } from '../api/index.js';
-import { updateHtmlContent } from '../tools/index.js';
+import { requestGet } from '../../api/index.js';
+import { updateHtmlContent } from '../../tools/index.js';
 
 
 async function FriendProfile(friendName) {

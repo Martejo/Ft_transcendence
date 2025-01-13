@@ -1,6 +1,6 @@
-import { requestPost } from '../api/index.js';
+import { requestPost } from '../../api/index.js';
 
-export async function removeFriend(friendName) {
+async function removeFriend(friendName) {
     console.log(`removeFriend: Suppression de l'ami ${friendName}`);
     
     const formData = new FormData();

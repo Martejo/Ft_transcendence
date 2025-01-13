@@ -1,4 +1,4 @@
-
+import { clearSessionAndUI, displayErrorMessage, displaySuccessMessage } from '../tools/index.js';
 import { requestPost } from '../api/index.js';
 
 async function logoutUser() {
@@ -30,11 +30,16 @@ export async function handleLogout() {
     console.log('Déconnexion en cours...');
     try {
         await logoutUser(); // Appel de la logique technique
+        displaySuccessMessage('delete-success', 'Votre compte a été supprimé avec succès.');
+        setTimeout(() => {
+            clearSessionAndUI(); // Attache les événements nécessaires à la modale
+        }, 5000);
         clearSessionAndUI(); // Nettoie la session et l'interface utilisateur
         console.log('Déconnexion réussie.');
     } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);
 
+        //[IMPROVE] Quel id utiliser pour l'erreur ou le success?
         // Afficher un message d'erreur personnalisé à l'utilisateur
         displayErrorMessage('logout-error', 'La déconnexion a échoué. Veuillez réessayer.');
     }

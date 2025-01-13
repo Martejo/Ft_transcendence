@@ -1,4 +1,4 @@
-
+import { requestPost } from '../../api/index.js';
 
 async function friendInvitation(requestId, action) {
     console.log(`handleFriendRequestAction: Demande d'ami ID ${requestId}, action : ${action}`);

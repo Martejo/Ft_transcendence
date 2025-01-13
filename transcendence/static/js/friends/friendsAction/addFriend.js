@@ -1,4 +1,6 @@
-export async function addFriend(friendUsername) {
+import { requestPost } from '../../api/index.js';
+
+async function addFriend(friendUsername) {
     console.log('addFriend:', friendUsername);
 
     const formData = new FormData();
@@ -26,15 +28,16 @@ export async function handleAddFriend(e) {
         console.log('Gestionnaire: handleAddFriend - Ajout d\'un ami:', friendUsername);
         try {
             // Appelle la fonction principale pour ajouter un ami
-            const response = await addFriend(friendUsername);
-    
+            //const response = await addFriend(friendUsername);
+            await addFriend(friendUsername);
+            
             // Affiche un message de succès si l'ajout a réussi
-            displaySuccessMessage('add-friend-success', response.message || 'Demande d\'ami envoyée avec succès.');
-            clearErrorMessage('add-friend-error'); // Nettoie tout message d'erreur précédent
+            //displaySuccessMessage('add-friend-success', response.message || 'Demande d\'ami envoyée avec succès.');
+            //clearErrorMessage('add-friend-error'); // Nettoie tout message d'erreur précédent
         } catch (error) {
             // Gestion des erreurs
             console.error('Erreur dans handleAddFriend:', error);
-            displayErrorMessage('add-friend-error', error.message || 'Une erreur est survenue lors de l\'ajout de l\'ami.');
+            //displayErrorMessage('add-friend-error', error.message || 'Une erreur est survenue lors de l\'ajout de l\'ami.');
         }
     }
 }

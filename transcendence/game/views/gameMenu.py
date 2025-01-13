@@ -25,11 +25,21 @@ class GameMenuView(View):
         Retourne le contenu HTML du menu du jeu.
         """
         logger.debug("Handling GET request for GameMenuView")
-        rendered_html = render_to_string('game/gameMenu.html')  # Charge et rend le HTML
+        game_personalization_form = GamePersonnalizationForm();
+        # initialiser un form vide ici 
+        # Envoyer un form pour personnalisation de jeu dans le cas d'une partie locale
+        # Utiliser balises django dans le html 
+        # recevoir le formulaire remplie dans un post et examiner les valeurs recue (les valeurs impossibles ne sont pas acceptees) avant d'enregistrer en db
+        # rendered_html = render_to_string('game/gameMenu.html', form)  # Charge et rend le HTML
+        rendered_html = render_to_string('game/gameMenu.html', {
+            'game_personalization_form': game_personalization_form,
+        })
         return JsonResponse({
             'status': 'success',
             'html': rendered_html
         })
+    
+    def post
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         """

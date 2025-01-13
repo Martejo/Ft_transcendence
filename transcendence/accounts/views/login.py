@@ -28,8 +28,7 @@ class LoginView(View):
     - POST : Traite les données du formulaire et connecte l'utilisateur.
     """
 
-    #[IMPROVE] remplacer ce genre de requetes get par des appels a fichiers statiques si on ne prevoit pas d' utilisr les balises
-    # apres a voir si c' est pas plus simple d' envoyer les statiques par json.
+    #[IMPROVE] Appliquer le form avec balises django dans le html
     def get(self, request):
         """
         Gère une requête HTTP GET.

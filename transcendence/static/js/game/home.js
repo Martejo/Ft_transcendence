@@ -22,15 +22,15 @@ export async function initializeGameHomeView() {
         console.error('Erreur lors de la requete API initializeGameHomeView :', error);
     }
 
-    //event : click on login_btn =  change hash => load login view
-    const playBtn = document.querySelector('#play-btn');
-    if (!playBtn) return;
+    // //event : click on login_btn =  change hash => load login view
+    // const playBtn = document.querySelector('#play-btn');
+    // if (!playBtn) return;
 
-    playBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('play-btn clicked');
-        window.location.hash = "#game-game_menu"
-    });
+    // playBtn.addEventListener('click', (e) => {
+    //     e.preventDefault();
+    //     console.log('play-btn clicked');
+    //     window.location.hash = "#game-game_menu"
+    // });
 
 
 

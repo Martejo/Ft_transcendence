@@ -1,4 +1,4 @@
-import { handleEnable2FA, handleDisable2FA, handleDeleteAccount } from './actions.js';
+import { handleEnable2FA, handleDisable2FA, handleDeleteAccount } from '../auth/index.js';
 
 export function attachProfileEvents() {
     // Bouton Activer 2FA

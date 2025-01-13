@@ -1,2 +1,4 @@
 // profile/index.js
-export { initializeProfileView } from './viewProfile.js';
+export { attachProfileEvents } from './events.js';
+export { handleAccountsManagement } from './accountsManagement.js';
+export { initializeaccountsManagementFormHandlers } from './formHandler.js';
