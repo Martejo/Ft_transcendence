@@ -24,7 +24,7 @@ async function addFriend(friendUsername) {
 export async function handleAddFriend(e) {
     e.preventDefault();
     const friendUsername = document.querySelector('#friend-username').value.trim();
-    if (!friendUsername) {
+    if (friendUsername) {
         console.log('Gestionnaire: handleAddFriend - Ajout d\'un ami:', friendUsername);
         try {
             // Appelle la fonction principale pour ajouter un ami

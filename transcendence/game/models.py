@@ -41,12 +41,12 @@ class GameParameters(models.Model):
 
 class Game(models.Model):
     user1 = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        CustomUser,
         related_name='games_as_user1',
         on_delete=models.CASCADE
     )
     user2 = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        CustomUser,
         related_name='games_as_user2',
         on_delete=models.CASCADE,
         null=True,
@@ -80,8 +80,6 @@ class Game(models.Model):
         ],
         default='pending'
     )
-    is_standard = models.BooleanField(default=True)  # Indique si le jeu est standard ou personnalisé
-
     def __str__(self):
         user2_display = self.user2.username if self.user2 else 'Local (Shared Keyboard)'
         return f"Game: {self.user1.username} vs {user2_display}"

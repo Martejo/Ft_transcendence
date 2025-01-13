@@ -73,7 +73,9 @@ function setupNavigationEvents() {
 // Gestion du formulaire d'ajout d'ami
 function setupAddFriendEvent() {
     const addFriendForm = document.querySelector('#add-friend-form');
+    console.log('ajout d\'ami :', addFriendForm);
     if (addFriendForm && !addFriendForm.dataset.bound) {
+        console.log('appelle de fonction ajout d\'ami');
         addFriendForm.addEventListener('submit', handleAddFriend);
         addFriendForm.dataset.bound = true;
     }

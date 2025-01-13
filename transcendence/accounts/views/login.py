@@ -36,7 +36,7 @@ class LoginView(View):
         """
         form = LoginForm()  # Initialise un formulaire de connexion vide
         # Le HTML est transforme en string et le formulaire renvoye est lie au regles du back (cf.forms.py) 
-        rendered_form = render_to_string('accounts/login.html') #ce retour implique d'utiliser les balises django dans le html
+        rendered_form = render_to_string('accounts/login.html', {'form': form}) #ce retour implique d'utiliser les balises django dans le html
         return JsonResponse({
             'status': 'success',
             'html': rendered_form,  # Renommé pour être plus explicite

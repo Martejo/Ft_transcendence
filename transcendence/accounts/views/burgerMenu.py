@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 
 # ---- Imports locaux ----
 from accounts.models import FriendRequest
+from game.models import GameInvitation
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ def get_burger_menu_context(user):
         'user': user,
         'friends': user.friends.all(),
         'friend_requests': FriendRequest.objects.filter(to_user=user),
+        'game_invitations': GameInvitation.objects.filter(to_user=user, status='pending'),
         'avatar_url': user.avatar.url if user.avatar else default_avatar,
     }
 

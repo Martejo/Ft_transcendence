@@ -1,40 +1,51 @@
 // game/invitations.js
-import { requestPost }  from '../api/index.js';
+import { requestPost, requestGet }  from '../api/index.js';
+import { updateHtmlContent } from '../tools/index.js';
 
 
 let invitedFriends = 0;
 let participantCount = 1;
 
 async function sendInvitation(button) {
-    const friendBtn = button.parentElement.querySelector('.friend-btn');
-    const friendUsername = friendBtn ? friendBtn.textContent : null;
-    if (!friendUsername) return;
+    console.log('Envoi de l\'invitation...');
+    
+    // Récupération du nom d'utilisateur depuis l'attribut data-username
+    const friendUsername = button.closest('li')?.getAttribute('data-username');
+    if (!friendUsername) {
+        console.error('Nom d\'utilisateur introuvable.');
+        return;
+    }
 
+    // Création des données du formulaire
     const formData = new FormData();
     formData.append('friend_username', friendUsername);
+    console.log('Invitation envoyée à', friendUsername);
 
     try {
+        // Envoi de l'invitation via une requête POST
         const response = await requestPost('game', 'send_invitation', formData);
+
         if (response.status === 'success') {
+            // Mise à jour de l'état du bouton après succès
             button.innerHTML = 'Envoyé <span class="cancel-icon">&times;</span>';
             button.classList.add('sent');
-            invitedFriends++;
-
-            if (invitedFriends >= participantCount) {
-                document.querySelectorAll('.invite-button:not(.sent)').forEach(el => el.classList.add('disabled'));
-                if (participantCount === 1) {
-                    document.querySelector('#start-game-btn').removeAttribute('disabled');
-                } else {
-                    document.querySelector('#start-tournament-btn').removeAttribute('disabled');
-                }
-            }
+            button.disabled = false; // Empêche de cliquer plusieurs fois
+        } else {
+            throw new Error(response.message || 'Erreur inconnue');
         }
     } catch (error) {
-        console.error('Erreur envoi invitation:', error);
+        console.error('Erreur lors de l\'envoi de l\'invitation :', error);
+
+        // Affichage d'une erreur pour l'utilisateur
+        button.textContent = 'Erreur';
+        button.classList.add('error');
+        setTimeout(() => {
+            button.innerHTML = 'Inviter <span class="cancel-icon d-none">&times;</span>';
+            button.classList.remove('error');
+        }, 3000);
     }
 }
-
-export async function cancelInvitation(button) {
+async function cancelInvitation(button) {
     const friendBtn = button.parentElement.querySelector('.friend-btn');
     const friendUsername = friendBtn ? friendBtn.textContent : null;
     if (!friendUsername) return;
@@ -62,30 +73,43 @@ export async function cancelInvitation(button) {
     }
 }
 
-export function initializeFriendInvitation() {
-    document.addEventListener('click', async function(event) {
-        const btn = event.target.closest('.invite-button');
-        if (!btn) return;
+function initializeFriendInvitation() {
+    document.addEventListener('click', async (event) => {
+        try {
+            const btn = event.target.closest('.invite-button');
+            if (!btn) return; // Ignorer si le clic n'est pas sur un bouton d'invitation
 
-        if (event.target.classList.contains('cancel-icon')) {
-            event.stopPropagation();
-            await cancelInvitation(btn);
-            return;
+            // Gestion de l'annulation d'une invitation
+            if (event.target.classList.contains('cancel-icon')) {
+                event.stopPropagation();
+                await cancelInvitation(btn);
+                return;
+            }
+
+            // Gestion de l'envoi d'une invitation
+            if (!btn.classList.contains('sent')) {
+                console.log('Envoi d\'invitation...');
+                await sendInvitation(btn);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la gestion de l\'invitation :', error);
         }
-
-        if (!btn.classList.contains('sent')) {
-            sendInvitation(btn);
-        }
-    });
-
-    document.querySelectorAll('#start-tournament-btn, #start-game-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Vous n'avez pas startLoading ici, on le gérera dans loading.js
-            // On pourrait soit importer startLoading ici, soit laisser la logique
-            // du "start" être gérée par la vue qui appelle initializeFriendInvitation.
-            // Si vous voulez garder la même logique, importez startLoading :
-            // import { startLoading } from './loading.js';
-            // startLoading(participantCount);
-        });
     });
 }
+
+
+
+// Exemple de fonction pour gérer l'invitation
+export async function handleInviteGame() {
+    console.log('Invitation envoyée !');
+    // Ajoutez ici la logique pour envoyer une invitation via AJAX
+    try {
+        const response = await requestGet('game', 'invite_game'); // Exemple de requête
+        updateHtmlContent('#content', response.html);
+        initializeFriendInvitation(); // Initialise les boutons d'invitation
+        // Gérer la réponse (afficher un message, mettre à jour l'interface, etc.)
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi de l\'invitation :', error);
+    }
+}
+
