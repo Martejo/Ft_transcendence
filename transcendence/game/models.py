@@ -58,6 +58,7 @@ class Game(models.Model):
         related_name='game',
         on_delete=models.PROTECT,
     )
+    state 
     score_user1 = models.PositiveIntegerField(default=0)
     score_user2 = models.PositiveIntegerField(default=0)
     game_type = models.CharField(
@@ -100,3 +101,26 @@ class Game(models.Model):
         self.status = 'completed'
         self.end_time = now()
         self.save()
+
+
+
+
+    # cette base de donnee sera sauvegardee sur redis pour une utilisation plus rapide
+    class GameState(models.Model):
+        raquette_gauche_y = models.FloatField(default=50.0)  # Position verticale en pourcentage
+        raquette_droite_y = models.FloatField(default=50.0)
+        score_gauche = models.IntegerField(default=0)
+        score_droite = models.IntegerField(default=0)
+        balle_x = models.FloatField(default=50.0)
+        balle_y = models.FloatField(default=50.0)
+        balle_speed_x = models.FloatField(default=0.5)
+        balle_speed_y = models.FloatField(default=0.5)
+
+        def reset(self):
+            self.raquette_gauche_y = 50.0
+            self.raquette_droite_y = 50.0
+            self.balle_x = 50.0
+            self.balle_y = 50.0
+            self.balle_speed_x = 0.5
+            self.balle_speed_y = 0.5
+            self.save()
