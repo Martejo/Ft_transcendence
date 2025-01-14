@@ -58,7 +58,6 @@ class Game(models.Model):
         related_name='game',
         on_delete=models.PROTECT,
     )
-    state 
     score_user1 = models.PositiveIntegerField(default=0)
     score_user2 = models.PositiveIntegerField(default=0)
     game_type = models.CharField(

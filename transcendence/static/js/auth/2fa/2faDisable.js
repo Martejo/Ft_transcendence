@@ -7,7 +7,6 @@ export async function handleDisable2FA() {
     try {
         // Charge la vue de désactivation de la 2FA
         await loadDisable2FAView();
-        window.location.hash = '#accounts-gestion_profil';
     } catch (error) {
         console.error('Erreur dans handleDisable2FA:', error);
         displayErrorMessage('#content', 'Erreur lors de la désactivation de la 2FA.');
@@ -39,6 +38,7 @@ function attachDisable2FAEvent() {
             e.preventDefault();
             try {
                 await submitDisable2FA(disable2FAForm);
+                
             } catch (error) {
                 console.error('Erreur dans submitDisable2FA:', error);
                 displayErrorMessage('Une erreur est survenue lors de la soumission.');

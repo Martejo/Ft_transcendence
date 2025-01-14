@@ -2,7 +2,7 @@
 // contient uniquement les fonctions que l'on souhaite appeler depuis d'autres fichiers
 
 export { handleInviteGame } from './invitation.js';
-export { startLoading } from './loading.js';
+//export { startLoading } from './loading.js';
 export { displayGame, displayTournamentBracket } from './display.js';
 export { initializeGameControls } from './controls.js';
 export { initializeGameHomeView } from './home.js';

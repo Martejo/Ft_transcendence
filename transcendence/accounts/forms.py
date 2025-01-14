@@ -7,6 +7,10 @@ from django.contrib.auth.forms import UserCreationForm  # Formulaire pour la cr�
 from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
+from django.forms.widgets import ClearableFileInput
+from django.utils.translation import gettext_lazy as _
+
+
 
 # ---- Configuration ----
 User = get_user_model()
@@ -48,23 +52,28 @@ class PasswordChangeForm(DjangoPasswordChangeForm):
         model = User
         fields = ['old_password', 'new_password1', 'new_password2']
 
+class CustomClearableFileInput(ClearableFileInput):
+    """Widget personnalisé pour masquer 'Actuellement' et 'Effacer'."""
+    initial_text = ''  # Supprime le texte "Actuellement"
+    input_text = _('Choisir un fichier')  # Texte pour le bouton d'upload
+    clear_checkbox_label = ''  # Supprime le texte "Effacer"
+
 class AvatarUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['avatar']
         widgets = {
-            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'avatar': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
 
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar', False)
         if avatar:
             if avatar.size > 4 * 1024 * 1024:
-                raise forms.ValidationError("L'image ne doit pas dépasser 4 Mo.")
+                raise forms.ValidationError(_("L'image ne doit pas dépasser 4 Mo."))
             if avatar.content_type not in ["image/jpeg", "image/png", "image/gif"]:
-                raise forms.ValidationError("Seules les images JPEG, PNG et GIF sont autorisées.")
+                raise forms.ValidationError(_("Seules les images JPEG, PNG et GIF sont autorisées."))
         return avatar
-    
 
 class DeleteAccountForm(forms.Form):
     password = forms.CharField(

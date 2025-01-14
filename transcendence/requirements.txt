@@ -7,3 +7,4 @@ pyotp
 PyJWT==2.8.0
 qrcode
 djangorestframework-simplejwt
+django-widget-tweaks

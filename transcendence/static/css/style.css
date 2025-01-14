@@ -15,6 +15,7 @@ html, body {
 	height: 100%;
 	width: 100%;
 	background-color: #101A32;
+	color:white;
 	overflow: auto;
 	margin: 0;
 	padding: 0;
@@ -326,6 +327,7 @@ html, body {
     height: var(--sin-nav-height); /* Hauteur de la page moins la navbar */
     background-color: rgba(0, 0, 0, 0.5); /* Couleur sombre avec transparence */
     z-index: 97; /* Doit être derrière le menu burger */
+	display: none;
 }
 
 /* Styles pour le bouton profil */

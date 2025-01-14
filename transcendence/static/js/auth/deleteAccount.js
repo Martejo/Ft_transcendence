@@ -62,6 +62,10 @@ async function submitDeleteAccount(form) {
         if (response.status !== 'success') {
             displayErrorMessage(response.message || 'Erreur lors de la suppression du compte.');
         } 
+        displaySuccessMessage('delete-success', 'Votre compte a été supprimé avec succès.');
+        setTimeout(() => {
+            clearSessionAndUI(); // Attache les événements nécessaires à la modale
+        }, 5000);
     } catch (error) {
         displayErrorMessage('delete-error', error.message);
     }
@@ -73,10 +77,6 @@ export async function handleDeleteAccount() {
     try {
         await loadDeleteAccountView(); // Charge et affiche la modale de suppression
         await attachDeleteAccountEvents();
-        displaySuccessMessage('delete-success', 'Votre compte a été supprimé avec succès.');
-        setTimeout(() => {
-            clearSessionAndUI(); // Attache les événements nécessaires à la modale
-        }, 5000);
     } catch (error) {
         console.error('Erreur dans handleDeleteAccount:', error);
         displayErrorMessage('delete-error', 'Erreur lors de la tentative de suppression du compte.');

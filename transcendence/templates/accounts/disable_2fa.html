@@ -1,15 +1,31 @@
-<div class="container_disable_2fa" style="position: relative; z-index: 10;">
-    <h3>Disable 2FA</h3>
-    <p>To disable 2FA, enter your current 2FA code from the authenticator app.</p>
-    <form id="disable-2fa-form" method="POST">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="code" class="form-label">Authentication Code</label>
-            {{ disable_form.as_p }}
-        </div>
-        <button type="submit" class="btn btn-danger">Disable 2FA</button>
-    </form>
-    <!-- Section pour les messages de succès et d'erreur -->
-    <div class="verification-success text-success mt-3" style="display: none;"></div>
-    <div class="verification-error text-danger mt-3" style="display: none;"></div>
+{% load i18n %}
+<div class="container-fluid d-flex justify-content-center mt-3" style="height: 100%; padding-top: 20px; z-index: 10;">
+	<div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4 col-xxl-4">
+
+		<h2 class="text-white texte-center mb-3" style="font-size: 2em;">{% trans "Désactiver l'authentification à deux facteurs" %}</h2>
+
+		<div class=" dfa-item d-flex flex-column align-items-center justify-content-between text-white p-4">
+			<p>{% trans "Entrez le code généré par votre application d'authentification." %}</p>
+			<form id="disable-2fa-form" method="POST">
+				{% csrf_token %}
+				<div class="d-flex flex-column form-group w-100">
+					<label for="id_code">{% trans "Code 2FA :" %}</label>
+					{{ disable_form.code }}
+				</div> 
+				<button type="submit" class="btn btn-danger btn-70">{% trans "Désactiver 2FA" %}</button>
+			</form>
+		</div>
+
+	</div>
 </div>
+<style>
+	.dfa-item {
+		background-color:  #101A32;
+		border: 2px solid rgb(153, 148, 148);
+		border-radius: 20px;
+		font-style: "Jersey 10";
+		color: white;
+		font-size: 1.2em;
+		min-width: 300px;
+	}
+</style>

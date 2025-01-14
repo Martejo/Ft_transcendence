@@ -1,3 +1,7 @@
-Gerer le cas ou l'utilisateur ou :
-
-- L'utilisateur ne peux pas supprimer l'avatar par defaut mais peux juste le remplacer
+1.) Faire une gestion d'extension de fichier pour l'avatar
+2.) Appliquer les translates sur tous les fichiers
+3.) Appliquer l'adjust container (load, login, register) dès le chargement de la page
+4.) Appliquer l'adjust container (load, ground game) dès le chargement de la page
+5.) Css gestion de compte. 
+6.) Changer la couleur de l'écriture en blanc
+7.) Problème de connexion utilisateur après connexion via 2fa.
