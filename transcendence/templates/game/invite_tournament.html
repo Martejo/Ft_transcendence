@@ -1,50 +1,50 @@
+{% load i18n %}
 <div id="invite-container" class="container-fluid text-center d-flex flex-column align-items-center col-12" style="height: 100%; padding-top: 20px; z-index: 2;">
-	<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">Invitez vos amis</h2>
+	<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">{% trans "Invitez vos amis" %}</h2>
 
 
-	<!-- Liste d'amis -->
-	<div id="friend-list" class="list-group mb-4 col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-		<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
-		<!-- <div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
-			<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
-				<div class="position-relative">
-					<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-2" style="width: 50px; height: 50px;">
-					<span class="status-indicator-friend online" id="friend1-status"></span>
-				</div>
-				<button class="friend-btn me-2">Friend1</button>
-				<button class="btn invite-button">Inviter
-					<span class="cancel-icon d-none">&times;</span>
-				</button>
-			</div> -->
-
-			<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
+		<!-- Liste d'amis -->
+		<div class="list-group mb-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4">
+			<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
+			<!-- <div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
 				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
 					<div class="position-relative">
-						<ul class="list-unstyled" id="friends-list-container">
-							{% for friend in friends %}
-							<li class="d-flex align-items-center mb-2 w-100">
-								<div class="position-relative">
-									<img src="{{ friend.avatar.url }}" alt="Avatar of {{ friend.username }}" class="rounded-circle me-2" style="width: 50px; height: 50px;">
-									<span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
-								</div>
-								<button class="friend-btn me-2 w-100" onclick="showFriendPopup(event, '{{ friend.username }}')">{{ friend.username }}</button>
-								<button class="btn invite-button">Inviter
-									<span class="cancel-icon d-none">&times;</span>
-								</button>
-							</li>
-							{% empty %}
-							<p class="text-center">Aucun ami pour le moment.</p>
-							{% endfor %}
-						</ul>
+						<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+						<span class="status-indicator-friend online" id="friend1-status"></span>
 					</div>
-				</div>
-			
-				<!-- Bouton pour commencer le tournoi -->
-				<div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-					<button id="start-tournament-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">Commencer</button>
-				</div>
+					<button class="friend-btn me-2">Friend1</button>
+					<button class="btn invite-button">Inviter
+						<span class="cancel-icon d-none">&times;</span>
+					</button>
+				</div> -->
+
+		<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2 w-100">
+			<div class="text-white p-3 w-100">
+					<ul class="list-unstyled w-100 mb-0" id="friends-list-container">
+						{% for friend in friends %}
+						<li class="d-flex flex-column flex-sm-row align-items-center justify-content-between mb-2">
+							<div class="avatar position-relative">
+								<img src="{{ friend.avatar_url }}" alt="Avatar of {{ friend.username }}" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+								<span class="status-indicator-friend {% if friend.profile.is_online %}online{% else %}offline{% endif %}"></span>
+							</div>
+							<button class="friend-btn me-3" onclick="showFriendPopup(event, '{{ friend.username }}')">{{ friend.username }}</button>
+							<button class="btn invite-button">{% trans "Inviter" %}
+								<span class="cancel-icon d-none">&times;</span>
+							</button>
+						</li>
+						{% empty %}
+						<p class="text-center mb-0">Aucun ami pour le moment.</p>
+						{% endfor %}
+					</ul>
 			</div>
+
+			<!-- Bouton pour commencer le tournoi -->
+			<div class=" col-11">
+				<button id="setting-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3" onclick="window.location.hash='#game-remote_menu'" >{% trans "Continuer" %}</button>
+			</div>
+		</div>
 	</div>
+</div>
 <style>
 	body, html {
 		overflow: auto;
@@ -57,39 +57,69 @@
 	}
 	.list-group-item, .friend-btn{
 		background-color:  #101A32;
-		/* overflow: hidden; */
-		
 	}
-	.list-group-item, .btn-primary{
-		min-width: 300px;
+	.start-game-btn, .list-group-item, .friend-btn, .list-group {
+		overflow: auto;
+	}
+
+	.list-group {
+		min-width: 20em;
 	}
 
 	.status-indicator-friend {
-		right: 15px !important;
+		right: 20px !important;
 	}
 	.btn-primary{
 		font-size: 1.25em !important;
 	} 
+
+	.friend-btn {
+		min-width: 4em;
+	}
 
     .invite-button {
     /* width: 150px; Définir la largeur fixe du bouton */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgb(153, 148, 148);
-    border-radius: 10px;
     background: none;
     color: white;
     padding: 5px 10px;
     cursor: pointer;
     position: relative;
     text-align: center;
-	min-width: 5em;
+	min-width: 6em;
     /* overflow: hidden; */
 }
 	.invite-button:hover {
 		border: 2px solid rgb(153, 148, 148);
 	}
+
+	@media (max-width: 576px) {
+		/* #friends-list-container li {
+			flex-direction: column;
+			align-items: center;
+		} */
+
+		.avatar, .invite-button, .friend-btn{
+			margin-bottom: 10px;
+			margin-left: 0;
+			margin-right: 0 !important;
+		}
+		.rounded-circle {
+			margin-right: 0 !important;
+		}
+		.status-indicator-friend {
+			right: 5px !important;
+		}
+
+		.invite-button, .friend-btn {
+			width: 100%; /* Donne à chaque bouton 100% de la largeur */
+		}
+
+		
+	}
+
 	.cancel-icon {
 		color: #ff5c5c; /* Rouge pour la croix */
 		cursor: pointer;

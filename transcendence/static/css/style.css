@@ -63,6 +63,58 @@ html, body {
 
 }
 
+/* Popup Info */
+.mask {
+	position: fixed; 
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1; 
+	backdrop-filter: blur(10px);
+	pointer-events: none; 
+}
+
+
+.popup {
+    position: fixed;
+    top: 50px; /* Ajustez en fonction de la hauteur de votre navbar */
+    left: 0;
+    transform: translateX(-50%);
+    width: 100%; /* Largeur de la popup */
+    padding: 10px 20px;
+	font-size: 1.2em;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(-20px);
+    z-index: 999; /* Juste en dessous de la navbar */
+}
+
+.popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.popup.hide {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.success {
+    background-color: #c2f4c2; /* Vert pour 'en ligne' */
+	color: #196419;
+}
+
+.error {
+    background-color: #ef8691; /* Rouge pour 'hors ligne' */
+	color: #710c16;
+}
+
+.d-none {
+    display: none !important;
+}
+
 /* Pongame et login */
 
 .home-btn {

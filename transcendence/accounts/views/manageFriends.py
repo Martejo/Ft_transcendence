@@ -57,18 +57,23 @@ class AddFriendView(BaseFriendView):
         user = request.user
         friend_username = request.POST.get('friend_username')
 
+
         try:
             friend = self.validate_friend(user, friend_username)
         except FriendValidationError as e:
+            logger.error(f"Error adding friend: {e}")
             return self.create_json_response('error', str(e), 400)
 
         if friend in user.friends.all():
+            logger.error(f"Error adding friend: {user.username} is already friends with {friend.username}")
             return self.create_json_response('error', 'Vous êtes déjà ami avec cet utilisateur.', 400)
 
         if FriendRequest.objects.filter(from_user=user, to_user=friend).exists():
+            logger.error(f"Error adding friend: Friend request already sent from {user.username} to {friend.username}")
             return self.create_json_response('error', 'Demande d\'ami déjà envoyée.', 400)
 
         if FriendRequest.objects.filter(from_user=friend, to_user=user).exists():
+            logger.error(f"Error adding friend: Friend request already received from {friend.username} to {user.username}")
             return self.create_json_response('error', 'Cet utilisateur vous a déjà envoyé une demande d\'ami.', 400)
 
         FriendRequest.objects.create(from_user=user, to_user=friend)

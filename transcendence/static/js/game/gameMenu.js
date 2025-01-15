@@ -37,6 +37,22 @@ function attachGameMenuEvents() {
         inviteGameButton.dataset.bound = true;
     }
 
+
+    // Fonction pour lancer partie standard a oimplemetner 
+    // function initializeRemoteMenu(participantCount) {
+    //     // Utiliser un gestionnaire d'événements délégué
+    //     $(document).on('click', '#start-tournament-btn, #start-game-btn', function() {
+    
+    //         // Vérifier que participantCount existe avant d'appeler startLoading
+    //         if (typeof participantCount !== 'undefined') {
+    //             startLoading(participantCount); // Charger la page d'attente
+    //         } else {
+    //             console.error('participantCount est non défini');
+    //         }
+    //     });
+    // }
+    
+
     // =============================
     // 3) Bouton "Jeu Standard"
     // =============================
@@ -72,6 +88,19 @@ function attachGameMenuEvents() {
         customGameBtn.addEventListener('click', () => {
             // On dévoile le menu de customisation
             document.getElementById('customization-menu').classList.remove('d-none');
+        });
+    }
+
+
+    const tutorialBtn = document.getElementById('tutorial-btn');
+    if (tutorialBtn) {
+        tutorialBtn.addEventListener('click', () => {
+            const tutorialContent = document.getElementById('tutorial-content');
+		if (tutorialContent.classList.contains('collapse')) {
+			tutorialContent.classList.remove('collapse');
+		} else {
+			tutorialContent.classList.add('collapse');
+		}
         });
     }
 

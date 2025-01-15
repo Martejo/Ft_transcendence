@@ -1,6 +1,6 @@
 
 // Fonctions génériques pour l'affichages d'informations
-export { displayErrorMessage, displaySuccessMessage, clearMessage, displayInfoMessage } from './displayInfo.js';
+export { displayErrorMessage, displaySuccessMessage, clearMessage, displayInfoMessage, showStatusMessage } from './displayInfo.js';
 
 export { updateTextContent, updateAttribute , updateHtmlContent} from './domHandler.js';
 export { isTouchDevice, resetScrollPosition } from './utility.js';

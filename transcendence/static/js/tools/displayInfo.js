@@ -59,3 +59,31 @@ export function clearMessage(elementId) {
         console.warn(`Element with ID '${elementId}' not found.`);
     }
 }
+
+export function showStatusMessage (message, status) {
+    const popup = document.getElementById('popup');
+    const info = document.getElementById('info');
+
+    // Définir le message
+    info.textContent = message;
+
+    // Supprimer les anciennes classes
+    popup.classList.remove('success', 'error', 'd-none', 'hide');
+
+    // Ajouter la classe appropriée
+    if (status === 'success') {
+        popup.classList.add('success');
+    } else if (status === 'error') {
+        popup.classList.add('error');
+    }
+
+    // Afficher le popup
+    popup.classList.add('show');
+
+    // Cacher automatiquement après 3 secondes
+    setTimeout(() => {
+        popup.classList.remove('show');
+        popup.classList.add('hide');
+        setTimeout(() => popup.classList.add('d-none'), 500);
+    }, 3000);
+}

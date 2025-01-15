@@ -23,7 +23,7 @@ class inviteGameView(View):
 
         # Récupérer les amis de l'utilisateur
         user = request.user
-        friends = user.friends.all().values('username', 'avatar')  # Ajoute 'username' et 'avatar' au contexte
+        friends = user.friends.all()  # Ajoute 'username' et 'avatar' au contexte
 
         # Render le template avec les amis
         rendered_html = render_to_string('game/invite_game.html', {'friends': friends})

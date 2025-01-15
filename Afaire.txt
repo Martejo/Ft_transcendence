@@ -1,7 +1,19 @@
 1.) Faire une gestion d'extension de fichier pour l'avatar
-2.) Appliquer les translates sur tous les fichiers
-3.) Appliquer l'adjust container (load, login, register) dès le chargement de la page
-4.) Appliquer l'adjust container (load, ground game) dès le chargement de la page
-5.) Css gestion de compte. 
+9.) mettre en place bouton tournoi burgerMenu
+10.) Mettre en place La page et le nécanisme de tournoi
+
+
+
+Hamza : 
 6.) Changer la couleur de l'écriture en blanc
+5.) Css gestion de compte. 
+12.) Intégrer le multilangag
+3.) Appliquer l'adjust container (load, login, register) dès le chargement de la page
+4.) Appliquer l'adjust container (load, ground game et burgerMenu) dès le chargement de la page
+
+
+Geoffrey
 7.) Problème de connexion utilisateur après connexion via 2fa.
+8.) Terminer gestion invitation a jouer, envoyer le jouer apres acceptation en loading
+11.)Message success et error pour tout
+9.) mettre en place bouton tournoi burgerMenu

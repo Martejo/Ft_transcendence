@@ -10,6 +10,7 @@ async function addFriend(friendUsername) {
         const response = await requestPost('accounts', 'friends/add', formData);
 
         if (response.status !== 'success') {
+            console.error('Erreur dans addFriend:', response.message);
             throw new Error(response.message || 'Erreur lors de l\'ajout de l\'ami.');
         }
 

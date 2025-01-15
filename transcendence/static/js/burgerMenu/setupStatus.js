@@ -1,5 +1,5 @@
 import { requestPost } from '../api/index.js';
-import { displayErrorMessage } from '../tools/index.js';
+import { displayErrorMessage, showStatusMessage } from '../tools/index.js';
 
 async function updateUserStatus(status) {
     console.log('Mise à jour du statut utilisateur :', status);
@@ -15,7 +15,7 @@ async function updateUserStatus(status) {
         console.log(`Statut mis à jour avec succès : ${status}`);
         return response; // Retourne la réponse pour une éventuelle utilisation
     } catch (error) {
-        console.error('Erreur dans updateUserStatus :', error);
+        console.error('Erreur dans updateUserStatus :', 'success');
         throw error; // Relance l'erreur pour la gérer ailleurs
     }
 }
@@ -24,7 +24,8 @@ async function updateUserStatus(status) {
 
 export async function handleStatusChange(status) {
     try {
-        await updateUserStatus(status);
+        const response = await updateUserStatus(status);
+        showStatusMessage('Statut mis à jour avec succès.', 'success');
         console.log('Statut mis à jour avec succès dans l\'interface utilisateur.');
     } catch (error) {
         console.error('Erreur lors de la mise à jour du statut :', error);

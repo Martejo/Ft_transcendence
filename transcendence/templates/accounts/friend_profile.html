@@ -1,7 +1,7 @@
 {% load static %}
-
-<div class="container-fluid mt-5" style="height: var(--sin-nav-height);">
-    <h1 class="text-center title mb-4" style="min-width: 300px;">Profil de l'Ami</h1>
+{% load i18n %}
+<div class="container-fluid mt-4" style="height: 100%; ">
+	<h1 class="text-center title mb-4" style="min-width: 300px;">{% trans "Profil de" %} {{ friend.username }}</h1>
 
     <!-- Informations du profil -->
     <div class="row d-flex justify-content-center mb-4">
@@ -19,62 +19,73 @@
     </div>
 
     <!-- Section Statistiques -->
-    <div class="row d-flex justify-content-center mb-4">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-            <div class="statistics text-center">
-                <h4 class="stat-title">Statistiques Générales</h4>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item bg-transparent text-white">Victoires : {{ victories }}</li>
-                    <li class="list-group-item bg-transparent text-white">Défaites : {{ defeats }}</li>
-                    <li class="list-group-item bg-transparent text-white">Meilleur score : {{ best_score }} pts</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+	<div class="row d-flex justify-content-center mb-4">
+		<div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="statistics text-center">
+				<h4 class="stat-title">{% trans "Statistiques Générales" %}</h4>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item bg-transparent text-white">{% trans "Victoires : " %}{{ victories }}</li>
+					<li class="list-group-item bg-transparent text-white">{% trans "Défaites : " %}{{ defeats }}</li>
+					<li class="list-group-item bg-transparent text-white">{% trans "Meilleur score : " %}{{ best_score }} pts</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 
-    <!-- Section Amis -->
-    <div class="row d-flex justify-content-center mb-4">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
-            <div class="friends-section text-center">
-                <h4 class="stat-title">Amis</h4>
-                <p>Nombre d'amis : <strong>{{ friends_count }}</strong></p>
-            </div>
-        </div>
-    </div>
+     <!-- Section Amis -->
+	<div class="row d-flex justify-content-center mb-0">
+		<div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+			<div class="friends-section text-center">
+				<h4 class="stat-title">{% trans "Amis" %}</h4>
+				<p>{% trans "Nombre d'amis : " %}<strong>{{ friends_count }}</strong></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <!-- Styles spécifiques -->
 <style>
-    html, body {
-        overflow: auto;
-    }
-    .card {
-        background-color: #101A32;
-        border: 2px solid rgb(153, 148, 148);
-        min-width: 300px;
-        color: white;
-    }
-    body {
-        background-color: #101A32;
-        color: white;
-    }
-    h1, .card-title, .stat-title {
-        color: #2DB4F3;
-    }
-    .profile-info img {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-    }
-    .statistics, .friends-section {
-        background-color: #101A32;
-        border: 2px solid rgb(153, 148, 148);
-        padding: 20px;
-        border-radius: 10px;
-        min-width: 300px;
-    }
-    .list-group-item {
-        background-color: transparent;
-        color: white;
-    }
+	.html, body {
+		overflow: auto;
+	}
+	.card {
+		background-color:  #101A32;
+		border: 2px solid rgb(153, 148, 148);
+		min-width: 300px;
+		color: white;
+	}
+	body {
+		background-color: #101A32;
+		color: white;
+	}
+		h1, .card-title, .stat-title {
+		color: #2DB4F3;
+	}
+	.profile-info {
+		display: flex;
+		align-items: center;
+	}
+	.profile-info img {
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		margin-right: 20px;
+	}
+	
+	.statistics {
+		background-color:  #101A32;
+		border: 2px solid rgb(153, 148, 148);
+		padding: 20px;
+		border-radius: 10px;
+		min-width: 300px;
+	}
+	.friends-section {
+		background-color:  #101A32;
+		border: 2px solid rgb(153, 148, 148);
+		padding: 20px;
+		border-radius: 10px;
+		min-width: 300px;
+	}
+
+
 </style>
