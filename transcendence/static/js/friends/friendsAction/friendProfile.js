@@ -1,35 +1,35 @@
 import { requestGet } from '../../api/index.js';
-import { updateHtmlContent } from '../../tools/index.js';
+import { updateHtmlContent, showStatusMessage } from '../../tools/index.js';
 
 
 async function FriendProfile(friendName) {
     try {
         console.log(`Chargement du profil de l'ami : ${friendName}`);
         const response = await requestGet('accounts', `friend/${friendName}`);
-        
-        if (response.status !== 'success') {
-            throw new Error(response.message || 'Erreur lors de la récupération du profil.');
+
+        if (!response || response.status !== 'success') {
+            const errorMessage = response?.message || 'Erreur lors de la récupération du profil.';
+            console.error('Erreur dans FriendProfile :', errorMessage);
+            throw new Error(errorMessage);
         }
+
         updateHtmlContent('#content', response.html);
-        return response.message; // Retourne la réponse en cas de succès
+        return response.message;
     } catch (error) {
-        console.error('Erreur dans viewFriendProfile :', error);
-        throw error; // Relance l'erreur pour la gestion dans le gestionnaire
+        console.error('Erreur dans FriendProfile :', error);
+        throw error;
     }
 }
 
 export async function handleFriendProfile(friendName) {
     console.log(`Gestionnaire: Affichage du profil de l'ami ${friendName}`);
-    try {
-        // Appelle la fonction principale pour charger le profil
-        const response = await FriendProfile(friendName);
 
-        // Affiche un message de succès
-        displaySuccessMessage('friend-profile-success', 'Profil de l\'ami chargé avec succès.');
-        clearErrorMessage('friend-profile-error'); // Nettoie les anciens messages d'erreur
+    try {
+        const response = await FriendProfile(friendName);
+        showStatusMessage(response || 'Profil de l\'ami chargé avec succès.', 'success');
     } catch (error) {
-        // Gestion des erreurs
-        console.error('Erreur dans handleViewFriendProfile :', error);
-        displayErrorMessage('friend-profile-error', error.message || 'Une erreur est survenue lors du chargement du profil de l\'ami.');
+        const errorMessage = error?.message || 'Erreur lors de la récupération du profil.';
+        console.error('Erreur dans handleFriendProfile :', error);
+        showStatusMessage(errorMessage, 'error');
     }
 }

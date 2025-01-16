@@ -16,7 +16,7 @@ const Views = {
         // Table de correspondance des vues avec importation dynamique
         const viewInitializers = {
             'core-home': async () => (await import('../landing/coreHome.js')).initializeHomeView(),
-            'accounts-login': async () => (await import('../auth/index.js')).initializeLoginView(),
+            'accounts-login': async () => (await import('../auth/index.js')).handleLogin(),
             'accounts-register': async () => (await import('../auth/index.js')).initializeRegisterView(),
             'accounts-gestion_profil': async () => (await import('../accountManagement/index.js')).handleAccountsManagement(),
             'accounts-enable_2fa': async () => (await import('../auth/index.js')).initializeEnable2FAView(),

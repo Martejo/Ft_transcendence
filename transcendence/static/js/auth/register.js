@@ -1,27 +1,16 @@
 // auth/register.js
 import { requestPost, requestGet } from '../api/index.js';
-import { updateHtmlContent } from '../tools/index.js'
-
-
-function displayRegistrationErrors(errors) {
-    const registerError = document.querySelector('#register-error');
-    let errorMessages = '';
-    for (let field in errors) {
-        if (Object.prototype.hasOwnProperty.call(errors, field)) {
-            errorMessages += errors[field].join('<br>') + '<br>';
-        }
-    }
-    registerError.innerHTML = errorMessages;
-}
+import { updateHtmlContent, showStatusMessage } from '../tools/index.js';
 
 function handleRegisterResponse(response) {
     if (response.status === 'success') {
-        alert(response.message);
+        showStatusMessage(response.message, 'success');
         window.location.hash = '#accounts-login';
-    } else {
-        if (response.errors) {
-            displayRegistrationErrors(response.errors);
-        }
+    } else if (response.errors) {
+        const errorMessages = Object.keys(response.errors)
+            .map(field => response.errors[field].join('<br>'))
+            .join('<br>');
+        showStatusMessage(errorMessages, 'error');
     }
 }
 
@@ -33,11 +22,12 @@ async function submitRegistration(form) {
     const formData = new FormData(form);
 
     try {
-        const response = await requestPost('accounts','submit_register', formData);
+        const response = await requestPost('accounts', 'submit_register', formData);
+        console.log('Réponse de la requête POST submit_register :', response);
         handleRegisterResponse(response);
     } catch (error) {
-        console.error('Erreur lors de l\'inscription:', error);
-        document.querySelector('#register-error').innerHTML = '<p>Une erreur est survenue. Veuillez réessayer.</p>';
+        console.error('Erreur lors de l\'inscription :', error);
+        showStatusMessage('Une erreur est survenue lors de l\'inscription. Veuillez réessayer.', 'error');
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'S\'inscrire';
@@ -47,20 +37,20 @@ async function submitRegistration(form) {
 // MAIN FUNCTION
 export async function initializeRegisterView() {
     console.log('initializeRegisterView');
-    let data;
+
     try {
-        data = await requestGet('accounts', 'register')
-        updateHtmlContent('#content', data.html)
+        const data = await requestGet('accounts', 'register');
+        updateHtmlContent('#content', data.html);
+
+        const form = document.querySelector('#register-form');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitRegistration(form);
+            });
+        }
     } catch (error) {
-        // [IMPROVE] Faire un gestionnaire d'erreurs 
-        console.error('Erreur lors de la requete API initializeRegisterView :', error);
+        console.error('Erreur lors de la requête API initializeRegisterView :', error);
+        showStatusMessage('Impossible de charger la vue d\'inscription. Veuillez réessayer.', 'error');
     }
-
-    const form = document.querySelector('#register-form');
-    if (!form) return;
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        submitRegistration(form);
-    });
 }

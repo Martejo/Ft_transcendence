@@ -1,6 +1,5 @@
 import { requestPost } from '../api/index.js';
-import { clearSessionAndUI, displaySuccessMessage, displayErrorMessage } from '../tools/index.js';
-
+import { clearSessionAndUI, showStatusMessage} from '../tools/index.js';
 
 // Charge et affiche la modale de suppression
 async function loadDeleteAccountView() {
@@ -13,6 +12,7 @@ async function loadDeleteAccountView() {
         modal.style.display = 'flex'; // Affiche la modale
     } catch (error) {
         console.error('Erreur dans loadDeleteAccountView:', error);
+        showStatusMessage('Impossible de charger la vue de suppression. Veuillez réessayer.', 'error');
         throw error;
     }
 }
@@ -48,6 +48,7 @@ async function attachDeleteAccountEvents() {
         }
     } catch (error) {
         console.error('Erreur dans attachDeleteAccountEvents:', error);
+        showStatusMessage('Erreur lors de l\'attachement des événements de suppression.', 'error');
         throw error;
     }
 }
@@ -59,15 +60,21 @@ async function submitDeleteAccount(form) {
 
     try {
         const response = await requestPost('accounts', 'profile/delete_account', formData);
+
         if (response.status !== 'success') {
-            displayErrorMessage(response.message || 'Erreur lors de la suppression du compte.');
-        } 
-        displaySuccessMessage('delete-success', 'Votre compte a été supprimé avec succès.');
+            console.error('Erreur serveur :', response.message);
+            showStatusMessage(response.message || 'Erreur lors de la suppression du compte.', 'error');
+            return;
+        }
+
+        showStatusMessage('Votre compte a été supprimé avec succès.', 'success');
+
         setTimeout(() => {
-            clearSessionAndUI(); // Attache les événements nécessaires à la modale
+            clearSessionAndUI();
         }, 5000);
     } catch (error) {
-        displayErrorMessage('delete-error', error.message);
+        console.error('Erreur lors de la soumission de la suppression du compte :', error);
+        showStatusMessage('Une erreur est survenue. Veuillez réessayer.', 'error');
     }
 }
 
@@ -79,6 +86,6 @@ export async function handleDeleteAccount() {
         await attachDeleteAccountEvents();
     } catch (error) {
         console.error('Erreur dans handleDeleteAccount:', error);
-        displayErrorMessage('delete-error', 'Erreur lors de la tentative de suppression du compte.');
+        showStatusMessage('Erreur lors de la tentative de suppression du compte.', 'error');
     }
 }

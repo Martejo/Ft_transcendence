@@ -1,69 +1,31 @@
-// auth/login.js
-//import Api from '../api/api.js';
-
 import { requestGet, requestPost } from '../api/index.js';
 import { handleNavbar } from '../navbar/index.js';
-import { updateHtmlContent } from '../tools/index.js'
+import { updateHtmlContent, showStatusMessage } from '../tools/index.js';
+import { navigateTo } from '../router.js'; // Importer la fonction pour naviguer
 
 
-/**
- * Affiche les erreurs de connexion reçues du serveur dans la zone prévue pour les erreurs.
- * @param {Object} errors - Un objet contenant les erreurs retournées par le serveur.
- */
-function displayLoginErrors(errors) {
-    const loginError = document.querySelector('#login-error');
-    let errorMessages = '';
-    for (let field in errors) {
-        if (Object.prototype.hasOwnProperty.call(errors, field)) {
-            errorMessages += errors[field].join('<br>') + '<br>';
-        }
-    }
-    loginError.innerHTML = errorMessages;
-}
-
-
-/**
- * Gère la réponse du serveur après une tentative de connexion.
- * Redirige l'utilisateur en fonction du statut de la connexion ou affiche des messages d'erreur.
- * @param {Object} response - La réponse du serveur après soumission du formulaire de connexion.
- */
 async function handleLoginResponse(response) {
     console.log('handleLoginResponse');
     if (response.status === 'success') {
         if (response.requires_2fa) {
-            window.location.hash = '#accounts-verify_2fa_login';
-        } 
-        else {
+            navigateTo('/login-2fa');
+        } else {
             console.log("Access token = ", response.access_token);
             localStorage.setItem('access_token', response.access_token);
-            //[IMPROVE]Dois t on renvoyer des tokens refresh a chaque nouvelle connexion ?
             localStorage.setItem('refresh_token', response.refresh_token);
 
             setTimeout(async () => {
                 window.isAuthenticated = true;
-
-                // Appel à la fonction async loadNavbar avec await
                 await handleNavbar();
-
-                window.location.hash = '#game-home';
+                navigateTo('/home');
             }, 500);
         }
     } else {
-        if (response.errors) {
-            displayLoginErrors(response.errors);
-        } else if (response.message) {
-            document.querySelector('#login-error').textContent = response.message;
-        }
+        const message = response.errors?.join('<br>') || response.message || 'Erreur inconnue.';
+        showStatusMessage(message, 'error');
     }
 }
 
-
-
-/**
- * Soumet le formulaire de connexion au serveur via une requête POST.
- * Désactive le bouton de validation pendant le traitement et gère les erreurs éventuelles.
- * @param {HTMLFormElement} form - Le formulaire de connexion soumis par l'utilisateur.
- */
 async function submitLogin(form) {
     console.log('submitLogin');
     const validateBtn = document.querySelector('#validate-btn');
@@ -73,59 +35,48 @@ async function submitLogin(form) {
     const formData = new FormData(form);
 
     try {
-        
-        const response = await requestPost('accounts','submit_login', formData);
-        console.log('Reponse de la requete POST submit_login :', response);
-        handleLoginResponse(response);
+        const response = await requestPost('accounts', 'submit_login', formData);
+        console.log('Réponse de la requête POST submit_login :', response);
+        return response;
     } catch (error) {
         console.error('Erreur lors de la connexion :', error);
-        document.querySelector('#login-error').innerHTML = '<p>Une erreur est survenue. Veuillez réessayer.</p>';
+        showStatusMessage('Une erreur est survenue. Veuillez réessayer.', 'error');
+        return null;
     } finally {
         validateBtn.disabled = false;
         validateBtn.textContent = 'Valider';
     }
 }
 
-// [IMPROVE] Verifier le fonction des nouvelles urls
-export async function initializeLoginView() {
-    let data;
+async function initializeLoginForm() {
     try {
-        data = await requestGet('accounts', 'login')
-        updateHtmlContent('#content', data.html)
+        const data = await requestGet('accounts', 'login');
+        updateHtmlContent('#content', data.html);
 
-        // if (data && data.html)
-        // {
-        //     updateHtmlContent('#content', data.html)
-        // }
-        // else
-        // {
-        //     console.error('Les données HTML de la page d\'accueil sont manquantes.');
-        // }
+        const form = document.querySelector('#login-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log('Soumission du formulaire de connexion');
+                const response = await submitLogin(form);
+                if (response) {
+                    await handleLoginResponse(response);
+                }
+            });
+        }
     } catch (error) {
-        
-        // [IMPROVE] Faire un gestionnaire d'erreurs 
-        console.error('Erreur lors de la requete API initializeLoginView :', error);
+        console.error('Erreur lors de l\'initialisation du formulaire :', error);
+        showStatusMessage('Impossible de charger la vue de connexion. Veuillez réessayer.', 'error');
     }
+}
 
-    const form = document.querySelector('#login-form');
-    if (!form) return;
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        console.log('Soumission du formulaire de connexion');
-        submitLogin(form);
-    });
-
-
-    const forgotPasswordLink = document.querySelector('#forgot-password-link');
-    if (!forgotPasswordLink) return;
-
-    forgotPasswordLink.addEventListener('click', (e) => {
-        e.preventDefault(); // Empêche le comportement par défaut du lien
-        // Exemple d'action : Redirection ou affichage d'une modale
-        alert("Redirection vers la page de récupération de mot de passe."); // À remplacer par votre logique
-        // window.location.href = '/accounts/forgot_password/';
-    });
-
-    console.log('Fin de initializeLoginView');
+export async function handleLogin() {
+    try {
+        console.log('Initialisation de la vue de connexion');
+        await initializeLoginForm();
+        console.log('Vue de connexion initialisée avec succès');
+    } catch (error) {
+        console.error('Erreur dans handleLogin :', error);
+        showStatusMessage('Erreur lors de l\'initialisation de la connexion.', 'error');
+    }
 }

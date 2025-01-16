@@ -1,7 +1,6 @@
-// navbar/loadNavbar.js
 import { toggleBurgerMenu } from './toggleBurgerMenu.js';
 import { requestGet } from '../api/index.js';
-import { updateHtmlContent } from '../tools/index.js';
+import { updateHtmlContent, showStatusMessage } from '../tools/index.js';
 import { eventsHandlerBurgerMenu } from '../burgerMenu/index.js';
 
 /**
@@ -12,6 +11,7 @@ async function initializeBurgerMenu() {
     if (burgerToggle && !burgerToggle.dataset.bound) {
         burgerToggle.addEventListener('click', toggleBurgerMenu);
         burgerToggle.dataset.bound = true; // Marque comme attaché
+        console.log('Événements du burger menu initialisés.');
     }
 }
 
@@ -28,17 +28,20 @@ async function loadNavbar() {
         if (data && data.html) {
             // Met à jour le contenu HTML de la navbar
             updateHtmlContent('#navbar', data.html);
+            console.log('Contenu de la navbar mis à jour.');
             return data.is_authenticated;
-
-            // [IMPROVE] gérer retour d'erreur
-            
         } else {
             console.error('Les données HTML de la navbar sont manquantes.');
+            showStatusMessage('Impossible de charger la barre de navigation.', 'error');
+            return false;
         }
     } catch (error) {
         console.error('Erreur lors du chargement de la navbar:', error);
+        showStatusMessage('Une erreur est survenue lors du chargement de la barre de navigation.', 'error');
+        throw error;
+    } finally {
+        console.log('Fin de loadNavbar');
     }
-    console.log('Fin de loadNavbar');
 }
 
 /**
@@ -49,15 +52,16 @@ export async function handleNavbar() {
     console.log('Chargement de la navbar...');
     try {
         const is_authenticated = await loadNavbar(); // Charge le contenu de la navbar et initialise les événements
-        if (is_authenticated)
-        {
+
+        if (is_authenticated) {
             await initializeBurgerMenu();
             eventsHandlerBurgerMenu();
-
+            console.log('Navbar et burger menu chargés avec succès.');
+        } else {
+            console.log('Utilisateur non authentifié ou erreur de chargement.');
         }
-        console.log('Navbar chargée avec succès.');
     } catch (error) {
         console.error('Erreur lors du chargement de la navbar dans handleNavbar:', error);
-        //displayNavbarError('Erreur lors du chargement de la navbar. Veuillez réessayer.');
+        showStatusMessage('Erreur lors du chargement de la barre de navigation. Veuillez réessayer.', 'error');
     }
 }

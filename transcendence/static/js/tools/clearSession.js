@@ -1,8 +1,11 @@
+import { navigateTo } from '../router.js'; // Importer la fonction pour naviguer
+
+
 /**
  * Supprime les tokens, nettoie l'interface utilisateur et redirige vers une URL donnée.
  * @param {string} redirectUrl - L'URL vers laquelle rediriger après le nettoyage. (Par défaut : '#core-home')
  */
-export function clearSessionAndUI(redirectUrl = '#core-home') {
+export function clearSessionAndUI(redirectUrl = '/') {
     console.log('Nettoyage de la session et de l\'interface utilisateur...');
 
     // Suppression des tokens
@@ -19,7 +22,7 @@ export function clearSessionAndUI(redirectUrl = '#core-home') {
     if (content) content.innerHTML = '';
 
     // Redirection
-    window.location.href = redirectUrl;
+    navigateTo(redirectUrl);
 
     console.log(`Redirection vers ${redirectUrl}`);
 }

@@ -16,5 +16,4 @@ Hamza :
 Geoffrey
 7.) Problème de connexion utilisateur après connexion via 2fa.
 8.) Terminer gestion invitation a jouer, envoyer le jouer apres acceptation en loading
-11.)Message success et error pour tout
 9.) mettre en place bouton tournoi burgerMenu

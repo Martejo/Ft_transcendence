@@ -1,45 +1,44 @@
-// auth/2faLogin.js
 import { requestPost, requestGet } from '../../api/index.js';
 import { handleNavbar } from '../../navbar/index.js'; // Adjust the import path as necessary
-import { updateHtmlContent } from '../../tools/index.js'; // Adjust the import path as necessary
-// [IMPROVE] Verifier le fonction des nouvelles urls
+import { updateHtmlContent, showStatusMessage } from '../../tools/index.js'; // Adjust the import path as necessary
 
+// Soumission du formulaire de connexion 2FA
 async function submitLogin2FA(form) {
     const formData = new FormData(form);
     try {
-        const response = await requestPost('accounts','2fa/login2fa', formData);
+        const response = await requestPost('accounts', '2fa/login2fa', formData);
         if (response.status === 'success') {
-            console.log("2fa success");
+            console.log("2FA activée avec succès");
             localStorage.setItem('access_Token', response.access_token);
             localStorage.setItem('refresh_Token', response.refresh_token);
+
             setTimeout(async () => {
                 window.isAuthenticated = true;
-                // Appel à la fonction async loadNavbar avec await
-                await handleNavbar();
-
-
+                await handleNavbar(); // Met à jour la barre de navigation
                 window.location.hash = '#game-home';
             }, 1000);
+            showStatusMessage('2FA activée avec succès.', 'success');
         } else {
-            alert(response.message);
+            throw new Error(response.message || 'Code 2FA incorrect.');
         }
     } catch (error) {
-        console.error('Erreur login 2FA:', error);
-        alert(error.message || 'Une erreur est survenue');
+        console.error('Erreur lors de la soumission 2FA:', error);
+        showStatusMessage(error.message || 'Une erreur est survenue lors de la connexion 2FA.', 'error');
     }
 }
 
+// Initialisation de la vue de connexion 2FA
 export async function initializeLogin2FAView() {
     try {
         const data = await requestGet('accounts', '2fa/login2fa');
-        updateHtmlContent('#content', data.html)
+        updateHtmlContent('#content', data.html);
     } catch (error) {
-        
-        // [IMPROVE] Faire un gestionnaire d'erreurs
-        console.error('Erreur lors de la requete API initializeLoginView :', error);
+        console.error('Erreur lors de la requête API initializeLogin2FAView:', error);
+        showStatusMessage('Impossible de charger la vue de connexion 2FA.', 'error');
+        return;
     }
-    
-    document.addEventListener('submit', function(e) {
+
+    document.addEventListener('submit', function (e) {
         if (e.target && e.target.id === 'login-2fa-form') {
             e.preventDefault();
             submitLogin2FA(e.target);

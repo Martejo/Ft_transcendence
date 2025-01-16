@@ -5,7 +5,7 @@
 export { handleLogout} from './logout.js';
 export { handleDeleteAccount } from './deleteAccount.js';
 
-export { initializeLoginView } from './login.js';
+export { handleLogin } from './login.js';
 export { initializeRegisterView } from './register.js';
 
 

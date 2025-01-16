@@ -1,9 +1,7 @@
 import { showFriendPopup, closePopupOnClickOutside, handleOptionPopup,  handleAddFriend, handleFriendInvitation  } from '../friends/index.js';
 import { handleStatusChange } from './index.js';
-import { handleViewProfile } from '../userProfile/index.js';
-import { handleAccountsManagement } from '../accountManagement/index.js';
 import { handleLogout } from '../auth/index.js';
-import {handleGameMenu} from '../game/index.js';
+import { navigateTo } from '../router.js';
 
 // Gestionnaire principal des événements pour le menu burger
 export function eventsHandlerBurgerMenu() {
@@ -44,17 +42,21 @@ function handleStatusChangeWrapper(e) {
 function setupProfileViewEvent() {
     const profileBtn = document.querySelector('#profile-btn');
     if (profileBtn && !profileBtn.dataset.bound) {
-        profileBtn.addEventListener('click', handleViewProfile);
-        profileBtn.dataset.bound = true;
+        profileBtn.addEventListener('click', (event) => {
+            event.preventDefault(); // Empêche le comportement par défaut du lien
+            console.log('Profil bouton cliqué');
+            navigateTo('/profile'); // Navigue vers la route profil
+        });
+        profileBtn.dataset.bound = true; // Marque comme attaché pour éviter les doublons
     }
 }
 
 // Gestion des boutons de navigation (Jouer, Tournoi, Paramètres)
 function setupNavigationEvents() {
     const navigationButtons = [
-        { selector: '#play-btn', action: handleGameMenu },
+        { selector: '#play-btn', action: () => navigateTo('/game-options') },
         //{ selector: '#tournament-link', action: handleTournamentClick },
-        { selector: '#settings-link', action:  handleAccountsManagement },
+        { selector: '#settings-link', action: () => navigateTo('/account')},
     ];
 
     navigationButtons.forEach(nav => {
@@ -75,7 +77,6 @@ function setupAddFriendEvent() {
     const addFriendForm = document.querySelector('#add-friend-form');
     console.log('ajout d\'ami :', addFriendForm);
     if (addFriendForm && !addFriendForm.dataset.bound) {
-        console.log('appelle de fonction ajout d\'ami');
         addFriendForm.addEventListener('submit', handleAddFriend);
         addFriendForm.dataset.bound = true;
     }
