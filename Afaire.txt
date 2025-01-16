@@ -1,6 +1,7 @@
 1.) Faire une gestion d'extension de fichier pour l'avatar
 9.) mettre en place bouton tournoi burgerMenu
 10.) Mettre en place La page et le nécanisme de tournoi
+13.) Faire en sorte que le burgerMenu disparaisse quand on clique sur un des boutons qui charge une page (Voir profil, Jouer etc..)
 
 
 
@@ -8,8 +9,8 @@ Hamza :
 6.) Changer la couleur de l'écriture en blanc
 5.) Css gestion de compte. 
 12.) Intégrer le multilangag
-3.) Appliquer l'adjust container (load, login, register) dès le chargement de la page
-4.) Appliquer l'adjust container (load, ground game et burgerMenu) dès le chargement de la page
+3.) Appliquer l'adjust container (load, login, register) dès le chargement de la page ✅
+4.) Appliquer l'adjust container (load, ground game et burgerMenu) dès le chargement de la page ✅
 
 
 Geoffrey

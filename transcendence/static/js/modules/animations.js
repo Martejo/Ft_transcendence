@@ -1,12 +1,12 @@
 // Ajuster la hauteur du menu burger avec marges
-function adjustBurgerHeight() {
+export function adjustBurgerHeight() {
     const navAndMarginHeight = 66; // Hauteur navbar et marge pour le menu burger
     const availableHeight = window.innerHeight - navAndMarginHeight;
     document.documentElement.style.setProperty('--burger-height', `${availableHeight}px`);
 }
 
 // Ajuster la hauteur sans la barre navigation
-function adjustSinNavHeight() {
+export function adjustSinNavHeight() {
     const navAndMarginHeight = 50; // Hauteur sans la navbar
     const availableHeight = window.innerHeight - navAndMarginHeight;
     document.documentElement.style.setProperty('--sin-nav-height', `${availableHeight}px`);
@@ -38,7 +38,7 @@ function adjustContainer(ContainerId) {
  * et appelle adjustContainer si l'élément est présent.
  * @param {string} containerId - L'ID de l'élément à ajuster.
  */
-function adjustContainerIfExists(containerId) {
+export function adjustContainerIfExists(containerId) {
     const container = document.getElementById(containerId);
     if (container) {
         adjustContainer(containerId);
@@ -56,12 +56,5 @@ export function adjustAllContainers() {
         adjustContainerIfExists('login');
         adjustContainerIfExists('register');
 
-    });
-
-    window.addEventListener('load', () => {
-        adjustBurgerHeight();
-        adjustSinNavHeight();
-        adjustContainerIfExists('login');
-        adjustContainerIfExists('register');
     });
 }

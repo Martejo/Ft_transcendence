@@ -4,6 +4,9 @@
 // Import des modules transverses
 import { handleNavbar } from './navbar/index.js';
 import { loadPongAnimation, stopPongAnimation } from './modules/groundAnimation.js';
+import { adjustBurgerHeight } from './modules/animations.js';
+import { adjustSinNavHeight } from './modules/animations.js';
+import { adjustContainerIfExists } from './modules/animations.js';
 import { adjustAllContainers } from './modules/animations.js';
 import { initializeHomeView } from './landing/coreHome.js';
 import Views from './modules/views.js';
@@ -20,5 +23,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initializeHomeView();
     
     loadPongAnimation();
-    adjustAllContainers();
+	adjustAllContainers(); // Pour resize
+    adjustBurgerHeight(); // Pour load, c'est ici qu'il faut appeler ces fonctions
+	adjustSinNavHeight(); // Pour load
+	adjustContainerIfExists('login'); // Pour load
+	adjustContainerIfExists('register'); // Pour load
 });

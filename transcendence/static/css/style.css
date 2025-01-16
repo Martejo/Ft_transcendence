@@ -88,7 +88,7 @@ html, body {
     opacity: 0;
     transition: opacity 0.5s ease, transform 0.5s ease;
     transform: translateY(-20px);
-    z-index: 999; /* Juste en dessous de la navbar */
+    z-index: 29; /* Juste en dessous de la navbar */
 }
 
 .popup.show {
@@ -327,7 +327,7 @@ html, body {
 /* Traits (Gauche et Droite) */
 .trait-gauche, .trait-droit {
 	width: 1.25%;
-	height: 30%;
+	height: 26%;
 	background-color: white;
 }
 
