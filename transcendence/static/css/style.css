@@ -245,6 +245,16 @@ html, body {
 	border-radius: 20px;
 }
 
+.btn-danger {
+	background-color: #ff4d4d;
+	border: none;
+	/* padding: 10px 20px; */
+	border-radius: 5px;
+	font-size: 1rem;
+	font-family: "Jersey 10";
+	transition: background-color 0.3s;
+}
+
 .btn-primary {
 	font-family: "Jersey 10";
 	background-color: #2DB4F3;

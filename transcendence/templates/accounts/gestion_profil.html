@@ -3,6 +3,25 @@
 <div class="container-fluid mt-4" style="height: 100%;">
 	<h1 class="text-center title mb-3">{% trans "Gestion de Profil" %}</h1>
 
+	<!-- Change Language Section -->
+	<div class="row d-flex justify-content-center mb-3">
+		<div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4">
+			<div class="card">
+				<div class="card-body p-4">
+					<h5 class="card-title mb-2">{% trans "Changer de langue" %}</h5>
+					<form method="post" action="{% url 'set_language' %}">
+						{% csrf_token %}
+						<div class="d-flex justify-content-center">
+							<button type="submit" name="language" value="fr" style="border: none; background: none;" class="me-2">🇫🇷</button>
+							<button type="submit" name="language" value="es" style="border: none; background: none;" class="me-2">🇪🇸</button>
+							<button type="submit" name="language" value="en" style="border: none; background: none;">🇬🇧</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
     <!-- Change Avatar Section -->
     <div class="row d-flex justify-content-center mb-3">
         <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4">
@@ -51,8 +70,8 @@
 					<form id="change-password-form" method="POST" style="color: white">
 						{% csrf_token %}
                         {{ password_form.old_password|add_class:"form-control mb-3"|attr:"placeholder:Ancien mot de passe" }}
-                        {{ password_form.new_password1|add_class:"form-control mb-3"|attr:"placeholder:Nouveau mot de passe" }}
-                        {{ password_form.new_password2|add_class:"form-control mb-3"|attr:"placeholder:Confirmez le nouveau mot de passe" }}
+						{{ password_form.new_password1|add_class:"form-control mb-3"|attr:"placeholder:Nouveau mot de passe" }}
+						{{ password_form.new_password2|add_class:"form-control mb-3"|attr:"placeholder:Confirmez le nouveau mot de passe" }}
 						<button type="submit" class="btn btn-primary w-90">{% trans "Valider" %}</button>
 						<div id="change-password-error" class="text-danger mt-2"></div>
 						<div id="change-password-success" class="text-success mt-2"></div>
@@ -92,26 +111,28 @@
         </div>
     </div>
 
-<!-- Modale pour la suppression de compte -->
-<div id="delete-account-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <div class="container_delete_account">
-            <h3>{% trans "Supprimer le compte" %}</h3>
-            <p>{% trans "Pour des raisons de sécurité, veuillez entrer votre mot de passe pour confirmer la suppression de votre compte." %}</p>
-            <form id="delete-account-form" method="POST">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="password" class="form-label">{% trans "Mot de passe" %}</label>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-danger">{% trans "Confirmer la suppression" %}</button>
-            </form>
-            <!-- Messages dynamiques -->
-            <div class="delete-success text-success mt-3" style="display: none;"></div>
-            <div class="delete-error text-danger mt-3" style="display: none;"></div>
-        </div>
-    </div>
+	<!-- Modale pour la suppression de compte -->
+	<div id="delete-account-modal" class="modal" style="display: none;">
+		<div class="modal-content">
+			<span class="close-btn">&times;</span>
+			<div class="container_delete_account">
+				<h3>{% trans "Supprimer le compte" %}</h3>
+				<p>{% trans "Pour des raisons de sécurité, veuillez entrer votre mot de passe pour confirmer la suppression de votre compte." %}</p>
+				<form id="delete-account-form" method="POST">
+					{% csrf_token %}
+					<div class="mb-3">
+						<label for="password" class="form-label">{% trans "Mot de passe" %}</label>
+						<input type="password" name="password" id="password" class="form-control" required>
+					</div>
+					<button type="submit" class="btn btn-danger">{% trans "Confirmer la suppression" %}</button>
+				</form>
+				<!-- Messages dynamiques -->
+				<div class="delete-success text-success mt-3" style="display: none;"></div>
+				<div class="delete-error text-danger mt-3" style="display: none;"></div>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 
@@ -217,16 +238,6 @@
     .container_delete_account p {
         margin-bottom: 20px;
         font-size: 1rem;
-    }
-
-    .btn-danger {
-        background-color: #ff4d4d;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 1rem;
-        font-family: "Jersey 10";
-        transition: background-color 0.3s;
     }
 
     .btn-danger:hover {

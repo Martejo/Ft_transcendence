@@ -4,6 +4,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from django.conf.urls.i18n import i18n_patterns
 
 import logging
 
@@ -31,4 +32,5 @@ if settings.DEBUG:
 # Route de fallback pour servir landing.html pour toutes les autres URLs
 urlpatterns += [
     re_path(r'^.*$', TemplateView.as_view(template_name='landing.html')),
+    path('i18n/', include('django.conf.urls.i18n')),
 ]

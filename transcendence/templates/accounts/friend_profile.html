@@ -10,8 +10,8 @@
                 <div class="profile-info d-flex flex-column justify-content-center align-items-center">
                     <img src="{{ avatar_url }}" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%;" class="mb-3">
                     <div class="mt-3">
-                        <h3>Pseudo : {{ friend.username }}</h3>
-                        <p class="mb-0">Nombre de matchs joués : <strong>{{ match_count|default:"N/A" }}</strong></p>
+                        <h3>{% trans "Pseudo : " %}{{ friend.username }}</h3>
+                        <p class="mb-0">{% trans "Nombre de matchs joués : " %}<strong>{{ match_count|default:"N/A" }}</strong></p>
                     </div>
                 </div>
             </div>

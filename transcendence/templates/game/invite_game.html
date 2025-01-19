@@ -13,19 +13,19 @@
                             <span class="status-indicator-friend {% if friend.is_online %}online{% else %}offline{% endif %}"></span>
                         </div>
 						<button class="friend-btn me-3" >{{ friend.username }}</button>
-                        <button class="btn invite-button">Inviter
+                        <button class="btn invite-button">{% trans "Inviter" %}
                             <span class="cancel-icon d-none">&times;</span>
                         </button>
                     </li>
                     {% empty %}
-                    <p class="text-center mb-0">Aucun ami pour le moment.</p>
+                    <p class="text-center mb-0">{% trans "Aucun ami pour le moment." %}</p>
                     {% endfor %}
                 </ul>
             </div>
 
             <!-- Bouton pour commencer le tournoi -->
             <div class="col-11">
-                <button id="start-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">Commencer</button>
+                <button id="start-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3">{% trans "Commencer" %}</button>
             </div>
         </div>
     </div>
