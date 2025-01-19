@@ -205,7 +205,6 @@ html, body {
 /* Champs de texte */
 .form-group input {
 	width: 150%; /* Champs prennent toute la largeur */
-	max-width: 500px; /* Limite la taille maximale des champs (augmentée) */
 	padding: 15px; /* Augmente l'espace intérieur des champs */
 	border-radius: 20px;
 	border: none; /* Supprime les bordures des champs */

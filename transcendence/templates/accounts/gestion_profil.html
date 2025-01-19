@@ -13,9 +13,9 @@
                         {% csrf_token %}
                         <div class="form-group mb-3">
                             <label for="id_avatar" class="form-label"></label>
-                            {{ avatar_form.avatar|add_class:"form-control w-100 mb-3"}}
+                            {{ avatar_form.avatar|add_class:"form-control mb-3"}}
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">{% trans "Valider" %}</button>
+                        <button type="submit" class="btn btn-primary w-90">{% trans "Valider" %}</button>
                         <div id="change-avatar-error" class="text-danger mt-3"></div>
                         <div id="change-avatar-success" class="text-success mt-3"></div>
                     </form>
