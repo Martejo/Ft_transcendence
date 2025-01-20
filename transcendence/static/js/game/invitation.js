@@ -1,7 +1,7 @@
 // game/invitations.js
 import { requestPost, requestGet }  from '../api/index.js';
-import { updateHtmlContent } from '../tools/index.js';
-
+import { showStatusMessage, updateHtmlContent } from '../tools/index.js';
+import { HTTPError } from '../api/index.js';
 
 let invitedFriends = 0;
 let participantCount = 1;
@@ -99,16 +99,29 @@ function initializeFriendInvitation() {
 
 
 
-// Exemple de fonction pour gérer l'invitation
 export async function handleInviteGame() {
-    console.log('Invitation envoyée !');
-    // Ajoutez ici la logique pour envoyer une invitation via AJAX
+    console.log('Tentative d\'envoi d\'invitation...');
     try {
         const response = await requestGet('game', 'invite_game'); // Exemple de requête
-        updateHtmlContent('#content', response.html);
-        initializeFriendInvitation(); // Initialise les boutons d'invitation
-        // Gérer la réponse (afficher un message, mettre à jour l'interface, etc.)
+        
+        if (response.status === 'error') {
+            // Affiche le message d'erreur envoyé par le backend
+            
+            showStatusMessage(response.message, 'error');
+        } else {
+            // Met à jour le contenu avec la liste des amis
+            updateHtmlContent('#content', response.html);
+            initializeFriendInvitation(); // Initialise les boutons d'invitation
+        }
     } catch (error) {
+        if (error instanceof HTTPError) {
+            // Affiche les erreurs spécifiques au backend
+            console.log('rentre ici');
+            showStatusMessage(error.message, 'error');
+        } else {
+            // Affiche une erreur générique pour les autres cas
+            showStatusMessage('Une erreur est survenue.', 'error');
+        }
         console.error('Erreur lors de l\'envoi de l\'invitation :', error);
     }
 }

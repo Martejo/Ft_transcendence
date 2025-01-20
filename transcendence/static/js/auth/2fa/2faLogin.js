@@ -10,14 +10,14 @@ async function submitLogin2FA(form) {
         const response = await requestPost('accounts', '2fa/login2fa', formData);
         if (response.status === 'success') {
             console.log("2FA activée avec succès");
-            localStorage.setItem('access_Token', response.access_token);
-            localStorage.setItem('refresh_Token', response.refresh_token);
+            localStorage.setItem('access_token', response.access_token);
+            localStorage.setItem('refresh_token', response.refresh_token);
 
             setTimeout(async () => {
                 window.isAuthenticated = true;
-                await handleNavbar(); // Met à jour la barre de navigation
-                navigateTo('/home'); // Redirige vers la page d'accueil
-            }, 1000);
+                await handleNavbar();
+                navigateTo('/home');
+            }, 500);
             showStatusMessage('Connexion 2FA réussie.', 'success');
         } else {
             throw new Error(response.message || 'Code 2FA incorrect.');

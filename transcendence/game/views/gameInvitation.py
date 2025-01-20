@@ -14,23 +14,29 @@ from django.shortcuts import get_object_or_404
 
 # ---- Configuration ----
 logger = logging.getLogger(__name__)
-
 @method_decorator(csrf_protect, name='dispatch')  # Applique la protection CSRF à toute la classe
-class inviteGameView(View):
+class InviteGameView(View):
     
     def get(self, request):
-        logger.debug("Handling GET request for inviteGameView")
+        logger.debug("Handling GET request for InviteGameView")
 
         # Récupérer les amis de l'utilisateur
         user = request.user
-        friends = user.friends.all()  # Ajoute 'username' et 'avatar' au contexte
+        friends = user.friends.all()
 
-        # Render le template avec les amis
+        if not friends.exists():  # Si l'utilisateur n'a pas d'amis
+            logger.info(f"{user.username} n'a pas d'amis à inviter.")
+            return JsonResponse({
+                'status': 'error',
+                'message': "Vous n'avez pas encore ajouté d'amis. Ajoutez des amis pour les inviter à jouer."
+            })
+
+         # Préparer la liste des amis pour le template
         rendered_html = render_to_string('game/invite_game.html', {'friends': friends})
         return JsonResponse({
             'status': 'success',
-            'html': rendered_html
-        })
+            'html': rendered_html,
+        }, status=200)
     
 
 @method_decorator(login_required, name='dispatch')

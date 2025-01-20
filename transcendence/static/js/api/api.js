@@ -150,11 +150,17 @@ const Api = {
 
     handleResponse(response) {
         const contentType = response.headers.get('Content-Type');
-
-        if (contentType && contentType.includes('application/json')) {
-            return response.json(); // Retourne les données JSON
+    
+        if (response.ok && contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else if (!response.ok && contentType && contentType.includes('application/json')) {
+            // En cas d'erreur avec un JSON dans la réponse
+            return response.json().then(errorData => {
+                throw new HTTPError(errorData.message || 'Erreur inconnue.', response.status);
+            });
         } else {
-            throw new ContentTypeError('Réponse inattendue : le serveur n\'a pas retourné de JSON.');
+            // Erreur générique pour les autres types de réponses
+            throw new HTTPError('Réponse inattendue.', response.status);
         }
     },
 
