@@ -344,7 +344,7 @@ msgstr "Iniciar Partido Personalizado"
 
 #: templates/game/gameSelectTournament.html:4
 msgid "Choisissez le nombre de participants"
-msgstr "Invitar a un amigo"
+msgstr "Eligir el número de participantes"
 
 #: templates/game/gameSelectTournament.html:6
 msgid "Tournoi à 4 joueurs"
