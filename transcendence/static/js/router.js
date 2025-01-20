@@ -7,6 +7,7 @@ import { handleAccountsManagement } from './accountManagement/index.js';
 import { handleViewProfile } from './userProfile/index.js';
 import {handleGameMenu} from './game/index.js';
 import { handleFriendProfile } from './friends/index.js';
+import { handleNavbar } from './navbar/loadNavbar.js';
 
 // Initialisation du routeur Navigo
 const router = new window.Navigo('/', { hash: false });
@@ -19,6 +20,7 @@ export function initializeRouter() {
     router
         .on('/', () => {
             console.log('Route: Home');
+            handleNavbar();
             initializeHomeView();
         })
         .on('/login', () => {
