@@ -24,6 +24,7 @@ const Views = {
             'accounts-disable_2fa': async () => (await import('../auth/index.js')).initializeDisable2FAView(),
             'game-invite_game': async () => (await import('../game/index.js')).initializeFriendInvitation(),
             'game-home': async () => (await import('../game/index.js')).initializeGameHomeView(),
+			'game-select_tournament': async () => (await import('../game/index.js')).handleSeclectTournament(),
         };
     
         // Appeler l'initialisateur correspondant, ou ne rien faire par défaut

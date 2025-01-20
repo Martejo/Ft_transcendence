@@ -55,7 +55,7 @@ function setupProfileViewEvent() {
 function setupNavigationEvents() {
     const navigationButtons = [
         { selector: '#play-btn', action: () => navigateTo('/game-options') },
-        //{ selector: '#tournament-link', action: handleTournamentClick },
+        { selector: '#tournament-link', action: () => navigateTo('/select_tournament')},
         { selector: '#settings-link', action: () => navigateTo('/account')},
     ];
 

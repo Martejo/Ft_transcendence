@@ -7,6 +7,7 @@ import { handleAccountsManagement } from './accountManagement/index.js';
 import { handleViewProfile } from './userProfile/index.js';
 import {handleGameMenu} from './game/index.js';
 import { handleFriendProfile } from './friends/index.js';
+import { handleSeclectTournament } from './game/index.js';
 
 // Initialisation du routeur Navigo
 const router = new window.Navigo('/', { hash: false });
@@ -40,6 +41,10 @@ export function initializeRouter() {
         .on('/account', () => {
             console.log('Route: account');
             handleAccountsManagement();
+        })
+		.on('/select_tournament', () => {
+            console.log('Route: Select Tournament');
+            handleSeclectTournament();
         })
         .on('/profile', () => {
             console.log('Route: profile');
