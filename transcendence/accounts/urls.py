@@ -18,7 +18,7 @@ from .views.login import LoginView
 from .views.manageFriends import AddFriendView, HandleFriendRequestView, RemoveFriendView
 from .views.login2fa import Enable2FAView, Check2FAView, Login2faView, Disable2FAView
 from .views.tokenManagement import RefreshJwtView
-
+from .views.setLanguage import SetLanguageView
 from django.views.i18n import set_language
 
 # ---- Configuration ----
@@ -74,7 +74,9 @@ urlpatterns = [
     path('refreshJwt/', RefreshJwtView.as_view(), name='refresh_jwt'),
 
 	# ---- Internationalization ----
-	path('set_language/', set_language, name='set_language'),
+	#path('set_language/', set_language, name='set_language'),
+    path('set_language/', SetLanguageView.as_view(), name='set_language'),
+
 
     # ---- Token Authentication (commented for now) ----
     # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

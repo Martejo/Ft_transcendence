@@ -139,6 +139,9 @@ LANGUAGES = [
     ('es', 'Español'),
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
