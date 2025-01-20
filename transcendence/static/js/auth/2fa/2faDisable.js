@@ -1,5 +1,6 @@
 import { requestGet, requestPost } from '/static/js/api/index.js';
 import { updateHtmlContent, showStatusMessage } from '/static/js/tools/index.js';
+import { navigateTo } from '/static/js/router.js';
 
 
 // Fonction pour charger la vue de désactivation de la 2FA
@@ -47,7 +48,7 @@ async function submitDisable2FA(form) {
         const response = await requestPost('accounts', '2fa/disable', formData);
         if (response.status === 'success') {
             showStatusMessage('La 2FA a été désactivée avec succès.', 'success');
-            window.location.hash = '#accounts-gestion_profil';
+            navigateTo('/account');
         } else {
             throw new Error(response.message || 'Échec de la désactivation de la 2FA.');
         }

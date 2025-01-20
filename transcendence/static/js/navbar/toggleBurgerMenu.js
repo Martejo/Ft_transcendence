@@ -1,6 +1,3 @@
-// navbar/toggleBurgerMenu.js
-
-
 // Fonction pour afficher/masquer le burger menu
 export function toggleBurgerMenu() {
     console.log('toggleBurgerMenu');
@@ -15,6 +12,7 @@ export function toggleBurgerMenu() {
     } else {
         menu.style.display = 'block';
         overlay.style.display = 'block';
+        
         function handleOutsideClick(event) {
             const burgerToggle = document.getElementById('burger-menu-toggle');
             if (!menu.contains(event.target) && burgerToggle && !burgerToggle.contains(event.target)) {

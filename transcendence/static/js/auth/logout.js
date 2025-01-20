@@ -28,8 +28,7 @@ export async function handleLogout() {
         showStatusMessage('Votre compte a été déconnecté avec succès.', 'success');
         setTimeout(() => {
             clearSessionAndUI();
-        }, 5000);
-
+        }, 3000);
         console.log('Déconnexion réussie.');
     } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);

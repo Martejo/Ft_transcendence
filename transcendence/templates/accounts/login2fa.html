@@ -10,7 +10,7 @@
 				<form id="login-2fa-form" method="POST" >
 					{% csrf_token %}
 					<div class="d-flex flex-column form-group">
-							<label for="id_code">{% trans "Code 2FA :" %}</label>
+							<label for="code">{% trans "Code 2FA :" %}</label>
 							{{ login2fa_form.code}}
 					</div>
 					<button type="submit" class="btn btn-primary btn-70">{% trans "Valider" %}</button>

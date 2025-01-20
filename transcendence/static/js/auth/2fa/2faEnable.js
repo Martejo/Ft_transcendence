@@ -1,3 +1,4 @@
+import { navigateTo } from '/static/js/router.js';
 import { requestGet, requestPost } from '/static/js/api/index.js';
 import { updateHtmlContent, showStatusMessage } from '/static/js/tools/index.js';
 
@@ -43,7 +44,7 @@ async function verification2FA(event) {
         const response = await requestPost('accounts', '2fa/check', formData);
         if (response.status === 'success') {
             showStatusMessage('2FA activée avec succès.', 'success');
-            window.location.hash = '#accounts-gestion_profil';
+            navigateTo('/account');
         } else {
             throw new Error(response.message || 'Code 2FA incorrect.');
         }

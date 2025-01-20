@@ -1,6 +1,7 @@
 import { requestPost, requestGet } from '../../api/index.js';
 import { handleNavbar } from '../../navbar/index.js'; // Adjust the import path as necessary
 import { updateHtmlContent, showStatusMessage } from '../../tools/index.js'; // Adjust the import path as necessary
+import { navigateTo } from '../../router.js';
 
 // Soumission du formulaire de connexion 2FA
 async function submitLogin2FA(form) {
@@ -15,9 +16,9 @@ async function submitLogin2FA(form) {
             setTimeout(async () => {
                 window.isAuthenticated = true;
                 await handleNavbar(); // Met à jour la barre de navigation
-                window.location.hash = '#game-home';
+                navigateTo('/home'); // Redirige vers la page d'accueil
             }, 1000);
-            showStatusMessage('2FA activée avec succès.', 'success');
+            showStatusMessage('Connexion 2FA réussie.', 'success');
         } else {
             throw new Error(response.message || 'Code 2FA incorrect.');
         }

@@ -2,6 +2,7 @@ import { toggleBurgerMenu } from './toggleBurgerMenu.js';
 import { requestGet } from '../api/index.js';
 import { updateHtmlContent, showStatusMessage } from '../tools/index.js';
 import { eventsHandlerBurgerMenu } from '../burgerMenu/index.js';
+import { navigateTo } from '../router.js'; // Importer la fonction pour naviguer
 
 /**
  * Initialise le burger menu : attache les événements et configure le rechargement périodique.
@@ -12,6 +13,17 @@ async function initializeBurgerMenu() {
         burgerToggle.addEventListener('click', toggleBurgerMenu);
         burgerToggle.dataset.bound = true; // Marque comme attaché
         console.log('Événements du burger menu initialisés.');
+    }
+}
+
+
+function handleHomeButtonClick(isAuthenticated) {
+    if (isAuthenticated) {
+        // Redirige vers la page de jeu
+        navigateTo('/home');
+    } else {
+        // Redirige vers la page de connexion
+        navigateTo('/login');
     }
 }
 
@@ -29,6 +41,14 @@ async function loadNavbar() {
             // Met à jour le contenu HTML de la navbar
             updateHtmlContent('#navbar', data.html);
             console.log('Contenu de la navbar mis à jour.');
+
+            // Attache un gestionnaire d'événements au bouton "PONGAME"
+            const homeButton = document.querySelector('#home-btn');
+            if (homeButton && !homeButton.dataset.bound) {
+                homeButton.addEventListener('click', () => handleHomeButtonClick(data.is_authenticated));
+                homeButton.dataset.bound = true; // Évite d'attacher plusieurs fois
+            }
+
             return data.is_authenticated;
         } else {
             console.error('Les données HTML de la navbar sont manquantes.');
@@ -48,6 +68,7 @@ async function loadNavbar() {
  * Gestionnaire pour charger et afficher la navbar.
  * Gère les erreurs et affiche des messages appropriés en cas de problème.
  */
+
 export async function handleNavbar() {
     console.log('Chargement de la navbar...');
     try {

@@ -25,6 +25,10 @@ export function initializeRouter() {
             console.log('Route: Login');
             handleLogin();
         })
+        .on('/login-2fa', () => {
+            console.log('Route: Login');
+            initializeLogin2FAView();
+        })
         .on('/register', () => {
             console.log('Route: Register');
             initializeRegisterView();
