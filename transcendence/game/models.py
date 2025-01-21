@@ -16,90 +16,149 @@ class GameInvitation(models.Model):
     def __str__(self):
         return f"Invitation de {self.from_user.username} à {self.to_user.username} - {self.status}"
 
+class GameResult(models.Model):
+    """Modèle représentant le résultat d'une partie."""
+    player1 = models.ForeignKey(
+        CustomUser,
+        related_name='games_as_player1',
+        on_delete=models.CASCADE,
+    )
+    player2 = models.ForeignKey(
+        CustomUser,
+        related_name='games_as_player2',
+        on_delete=models.CASCADE,
+    )
+    score_player1 = models.PositiveIntegerField(default=0)
+    score_player2 = models.PositiveIntegerField(default=0)
+    winner = models.ForeignKey(
+        CustomUser,
+        related_name='games_won',
+        on_delete=models.CASCADE,
+        null=True,  # Null en cas de match nul
+        blank=True,
+    )
+    is_draw = models.BooleanField(default=False)  # Match nul
+    date = models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICES = [
+        ('ongoing', 'Ongoing'),
+        ('finished', 'Finished'),
+    ]
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='ongoing',
+    )
+
+    def __str__(self):
+        if self.is_draw:
+            return f"Match nul entre {self.player1.username} et {self.player2.username}"
+        return f"Victoire de {self.winner.username} ({self.player1.username} vs {self.player2.username})"
+
+    class Meta:
+        verbose_name = "Game Result"
+        verbose_name_plural = "Game Results"
+        ordering = ['-date']
+
+
 
 class GameParameters(models.Model):
-    BALL_SPEED_CHOICES = [
-        (1, 'Slow'),
-        (2, 'Medium'),
-        (3, 'Fast'),
-    ]
-    ball_speed = models.PositiveSmallIntegerField(choices=BALL_SPEED_CHOICES, default=2)
+    """Modèle représentant les paramètres personnalisés d'une partie."""
+    BALL_SPEED_MIN = 1.0
+    BALL_SPEED_MAX = 2.0
+
+    ball_speed = models.FloatField(
+        default=1.0,
+        help_text="Ball speed (range: 1.0 to 2.0).",
+    )
 
     RACKET_SIZE_CHOICES = [
-        (1, 'Small'),
-        (2, 'Medium'),
-        (3, 'Large'),
+        ('small', 'Small'),
+        ('medium', 'Medium'),
+        ('large', 'Large'),
     ]
-    racket_size = models.PositiveSmallIntegerField(choices=RACKET_SIZE_CHOICES, default=2)
+    racket_size = models.CharField(
+        max_length=10,
+        choices=RACKET_SIZE_CHOICES,
+        default='medium',
+    )
 
-    bonus_malus_activation = models.BooleanField(default=False)
-    bumpers_activation = models.BooleanField(default=False)
+    # Bonus options
+    bonus_obstacle = models.BooleanField(default=False)
+    bonus_speed = models.BooleanField(default=False)
+    bonus_shrink = models.BooleanField(default=False)
+    bonus_frost = models.BooleanField(default=False)
+    bonus_flash = models.BooleanField(default=False)
+    bonus_mind = models.BooleanField(default=False)
+    bonus_canon = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Ball speed: {self.get_ball_speed_display()}, Racket size: {self.get_racket_size_display()}"
+        return (
+            f"Ball speed: {self.ball_speed}, "
+            f"Racket size: {self.get_racket_size_display()}, "
+            f"Active bonuses: {self.get_active_bonuses()}"
+        )
 
+    def get_active_bonuses(self):
+        """Retourne une liste des bonus activés."""
+        bonuses = [
+            ('Obstacle', self.bonus_obstacle),
+            ('Speed', self.bonus_speed),
+            ('Shrink', self.bonus_shrink),
+            ('Frost', self.bonus_frost),
+            ('Flash', self.bonus_flash),
+            ('Mind', self.bonus_mind),
+            ('Canon', self.bonus_canon),
+        ]
+        return ", ".join(name for name, active in bonuses if active) or "None"
+
+    class Meta:
+        verbose_name = "Game Parameter"
+        verbose_name_plural = "Game Parameters"
 
 class Game(models.Model):
-    user1 = models.ForeignKey(
+    """Modèle représentant une session de jeu."""
+    player1 = models.ForeignKey(
         CustomUser,
-        related_name='games_as_user1',
-        on_delete=models.CASCADE
-    )
-    user2 = models.ForeignKey(
-        CustomUser,
-        related_name='games_as_user2',
+        related_name='game_sessions_as_player1',
         on_delete=models.CASCADE,
-        null=True,
-        blank=True
     )
-    # Paramètres associés à la partie, toujours présents
-    parameters = models.OneToOneField(
+    player2 = models.ForeignKey(
+        CustomUser,
+        related_name='game_sessions_as_player2',
+        on_delete=models.CASCADE,
+    )
+    parameters = models.ForeignKey(
         'GameParameters',
-        related_name='game',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
-    score_user1 = models.PositiveIntegerField(default=0)
-    score_user2 = models.PositiveIntegerField(default=0)
-    game_type = models.CharField(
-        max_length=20,
-        choices=[
-            ('local', 'Local'),
-            ('online', 'Online'),
-        ],
-        default='local'
+    STATE_CHOICES = [
+        ('pending', 'Pending'),
+        ('ongoing', 'Ongoing'),
+        ('finished', 'Finished'),
+    ]
+    state = models.CharField(
+        max_length=10,
+        choices=STATE_CHOICES,
+        default='pending',
     )
-    start_time = models.DateTimeField(auto_now_add=True)
+    result = models.OneToOneField(
+        'game.GameResult',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    start_time = models.DateTimeField(default=now)
     end_time = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ('pending', 'Pending'),
-            ('in_progress', 'In Progress'),
-            ('completed', 'Completed'),
-            ('canceled', 'Canceled'),
-        ],
-        default='pending'
-    )
+
     def __str__(self):
-        user2_display = self.user2.username if self.user2 else 'Local (Shared Keyboard)'
-        return f"Game: {self.user1.username} vs {user2_display}"
+        return f"GameSession {self.id}: {self.player1.username} vs {self.player2.username} ({self.state})"
 
-    def save(self, *args, **kwargs):
-        # Si le jeu est standard, assure que les paramètres par défaut sont utilisés
-        if not self.parameters:
-            self.parameters = GameParameters.objects.create()
-        super().save(*args, **kwargs)
-
-    def get_scores(self):
-        return {
-            "user1": self.score_user1,
-            "user2": self.score_user2,
-        }
-
-    def end_game(self):
-        self.status = 'completed'
-        self.end_time = now()
-        self.save()
+    class Meta:
+        verbose_name = "Game"
+        verbose_name_plural = "Games"
+        ordering = ['-start_time']
 
 
 

@@ -13,8 +13,9 @@ from django.utils.timezone import now
 
 
 #[DOCUMENTATION] <Django - User & Abstract User>
+
 class CustomUser(AbstractUser):
-    # Champs supplémentaires
+    """Utilisateur personnalisé."""
     is_2fa_enabled = models.BooleanField(default=False)
     totp_secret = models.CharField(max_length=32, null=True, blank=True)
     friends = models.ManyToManyField('self', symmetrical=True, blank=True)
@@ -25,29 +26,17 @@ class CustomUser(AbstractUser):
         default='avatars/default_avatar.png'
     )
     is_online = models.BooleanField(default=False)
+
+    def match_history(self):
+        """Retourne l'historique des parties jouées par l'utilisateur."""
+        return GameResult.objects.filter(
+            models.Q(player1=self) | models.Q(player2=self)
+        ).order_by('-date')
+
     def __str__(self):
         return self.username
 
-# Il faudra le passer dans l'app game par la suite
-class Game(models.Model):
-    player1 = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='games_as_player1', on_delete=models.CASCADE)
-    player2 = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='games_as_player2', on_delete=models.CASCADE)
-    score_player1 = models.IntegerField(default=0)
-    score_player2 = models.IntegerField(default=0)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=[('ongoing', 'Ongoing'), ('finished', 'Finished')], default='ongoing')
-    
-    def __str__(self):
-        return f"Game {self.id} - {self.player1} vs {self.player2}"
 
-class MatchHistory(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='match_histories')
-    game = models.ForeignKey(Game, related_name='match_histories', on_delete=models.CASCADE)
-    result = models.CharField(max_length=10, choices=[('win', 'Win'), ('loss', 'Loss'), ('draw', 'Draw')])
-    played_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.user} - {self.game} - {self.result}"
 
 
 class FriendRequest(models.Model):
