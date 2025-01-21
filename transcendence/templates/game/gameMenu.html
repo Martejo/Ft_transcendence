@@ -10,14 +10,14 @@
                 <h5 class="card-title">{% trans "Type de Partie" %}</h5>
                 <div class="d-flex flex-column gap-2">
                     <button id="local-game-btn" class="btn btn-primary w-100">{% trans "Partie Locale" %}</button>
-                    <button id="invite-game-btn" class="btn btn-primary w-100">{% trans "Partie en ligne" %}</button>
-                    <button id="invite-tournament-btn" class="btn btn-primary w-100">{% trans "Créer un tournoi en ligne" %}</button>
+                    <button id="online-game-btn" class="btn btn-primary w-100">{% trans "Partie en ligne" %}</button>
+                    <button id="tournament-btn" class="btn btn-primary w-100">{% trans "Créer un tournoi en ligne" %}</button>
                 </div>
             </div>
         </div>
 
         <!-- Section des modes de jeu (affichée après le choix du type de partie) -->
-        <div id="game-modes" class="card mb-3 bg-secondary d-none">
+        <!-- <div id="game-modes" class="card mb-3 bg-secondary d-none">
             <div class="card-body">
                 <h5 class="card-title">{% trans "Modes de Jeu" %}</h5>
                 <div class="d-flex flex-column gap-2">
@@ -25,32 +25,32 @@
                     <button id="custom-game-btn" class="btn btn-primary w-100">{% trans "Personnaliser Partie" %}</button>
                 </div>
             </div>
-        </div>
+        </div> -->
 
 
-        <!-- Menu de personnalisation du gameplay (affiché uniquement pour Jeu Personnalisé) -->
-        <div id="customization-menu" class="card mb-3 bg-secondary d-none">
+        <!-- Menu de personnalisation du gameplay local -->
+        <div id="customization-local-game" class="card mb-3 bg-secondary d-none">
             <div class="card-body">
-                <h5 class="card-title">{% trans "Personnalisation du Gameplay" %}</h5>
+                <h5 class="card-title">{% trans "Gameplay Local" %}</h5>
                 
                 <!-- Vitesse de la balle -->
                 <div class="mb-3">
-                    <label for="ballSpeed" class="form-label">{% trans "Vitesse de la Balle" %} (x<span id="ballSpeedValue">1</span>)</label>
-                    <input type="range" class="form-range" id="ballSpeed" min="1" max="2" value="1" step="0.01" oninput="updateBallSpeed()">
+                    <label for="ballSpeedLocal" class="form-label">{% trans "Vitesse de la Balle" %} (x<span id="ballSpeedValueLocal">1</span>)</label>
+                    <input type="range" class="form-range" id="ballSpeedLocal" min="1" max="2" value="1" step="0.01" >
                 </div>
 
                 <!-- Taille de la raquette -->
                 <div class="mb-3">
-                    <label for="paddleSizeSelect" class="form-label">{% trans "Taille de la Raquette" %}</label>
-                    <select id="paddleSizeSelect" class="form-select" onchange="updatePaddleSize()">
+                    <label for="paddleSizeSelectLocal" class="form-label">{% trans "Taille de la Raquette" %}</label>
+                    <select id="paddleSizeSelectLocal" class="form-select">
                         <option value="small">{% trans "Petite" %}</option>
                         <option value="medium" selected>{% trans "Moyenne" %}</option>
                         <option value="large">{% trans "Grande" %}</option>
                     </select>
                 </div>
 
-                <button id= "tutorial-btn" class="btn btn-secondary w-100">{% trans "Selection des Bonus" %} </button>
-				<div id="tutorial-content" class="collapse mt-3">
+                <button id= "tutorial-btn-local" class="btn btn-secondary w-100">{% trans "Selection des Bonus" %} </button>
+				<div id="tutorial-content-local" class="collapse mt-3">
                     <p>💥 {% trans "**Power-Ups Légendaires !**" %} 💥</p>
                     <ul class="list-unstyled">
                         <li class="d-flex align-items-center mb-2">
@@ -91,9 +91,148 @@
                     </ul>
                 </div>
 
-                <button id="start-game-btn" class="btn btn-primary w-100 mt-3" onclick="initializeRemoteMenu(1)">{% trans "Lancer Partie Personnalisée" %}</button>
+                <button id="start-game-btn" class="btn btn-primary w-100 mt-3">{% trans "Lancer Partie" %}</button>
             </div>
         </div>
+
+
+
+		<!-- Menu de personnalisation du gameplay online -->
+        <div id="customization-online-game" class="card mb-3 bg-secondary d-none">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Gameplay en Ligne" %}</h5>
+                
+                <!-- Vitesse de la balle -->
+                <div class="mb-3">
+                    <label for="ballSpeedOnline" class="form-label">{% trans "Vitesse de la Balle" %} (x<span id="ballSpeedValueOnline">1</span>)</label>
+                    <input type="range" class="form-range" id="ballSpeedOnline" min="1" max="2" value="1" step="0.01" >
+                </div>
+
+                <!-- Taille de la raquette -->
+                <div class="mb-3">
+                    <label for="paddleSizeSelectOnline" class="form-label">{% trans "Taille de la Raquette" %}</label>
+                    <select id="paddleSizeSelectOnline" class="form-select" >
+                        <option value="small">{% trans "Petite" %}</option>
+                        <option value="medium" selected>{% trans "Moyenne" %}</option>
+                        <option value="large">{% trans "Grande" %}</option>
+                    </select>
+                </div>
+
+                <button id= "tutorial-btn-online" class="btn btn-secondary w-100">{% trans "Selection des Bonus" %} </button>
+				<div id="tutorial-content-online" class="collapse mt-3">
+                    <p>💥 {% trans "**Power-Ups Légendaires !**" %} 💥</p>
+                    <ul class="list-unstyled">
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusObstacle">
+                            <img src="{% static 'png_game/obstacle.png' %}" alt="Obstacle" class="img-bonus me-2">
+                            <span>Attention aux obstacles !</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusSpeed">
+                            <img src="{% static 'png_game/speed.png' %}" alt="Acceleration" class="img-bonus me-2">
+                            <span>Accelere la vitesse de ta raquette</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusShrink">
+                            <img src="{% static 'png_game/minus.png' %}" alt="Minus" class="img-bonus me-2">
+                            <span>Reduis la taille de la raquette de ton adversaire</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFrost">
+                            <img src="{% static 'png_game/icy.png' %}" alt="ice-age" class="img-bonus me-2">
+                            <span>Fais deraper ton adversaire</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFlash">
+                            <img src="{% static 'png_game/flash.png' %}" alt="flash" class="img-bonus me-2">
+                            <span>Morsure du Soleil</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusMind">
+                            <img src="{% static 'png_game/change.png' %}" alt="reverse-control" class="img-bonus me-2">
+                            <span>Inverse les commandes de l'adversaire</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusCanon">
+                            <img src="{% static 'png_game/canon.png' %}" alt="canon" class="img-bonus me-2">
+                            <span>Propulse la balle a toute vitesse</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <button id="invite-game-btn" class="btn btn-primary w-100 mt-3">{% trans "Inviter un ami" %}</button>
+            </div>
+        </div>
+
+
+		<!-- Menu de personnalisation du gameplay tournoi -->
+        <div id="customization-tournament" class="card mb-3 bg-secondary d-none">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Gameplay du Tournoi" %}</h5>
+                
+                <!-- Vitesse de la balle -->
+                <div class="mb-3">
+                    <label for="ballSpeedTournament" class="form-label">{% trans "Vitesse de la Balle" %} (x<span id="ballSpeedValueTournament">1</span>)</label>
+                    <input type="range" class="form-range" id="ballSpeedTournament" min="1" max="2" value="1" step="0.01" >
+                </div>
+
+                <!-- Taille de la raquette -->
+                <div class="mb-3">
+                    <label for="paddleSizeSelectTournament" class="form-label">{% trans "Taille de la Raquette" %}</label>
+                    <select id="paddleSizeSelectTournament" class="form-select" >
+                        <option value="small">{% trans "Petite" %}</option>
+                        <option value="medium" selected>{% trans "Moyenne" %}</option>
+                        <option value="large">{% trans "Grande" %}</option>
+                    </select>
+                </div>
+
+                <button id= "tutorial-btn-tournament" class="btn btn-secondary w-100">{% trans "Selection des Bonus" %} </button>
+				<div id="tutorial-content-tournament" class="collapse mt-3">
+                    <p>💥 {% trans "**Power-Ups Légendaires !**" %} 💥</p>
+                    <ul class="list-unstyled">
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusObstacle">
+                            <img src="{% static 'png_game/obstacle.png' %}" alt="Obstacle" class="img-bonus me-2">
+                            <span>Attention aux obstacles !</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusSpeed">
+                            <img src="{% static 'png_game/speed.png' %}" alt="Acceleration" class="img-bonus me-2">
+                            <span>Accelere la vitesse de ta raquette</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusShrink">
+                            <img src="{% static 'png_game/minus.png' %}" alt="Minus" class="img-bonus me-2">
+                            <span>Reduis la taille de la raquette de ton adversaire</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFrost">
+                            <img src="{% static 'png_game/icy.png' %}" alt="ice-age" class="img-bonus me-2">
+                            <span>Fais deraper ton adversaire</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFlash">
+                            <img src="{% static 'png_game/flash.png' %}" alt="flash" class="img-bonus me-2">
+                            <span>Morsure du Soleil</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusMind">
+                            <img src="{% static 'png_game/change.png' %}" alt="reverse-control" class="img-bonus me-2">
+                            <span>Inverse les commandes de l'adversaire</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusCanon">
+                            <img src="{% static 'png_game/canon.png' %}" alt="canon" class="img-bonus me-2">
+                            <span>Propulse la balle a toute vitesse</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <button id="invite-tournament-btn" class="btn btn-primary w-100 mt-3">{% trans "Lancer Tournoi" %}</button>
+            </div>
+        </div>
+
+
 		<div class="test mt-0 " style="font-size: 1px;"><p> .</p></div>  <!-- Pour qu'il y ait une marge en bas -->
     </div>
 </div>
@@ -115,7 +254,7 @@
 		min-width: 200px;
 	}
 
-	#tutorial-content {
+	#tutorial-content-local, #tutorial-content-online, #tutorial-content-tournament {
 		transition: all 0.4s ease-in-out;
 		overflow: hidden;
 	}
@@ -143,19 +282,3 @@
         display: none;
     }
 </style>
-
-<script>
-    // Met à jour l'affichage de la valeur de la vitesse de la balle
-    function updateBallSpeed() {
-        document.getElementById('ballSpeedValue').innerText = document.getElementById('ballSpeed').value;
-    }
-
-    // Met à jour la taille de la raquette selon l'option choisie
-    function updatePaddleSize() {
-        const paddleSize = document.getElementById('paddleSizeSelect').value;
-        console.log("Taille de la raquette choisie :", paddleSize);
-    }
-
-
-
-</script>

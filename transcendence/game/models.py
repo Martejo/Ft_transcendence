@@ -15,7 +15,7 @@ class GameInvitation(models.Model):
     
     def __str__(self):
         return f"Invitation de {self.from_user.username} à {self.to_user.username} - {self.status}"
-
+		
 
 class GameParameters(models.Model):
     BALL_SPEED_CHOICES = [

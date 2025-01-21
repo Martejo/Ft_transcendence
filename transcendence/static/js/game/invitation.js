@@ -125,4 +125,3 @@ export async function handleInviteGame() {
         console.error('Erreur lors de l\'envoi de l\'invitation :', error);
     }
 }
-

@@ -5,24 +5,116 @@ import { handleInviteGame } from './invitation.js'; // Suppose qu'on gère l'inv
 function attachGameMenuEvents() {
     console.log('Attachement des événements pour le menu du jeu.');
 
+	
+
     // =============================
     // 1) Bouton "Partie Locale"
     // =============================
     const localGameBtn = document.getElementById('local-game-btn');
     if (localGameBtn) {
         localGameBtn.addEventListener('click', () => {
-            // On affiche les modes de jeu (standard / personnalisé)
-            document.getElementById('game-modes').classList.remove('d-none');
-            // On masque la personnalisation (au cas où)
-            document.getElementById('customization-menu').classList.add('d-none');
+			// On masque les autres div de personnalisation (au cas où elles seraient apparantes)
+            document.getElementById('customization-online-game').classList.add('d-none');
+			document.getElementById('customization-tournament').classList.add('d-none');
+            // On affiche la personnalisation du jeu en local
+            document.getElementById('customization-local-game').classList.remove('d-none');
+			
+		}); 
+    }
 
-            // On peut stocker quelque part le fait qu'on est en mode "local" (via une variable globale, data-attribute, etc.)
-            // Par simplicité, on ne le fait pas ici, on gérera dans les boutons standard / custom
+	const localtutorialBtn = document.getElementById('tutorial-btn-local');
+	if (localtutorialBtn) {
+		localtutorialBtn.addEventListener('click', () => {
+			const localtutorialContent = document.getElementById('tutorial-content-local');
+		if (localtutorialContent.classList.contains('collapse')) {
+			localtutorialContent.classList.remove('collapse');
+		} else {
+			localtutorialContent.classList.add('collapse');
+		}
+		});
+	}
+	
+
+	const ballSpeedLocal = document.getElementById('ballSpeedLocal');
+    if (ballSpeedLocal) {
+        ballSpeedLocal.addEventListener('input', () => {
+            document.getElementById('ballSpeedValueLocal').innerText = ballSpeedLocal.value;
+            console.log("Vitesse de balle choisie (Local):", ballSpeedLocal.value);
+        });
+    }
+
+	// =============================
+    // 2) Bouton "Partie En Ligne"
+    // =============================
+    const onlineGameBtn = document.getElementById('online-game-btn');
+    if (onlineGameBtn) {
+        onlineGameBtn.addEventListener('click', () => {
+			// On masque les autres div de personnalisation (au cas où elles seraient apparantes)
+			document.getElementById('customization-local-game').classList.add('d-none');
+			document.getElementById('customization-tournament').classList.add('d-none');
+            // On affiche la personnalisation du jeu en ligne
+            document.getElementById('customization-online-game').classList.remove('d-none');
+
+        });
+    }
+
+	const onlinetutorialBtn = document.getElementById('tutorial-btn-online');
+	if (onlinetutorialBtn) {
+		onlinetutorialBtn.addEventListener('click', () => {
+			const onlinetutorialContent = document.getElementById('tutorial-content-online');
+		if (onlinetutorialContent.classList.contains('collapse')) {
+			onlinetutorialContent.classList.remove('collapse');
+		} else {
+			onlinetutorialContent.classList.add('collapse');
+		}
+		});
+	}
+
+	const ballSpeedOnline = document.getElementById('ballSpeedOnline');
+    if (ballSpeedOnline) {
+        ballSpeedOnline.addEventListener('input', () => {
+            document.getElementById('ballSpeedValueOnline').innerText = ballSpeedOnline.value;
+            console.log("Vitesse de balle choisie (Online):", ballSpeedOnline.value);
+        });
+    }
+
+	// =============================
+    // 3) Bouton "Tournoi"
+    // =============================
+    const tournamentBtn = document.getElementById('tournament-btn');
+    if (tournamentBtn) {
+        tournamentBtn.addEventListener('click', () => {
+            // On masque les autres div de personnalisation (au cas où elles seraient apparantes)
+			document.getElementById('customization-local-game').classList.add('d-none');
+            document.getElementById('customization-online-game').classList.add('d-none');
+            // On affiche la personnalisation du jeu en ligne
+			document.getElementById('customization-tournament').classList.remove('d-none');
+
+        });
+    }
+
+	const tournamenttutorialBtn = document.getElementById('tutorial-btn-tournament');
+	if (tournamenttutorialBtn) {
+		tournamenttutorialBtn.addEventListener('click', () => {
+			const tournamenttutorialContent = document.getElementById('tutorial-content-tournament');
+		if (tournamenttutorialContent.classList.contains('collapse')) {
+			tournamenttutorialContent.classList.remove('collapse');
+		} else {
+			tournamenttutorialContent.classList.add('collapse');
+		}
+		});
+	}
+
+	const ballSpeedTournament = document.getElementById('ballSpeedTournament');
+    if (ballSpeedTournament) {
+        ballSpeedTournament.addEventListener('input', () => {
+            document.getElementById('ballSpeedValueTournament').innerText = ballSpeedTournament.value;
+            console.log("Vitesse de balle choisie (Tournament):", ballSpeedLocal.value);
         });
     }
 
     // =============================
-    // 2) Bouton "Inviter un Ami" (donc partie ONLINE)
+    // 4) Bouton "Inviter un Ami" (donc partie ONLINE apres avoir custom)
     // =============================
     const inviteGameButton = document.querySelector('#invite-game-btn');
     if (inviteGameButton && !inviteGameButton.dataset.bound) {
@@ -36,7 +128,6 @@ function attachGameMenuEvents() {
         });
         inviteGameButton.dataset.bound = true;
     }
-
 
     // Fonction pour lancer partie standard a oimplemetner 
     // function initializeRemoteMenu(participantCount) {
@@ -80,40 +171,7 @@ function attachGameMenuEvents() {
         });
     }
 
-    // =============================
-    // 4) Bouton "Jeu Personnalisé"
-    // =============================
-    const customGameBtn = document.getElementById('custom-game-btn');
-    if (customGameBtn) {
-        customGameBtn.addEventListener('click', () => {
-            // On dévoile le menu de customisation
-            document.getElementById('customization-menu').classList.remove('d-none');
-        });
-    }
 
-
-    const tutorialBtn = document.getElementById('tutorial-btn');
-    if (tutorialBtn) {
-        tutorialBtn.addEventListener('click', () => {
-            const tutorialContent = document.getElementById('tutorial-content');
-		if (tutorialContent.classList.contains('collapse')) {
-			tutorialContent.classList.remove('collapse');
-		} else {
-			tutorialContent.classList.add('collapse');
-		}
-        });
-    }
-
-    // =============================
-    // 5) Input "vitesse de la balle"
-    // =============================
-    const ballSpeed = document.getElementById('ballSpeed');
-    if (ballSpeed) {
-        ballSpeed.addEventListener('input', () => {
-            document.getElementById('ballSpeedValue').innerText = ballSpeed.value;
-            console.log("Vitesse de balle choisie :", ballSpeed.value);
-        });
-    }
 
     // =============================
     // 6) Bouton "Lancer la partie personnalisée"
