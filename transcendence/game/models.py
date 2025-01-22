@@ -37,7 +37,7 @@ class GameResult(models.Model):
         null=True,  # Null en cas de match nul
         blank=True,
     )
-    is_draw = models.BooleanField(default=False)  # Match nul
+    is_draw = models.BooleanField(default=False)  # Indique si le match est nul
     date = models.DateTimeField(auto_now_add=True)
     STATUS_CHOICES = [
         ('ongoing', 'Ongoing'),
@@ -49,6 +49,20 @@ class GameResult(models.Model):
         default='ongoing',
     )
 
+    def save(self, *args, **kwargs):
+        """Détermine le vainqueur ou si le match est nul avant de sauvegarder."""
+        if self.score_player1 == self.score_player2:
+            self.is_draw = True
+            self.winner = None
+        else:
+            self.is_draw = False
+            self.winner = self.player1 if self.score_player1 > self.score_player2 else self.player2
+        super().save(*args, **kwargs)
+
+    def get_opponent(self, user):
+        """Retourne l'adversaire d'un utilisateur dans ce match."""
+        return self.player2 if self.player1 == user else self.player1
+
     def __str__(self):
         if self.is_draw:
             return f"Match nul entre {self.player1.username} et {self.player2.username}"
@@ -58,6 +72,7 @@ class GameResult(models.Model):
         verbose_name = "Game Result"
         verbose_name_plural = "Game Results"
         ordering = ['-date']
+
 
 
 

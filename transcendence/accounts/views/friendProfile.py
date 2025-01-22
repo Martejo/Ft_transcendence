@@ -11,6 +11,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
+from django.db.models import Q
+from game.models import GameResult
 
 # ---- Imports locaux ----
 
@@ -23,7 +25,7 @@ User = get_user_model()
 @method_decorator([csrf_protect, login_required], name='dispatch')
 class FriendProfileView(View):
     """
-    Display the profile of a friend, including statistics and metadata.
+    Display the profile of a friend, including statistics, metadata, and match history.
     """
 
     def get(self, request, friend_username):
@@ -35,21 +37,31 @@ class FriendProfileView(View):
             logger.info(f"User found: {friend.username}")
 
             # Calcul des statistiques supplémentaires pour l'ami
-            match_count = friend.match_histories.count() if hasattr(friend, 'match_histories') else 0
-            victories = friend.match_histories.filter(result='win').count() if hasattr(friend, 'match_histories') else 0
-            defeats = friend.match_histories.filter(result='loss').count() if hasattr(friend, 'match_histories') else 0
-            best_score = (
-                friend.games_as_player1.aggregate(Max('score_player1'))['score_player1__max']
-                if hasattr(friend, 'games_as_player1')
-                else 0
+            matches = GameResult.objects.filter(Q(player1=friend) | Q(player2=friend))
+            match_count = matches.count()
+            victories = matches.filter(winner=friend).count()
+            defeats = match_count - victories
+            best_score = max(
+                matches.filter(player1=friend).aggregate(Max('score_player1'))['score_player1__max'] or 0,
+                matches.filter(player2=friend).aggregate(Max('score_player2'))['score_player2__max'] or 0,
             )
-            best_score = best_score or 0  # Valeur par défaut pour le meilleur score
             friends_count = friend.friends.count()
 
             logger.info(
                 f"Statistics calculated: match_count={match_count}, victories={victories}, "
                 f"defeats={defeats}, best_score={best_score}, friends_count={friends_count}"
             )
+
+            # Calcul de l'historique des matchs
+            match_histories = []
+            for match in matches.order_by('-date'):
+                opponent = match.player1 if match.player2 == friend else match.player2
+                match_histories.append({
+                    'opponent': opponent.username,
+                    'result': 'win' if match.winner == friend else 'loss' if not match.is_draw else 'draw',
+                    'score': f"{match.score_player1} - {match.score_player2}",
+                    'played_at': match.date,
+                })
 
             # Préparer le contexte pour rendre le template
             default_avatar = '/media/avatars/default_avatar.png'
@@ -61,6 +73,7 @@ class FriendProfileView(View):
                 'defeats': defeats,
                 'best_score': best_score,
                 'friends_count': friends_count,
+                'match_histories': match_histories,  # Ajouter l'historique des matchs
             }
 
             # Rendre le template en HTML
@@ -74,5 +87,4 @@ class FriendProfileView(View):
         except Exception as e:
             logger.error(f"Error loading friend profile: {e}")
             return JsonResponse({'status': 'error', 'message': 'Erreur lors du chargement du profil de l\'ami.'}, status=500)
-
 

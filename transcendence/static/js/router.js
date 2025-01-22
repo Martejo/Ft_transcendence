@@ -60,9 +60,10 @@ export function initializeRouter() {
             console.log('Route: game-options');
             handleGameMenu();
         })
-        .on('/profile/:friendUsername', ({ friendUsername }) => {
+        .on('/profile/:friendUsername', ({ data }) => {
+            const friendUsername = data.friendUsername; // Utilisez `data` pour extraire le paramètre
             console.log(`Route: Profile for ${friendUsername}`);
-            handleFriendProfile(friendUsername); // Appelle la fonction pour gérer le profil de l'ami
+            handleFriendProfile(friendUsername);
         })
         .notFound(() => {
             console.error('Route inconnue : Page non trouvée');

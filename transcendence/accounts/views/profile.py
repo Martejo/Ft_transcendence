@@ -38,29 +38,29 @@ class ProfileView(View):
             )
             friends_count = user.friends.count()
 
-            # Récupération de l'historique
-            match_histories = [
-                {
-                    'opponent': match.get_opponent(user),
-                    'result': match.get_result(user),
+            match_histories = []
+            for match in matches:
+                opponent = match.get_opponent(user)
+                match_histories.append({
+                    'opponent': opponent,
+                    'result': 'win' if match.winner == user else 'loss',
+                    'score_user': match.score_player1 if match.player1 == user else match.score_player2,
+                    'score_opponent': match.score_player2 if match.player1 == user else match.score_player1,
                     'played_at': match.date,
-                }
-                for match in matches.order_by('-date')
-            ]
-
+                })
             logger.info(
                 f"Statistics calculated: match_count={match_count}, victories={victories}, "
                 f"defeats={defeats}, best_score={best_score}, friends_count={friends_count}"
             )
 
             context = {
-                'user': user,
-                'match_count': match_count,
-                'victories': victories,
-                'defeats': defeats,
-                'best_score': best_score,
-                'friends_count': friends_count,
-                'match_histories': match_histories,
+            'user': user,
+            'match_count': match_count,
+            'victories': victories,
+            'defeats': defeats,
+            'best_score': best_score,
+            'friends_count': friends_count,
+            'match_histories': match_histories,
             }
 
             rendered_html = render_to_string('accounts/profile.html', context)

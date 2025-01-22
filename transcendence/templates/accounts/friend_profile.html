@@ -32,6 +32,28 @@
 		</div>
 	</div>
 
+	<!-- Section Historique des matchs -->
+    <div class="row d-flex justify-content-center mb-4">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
+            <div class="match-history text-center">
+                <h4 class="stat-title">{% trans "Historique des Matchs" %}</h4>
+                {% if match_histories %}
+                    <ul class="list-group list-group-flush">
+                        {% for match in match_histories %}
+                            <li class="list-group-item bg-transparent text-white">
+                                <strong>{% trans "Adversaire : " %}</strong>{{ match.opponent.username }}<br>
+                                <strong>{% trans "Résultat : " %}</strong>{% if match.result == "win" %}{% trans "Victoire" %}{% else %}{% trans "Défaite" %}{% endif %}<br>
+                                <strong>{% trans "Joué le : " %}</strong>{{ match.played_at|date:"d/m/Y H:i" }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>{% trans "Aucun match enregistré pour le moment." %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
      <!-- Section Amis -->
 	<div class="row d-flex justify-content-center mb-0">
 		<div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-4">
@@ -72,20 +94,13 @@
 		margin-right: 20px;
 	}
 	
-	.statistics {
-		background-color:  #101A32;
-		border: 2px solid rgb(153, 148, 148);
-		padding: 20px;
-		border-radius: 10px;
-		min-width: 300px;
-	}
-	.friends-section {
-		background-color:  #101A32;
-		border: 2px solid rgb(153, 148, 148);
-		padding: 20px;
-		border-radius: 10px;
-		min-width: 300px;
-	}
+	.statistics, .friends-section, .match-history {
+        background-color: #101A32;
+        border: 2px solid rgb(153, 148, 148);
+        padding: 20px;
+        border-radius: 10px;
+        min-width: 300px;
+    }
 
 
 </style>
