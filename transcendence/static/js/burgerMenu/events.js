@@ -2,7 +2,7 @@ import { showFriendPopup, closePopupOnClickOutside, handleOptionPopup,  handleAd
 import { handleStatusChange } from './index.js';
 import { handleLogout } from '../auth/index.js';
 import { navigateTo } from '../router.js';
-
+import { handleGameInvitationBurgerMenu } from '../game/index.js';
 // Gestionnaire principal des événements pour le menu burger
 export function eventsHandlerBurgerMenu() {
     console.log('Initialisation des gestionnaires d\'événements...');
@@ -14,6 +14,7 @@ export function eventsHandlerBurgerMenu() {
     setupAddFriendEvent();      // Gestion du formulaire d'ajout d'ami
     setupFriendsListEvent();    // Gestion des clics sur les amis dans la liste
     setupFriendRequestsEvent(); // Gestion des invitations d'amis
+    setupGameInvitationsEvent();
     setupPopupEvents();         // Gestion des options du popup d'ami
     setupLogoutEvent();         // Gestion du bouton de déconnexion
     setupClosePopupEvent();     // Gestion de la fermeture du popup
@@ -107,6 +108,24 @@ function setupFriendRequestsEvent() {
             }
         });
         friendRequestsContainer.dataset.bound = true;
+    }
+}
+
+// Gestion des clics sur les invitations à jouer
+function setupGameInvitationsEvent() {
+    const gameInvitationsContainer = document.querySelector('#game-invitations-list-container');
+    if (gameInvitationsContainer && !gameInvitationsContainer.dataset.bound) {
+        gameInvitationsContainer.addEventListener('click', async (e) => {
+            const button = e.target.closest('button');
+            if (button) {
+                const invitationId = button.getAttribute('data-invitation-id');
+                const action = button.getAttribute('data-action');
+                if (invitationId && action) {
+                    await handleGameInvitationBurgerMenu(invitationId, action);
+                }
+            }
+        });
+        gameInvitationsContainer.dataset.bound = true;
     }
 }
 

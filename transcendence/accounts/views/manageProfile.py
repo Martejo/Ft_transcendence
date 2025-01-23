@@ -20,61 +20,6 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-# @method_decorator(csrf_protect, name='dispatch')
-# class ProfileView(View):
-#     """
-#     Class-Based View (CBV) for displaying the user's profile.
-#     Returns both JSON data and rendered HTML.
-#     """
-#     def get(self, request):
-#         """
-#         Handle GET request to fetch and return the user's profile information.
-#         """
-#         logger.debug("Entering ProfileView.get()")
-#         try:
-#             user = request.user
-#             logger.info(f"Utilisateur trouvé: {user.username}")
-
-#             # Calculer des données supplémentaires pour l'utilisateur
-#             match_count = user.match_histories.count()
-#             victories = user.match_histories.filter(result='win').count()
-#             defeats = user.match_histories.filter(result='loss').count()
-#             best_score = user.games_as_player1.aggregate(Max('score_player1'))['score_player1__max'] or 0
-
-#             friends_count = user.friends.count()
-
-#             logger.info(f"Statistiques calculées: match_count={match_count}, victories={victories}, defeats={defeats}, best_score={best_score}, friends_count={friends_count}")
-
-#             default_avatar = '/media/avatars/default_avatar.png'
-        
-#             # Render HTML from template
-#             rendered_html = render_to_string('accounts/profile.html')
-
-#             # Prepare the response JSON
-#             response_data = {
-#                 'username': user.username,
-#                 'email': user.email,
-#                 'avatar_url': user.avatar.url if user.avatar else default_avatar,
-#                 'is_2fa_enabled': user.is_2fa_enabled,
-#                 'match_count': match_count,
-#                 'victories': victories,
-#                 'defeats': defeats,
-#                 'best_score': best_score,
-#                 'friends_count': friends_count,
-#             }
-
-#             return JsonResponse({
-#                 'status': 'success',
-#                 'data': response_data,
-#                 'html': rendered_html,  # Include rendered HTML
-#             }, status=200)
-
-#         except Exception as e:
-#             # Log the error and return a generic error message
-#             logger.error(f"Error loading user profile: {e}")
-#             return JsonResponse({'status': 'error', 'message': 'An error occurred while loading the profile.'}, status=500)
-
-
 class ManageProfileView(View):
     """
     Display and manage profile-related forms.

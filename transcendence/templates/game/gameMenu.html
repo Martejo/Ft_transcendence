@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 <div class="game-menu col-12 col-sm-10 col-md-10 col-lg-6 col-xl-6 col-xxl-5">
-    <div class="container-fluid py-4 " style="height: var(--sin-nav-height); font-size: 1.2em;">
+    <div class="container-fluid py-4" style="height: var(--sin-nav-height); font-size: 1.2em;">
         <h1 class="text-center mb-4" style="font-size: 2em;">{% trans "Menu de Jeu" %}</h1>
 
         <!-- Section de choix de type de partie -->
@@ -10,91 +10,22 @@
                 <h5 class="card-title">{% trans "Type de Partie" %}</h5>
                 <div class="d-flex flex-column gap-2">
                     <button id="local-game-btn" class="btn btn-primary w-100">{% trans "Partie Locale" %}</button>
-                    <button id="invite-game-btn" class="btn btn-primary w-100">{% trans "Partie en ligne" %}</button>
-                    <button id="invite-tournament-btn" class="btn btn-primary w-100">{% trans "Créer un tournoi en ligne" %}</button>
+                    <button id="online-game-btn" class="btn btn-primary w-100">{% trans "Partie en ligne" %}</button>
+                    <button id="tournament-game-btn" class="btn btn-primary w-100">{% trans "Créer un tournoi en ligne" %}</button>
                 </div>
             </div>
         </div>
 
-        <!-- Section des modes de jeu (affichée après le choix du type de partie) -->
-        <div id="game-modes" class="card mb-3 bg-secondary d-none">
-            <div class="card-body">
-                <h5 class="card-title">{% trans "Modes de Jeu" %}</h5>
-                <div class="d-flex flex-column gap-2">
-                    <button id="start-game-btn" class="btn btn-primary w-100">{% trans "Lancer Partie Standard" %}</button>
-                    <button id="custom-game-btn" class="btn btn-primary w-100">{% trans "Personnaliser Partie" %}</button>
-                </div>
-            </div>
-        </div>
+        <!-- Sections dynamiques de personnalisation -->
+        <!-- Personnalisation pour Partie Locale -->
+        {% include 'partials/customization-section.html' with customization_id="local" customization_title="Gameplay Local" button_text="Lancer Partie" %}
 
+        <!-- Personnalisation pour Partie en Ligne -->
+        {% include 'partials/customization-section.html' with customization_id="online" customization_title="Gameplay en Ligne" button_text="Inviter un ami" %}
 
-        <!-- Menu de personnalisation du gameplay (affiché uniquement pour Jeu Personnalisé) -->
-        <div id="customization-menu" class="card mb-3 bg-secondary d-none">
-            <div class="card-body">
-                <h5 class="card-title">{% trans "Personnalisation du Gameplay" %}</h5>
-                
-                <!-- Vitesse de la balle -->
-                <div class="mb-3">
-                    <label for="ballSpeed" class="form-label">{% trans "Vitesse de la Balle" %} (x<span id="ballSpeedValue">1</span>)</label>
-                    <input type="range" class="form-range" id="ballSpeed" min="1" max="2" value="1" step="0.01" oninput="updateBallSpeed()">
-                </div>
+        <!-- Personnalisation pour Tournoi -->
+        {% include 'partials/customization-section.html' with customization_id="tournament" customization_title="Gameplay du Tournoi" button_text="Lancer Tournoi" %}
 
-                <!-- Taille de la raquette -->
-                <div class="mb-3">
-                    <label for="paddleSizeSelect" class="form-label">{% trans "Taille de la Raquette" %}</label>
-                    <select id="paddleSizeSelect" class="form-select" onchange="updatePaddleSize()">
-                        <option value="small">{% trans "Petite" %}</option>
-                        <option value="medium" selected>{% trans "Moyenne" %}</option>
-                        <option value="large">{% trans "Grande" %}</option>
-                    </select>
-                </div>
-
-                <button id= "tutorial-btn" class="btn btn-secondary w-100">{% trans "Selection des Bonus" %} </button>
-				<div id="tutorial-content" class="collapse mt-3">
-                    <p>💥 {% trans "**Power-Ups Légendaires !**" %} 💥</p>
-                    <ul class="list-unstyled">
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusObstacle">
-                            <img src="{% static 'png_game/obstacle.png' %}" alt="Obstacle" class="img-bonus me-2">
-                            <span>Attention aux obstacles !</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusSpeed">
-                            <img src="{% static 'png_game/speed.png' %}" alt="Acceleration" class="img-bonus me-2">
-                            <span>Accelere la vitesse de ta raquette</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusShrink">
-                            <img src="{% static 'png_game/minus.png' %}" alt="Minus" class="img-bonus me-2">
-                            <span>Reduis la taille de la raquette de ton adversaire</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFrost">
-                            <img src="{% static 'png_game/icy.png' %}" alt="ice-age" class="img-bonus me-2">
-                            <span>Fais deraper ton adversaire</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusFlash">
-                            <img src="{% static 'png_game/flash.png' %}" alt="flash" class="img-bonus me-2">
-                            <span>Morsure du Soleil</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusMind">
-                            <img src="{% static 'png_game/change.png' %}" alt="reverse-control" class="img-bonus me-2">
-                            <span>Inverse les commandes de l'adversaire</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <input class="form-check-input ms-2 me-3" type="checkbox" id="bonusCanon">
-                            <img src="{% static 'png_game/canon.png' %}" alt="canon" class="img-bonus me-2">
-                            <span>Propulse la balle a toute vitesse</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <button id="start-game-btn" class="btn btn-primary w-100 mt-3" onclick="initializeRemoteMenu(1)">{% trans "Lancer Partie Personnalisée" %}</button>
-            </div>
-        </div>
-		<div class="test mt-0 " style="font-size: 1px;"><p> .</p></div>  <!-- Pour qu'il y ait une marge en bas -->
     </div>
 </div>
 
@@ -115,7 +46,7 @@
 		min-width: 200px;
 	}
 
-	#tutorial-content {
+	#tutorial-content-local, #tutorial-content-online, #tutorial-content-tournament {
 		transition: all 0.4s ease-in-out;
 		overflow: hidden;
 	}
@@ -143,19 +74,3 @@
         display: none;
     }
 </style>
-
-<script>
-    // Met à jour l'affichage de la valeur de la vitesse de la balle
-    function updateBallSpeed() {
-        document.getElementById('ballSpeedValue').innerText = document.getElementById('ballSpeed').value;
-    }
-
-    // Met à jour la taille de la raquette selon l'option choisie
-    function updatePaddleSize() {
-        const paddleSize = document.getElementById('paddleSizeSelect').value;
-        console.log("Taille de la raquette choisie :", paddleSize);
-    }
-
-
-
-</script>

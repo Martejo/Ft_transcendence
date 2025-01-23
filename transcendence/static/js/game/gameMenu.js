@@ -1,146 +1,128 @@
 import { requestGet, requestPost } from '../api/index.js'; 
 import { updateHtmlContent } from '../tools/index.js'; 
-import { handleInviteGame } from './invitation.js'; // Suppose qu'on gère l'invitation en ligne ici
+import { handleInviteGame } from './handleInvitationGame.js'; // Suppose qu'on gère l'invitation en ligne ici
 
 function attachGameMenuEvents() {
-    console.log('Attachement des événements pour le menu du jeu.');
+    const sections = ['local', 'online', 'tournament'];
 
-    // =============================
-    // 1) Bouton "Partie Locale"
-    // =============================
-    const localGameBtn = document.getElementById('local-game-btn');
-    if (localGameBtn) {
-        localGameBtn.addEventListener('click', () => {
-            // On affiche les modes de jeu (standard / personnalisé)
-            document.getElementById('game-modes').classList.remove('d-none');
-            // On masque la personnalisation (au cas où)
-            document.getElementById('customization-menu').classList.add('d-none');
-
-            // On peut stocker quelque part le fait qu'on est en mode "local" (via une variable globale, data-attribute, etc.)
-            // Par simplicité, on ne le fait pas ici, on gérera dans les boutons standard / custom
+    sections.forEach((section) => {
+        // Bouton de sélection
+        document.getElementById(`${section}-game-btn`)?.addEventListener('click', () => {
+            sections.forEach((s) => {
+                document.getElementById(`customization-${s}`).classList.add('d-none');
+            });
+            document.getElementById(`customization-${section}`).classList.remove('d-none');
         });
-    }
 
-    // =============================
-    // 2) Bouton "Inviter un Ami" (donc partie ONLINE)
-    // =============================
-    const inviteGameButton = document.querySelector('#invite-game-btn');
-    if (inviteGameButton && !inviteGameButton.dataset.bound) {
-        inviteGameButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-
-            // handleInviteGame peut, par exemple, gérer l’ID de l’ami, etc.
-            // ou simplement afficher un formulaire pour choisir l’ami 
-            // puis lancer un POST pour game_type="online"
-            await handleInviteGame(); 
+        // Bouton Voir Tuto
+        document.getElementById(`tutorial-btn-${section}`)?.addEventListener('click', () => {
+            const tutorialContent = document.getElementById(`tutorial-content-${section}`);
+            tutorialContent.classList.toggle('collapse');
         });
-        inviteGameButton.dataset.bound = true;
-    }
 
+        // Gestion de la vitesse de la balle
+        document.getElementById(`ballSpeed${section.charAt(0).toUpperCase() + section.slice(1)}`)?.addEventListener('input', (event) => {
+            console.log(`Vitesse de balle (${section}):`, event.target.value);
+        });
 
-    // Fonction pour lancer partie standard a oimplemetner 
-    // function initializeRemoteMenu(participantCount) {
-    //     // Utiliser un gestionnaire d'événements délégué
-    //     $(document).on('click', '#start-tournament-btn, #start-game-btn', function() {
-    
-    //         // Vérifier que participantCount existe avant d'appeler startLoading
-    //         if (typeof participantCount !== 'undefined') {
-    //             startLoading(participantCount); // Charger la page d'attente
-    //         } else {
-    //             console.error('participantCount est non défini');
-    //         }
-    //     });
-    // }
-    
+        // Bouton principal (Lancer Partie, Inviter un ami, Lancer Tournoi)
+        const startGameButton = document.getElementById(`start-game-btn-${section}`);
+        const inviteGameButton = document.getElementById(`invite-game-btn-${section}`);
+        const inviteTournamentButton = document.getElementById(`invite-tournament-btn-${section}`);
+        const test = document.getElementById(`${section}-game-btn`); 
+        console.log(`test:`, test);
 
-    // =============================
-    // 3) Bouton "Jeu Standard"
-    // =============================
-    const standardGameBtn = document.getElementById('standard-game-btn');
-    if (standardGameBtn) {
-        standardGameBtn.addEventListener('click', async () => {
-            try {
-                // Conversion des données en FormData
+        console.log(`inviteGameButton:`, inviteGameButton);
+
+        // Définir un comportement différent selon le bouton
+        if (startGameButton && section === 'local') {
+            startGameButton.addEventListener('click', async () => {
                 const formData = new FormData();
-                formData.append('game_type', 'local');
-                formData.append('ball_speed', 2); 
-                formData.append('racket_size', 2);
-                formData.append('bonus_malus_activation', true);
-                formData.append('bumpers_activation', false);
+                formData.append('game_type', section);
 
-                // Envoi de la requête avec FormData
-                const response = await requestPost('game', 'menu', formData);
+                // Récupérer les éléments
+                const ballSpeedElement = document.getElementById(`ballSpeed${section}`);
+                const paddleSizeElement = document.getElementById(`paddleSizeSelect${section}`);
+                const bonusCheckbox = document.getElementById(`bonus${section}`);
+                const obstacleCheckbox = document.getElementById(`bonusObstacle${section}`);
 
-                // Gérer la réponse
-                alert(`Partie standard créée : ID = ${response.game_id}\n${response.message}`);
-            } catch (err) {
-                console.error('Erreur lors de la création de la partie standard :', err);
-                alert('Impossible de créer la partie standard.');
-            }
-        });
-    }
+                // Vérifier s’ils existent
+                if (!ballSpeedElement || !paddleSizeElement) {
+                    console.error(`Impossible de trouver les champs pour la section "${section}".`);
+                    return;
+                }
+                    
+                console.log(`Vitesse de balle (${section}):`, ballSpeedElement.value);
+                console.log(`Taille de raquette (${section}):`, paddleSizeElement.value);
+                console.log(`Bonus activé (${section}):`, bonusCheckbox?.checked);
+                console.log(`Obstacles activés (${section}):`, obstacleCheckbox?.checked);
+                // Lire les valeurs
+                formData.append('ball_speed', ballSpeedElement.value);
+                formData.append('paddle_size', paddleSizeElement.value);
+                formData.append('bonus_enabled', bonusCheckbox?.checked ?? false);
+                formData.append('obstacles_enabled', obstacleCheckbox?.checked ?? false);
 
-    // =============================
-    // 4) Bouton "Jeu Personnalisé"
-    // =============================
-    const customGameBtn = document.getElementById('custom-game-btn');
-    if (customGameBtn) {
-        customGameBtn.addEventListener('click', () => {
-            // On dévoile le menu de customisation
-            document.getElementById('customization-menu').classList.remove('d-none');
-        });
-    }
+                // Poster vers ton endpoint
+                try {
+                    const response = await requestPost('game', 'create_local_game', formData);
+                    alert(`Partie créée avec succès : ID = ${response.game_id}`);
+                } catch (err) {
+                    console.error('Erreur lors de la création de la partie :', err);
+                    alert('Impossible de créer la partie.');
+                }
+            });
+        }
 
+        if (startGameButton && section === 'online') {
+            startGameButton.addEventListener('click', async () => {
+                try {
+                    // Récupère les éléments
+                    const ballSpeedElement = document.getElementById(`ballSpeed${section}`);
+                    const paddleSizeElement = document.getElementById(`paddleSizeSelect${section}`);
+                    const bonusCheckbox = document.getElementById(`bonus${section}`);
+                    const obstacleCheckbox = document.getElementById(`bonusObstacle${section}`);
 
-    const tutorialBtn = document.getElementById('tutorial-btn');
-    if (tutorialBtn) {
-        tutorialBtn.addEventListener('click', () => {
-            const tutorialContent = document.getElementById('tutorial-content');
-		if (tutorialContent.classList.contains('collapse')) {
-			tutorialContent.classList.remove('collapse');
-		} else {
-			tutorialContent.classList.add('collapse');
-		}
-        });
-    }
+                    if (!ballSpeedElement || !paddleSizeElement) {
+                        console.error(`Impossible de trouver les champs pour la section "${section}".`);
+                        return;
+                    }
+                    
+                    // Stockage en mémoire JS
+                    const onlineParams = {
+                        ball_speed: ballSpeedElement.value,
+                        racket_size: paddleSizeElement.value,
+                        bonus_malus_activation: bonusCheckbox?.checked ?? false,
+                        bumpers_activation: obstacleCheckbox?.checked ?? false,
+                    };
+                    console.log('Paramètres de la partie online:', onlineParams);
 
-    // =============================
-    // 5) Input "vitesse de la balle"
-    // =============================
-    const ballSpeed = document.getElementById('ballSpeed');
-    if (ballSpeed) {
-        ballSpeed.addEventListener('input', () => {
-            document.getElementById('ballSpeedValue').innerText = ballSpeed.value;
-            console.log("Vitesse de balle choisie :", ballSpeed.value);
-        });
-    }
+                    // Maintenant on va charger la page "invite_game.html"
+                    // et injecter le HTML dans #content (ou autre conteneur).
+                    await handleInviteGame(onlineParams);
 
-    // =============================
-    // 6) Bouton "Lancer la partie personnalisée"
-    // =============================
-    const startCustomGameBtn = document.querySelector('#start-custom-game-btn');
-    if (startCustomGameBtn) {
-        startCustomGameBtn.addEventListener('click', async () => {
-            try {
-                // Création de l'objet FormData
+                } catch (err) {
+                    console.error('Erreur lors de la phase d\'invitation :', err);
+                    alert('Impossible d\'inviter un ami.');
+                }
+            });
+        }
+
+        if (inviteTournamentButton) {
+            inviteTournamentButton.addEventListener('click', async () => {
                 const formData = new FormData();
-                formData.append('game_type', 'local'); // pour le moment les parties personnalisées ne sont faisables qu'en local
-                formData.append('ball_speed', document.getElementById('ballSpeed').value); // 1, 2 ou 3
-                formData.append('racket_size', document.getElementById('racketSize').value);
-                formData.append('bonus_malus_activation', document.getElementById('bonusCkeckbox').checked);
-                formData.append('bumpers_activation', document.getElementById('bumpersCheckbox').checked);
+                formData.append('game_type', 'tournament');
+                formData.append('tournament_name', document.getElementById('tournamentName').value); // Exemple pour un champ tournoi
 
-                // Envoi de la requête avec FormData
-                const response = await requestPost('game', 'menu', formData);
-
-                // Gérer la réponse
-                alert(`Partie personnalisée créée : ID = ${response.game_id}\n${response.message}`);
-            } catch (err) {
-                console.error('Erreur lors de la création de la partie personnalisée :', err);
-                alert('Impossible de créer la partie personnalisée.');
-            }
-        });
-    }
+                try {
+                    const response = await requestPost('tournament/create', formData);
+                    alert(`Tournoi créé avec succès : ID = ${response.tournament_id}`);
+                } catch (err) {
+                    console.error('Erreur lors de la création du tournoi :', err);
+                    alert('Impossible de créer le tournoi.');
+                }
+            });
+        }
+    });
 }
 
 export async function handleGameMenu() {
@@ -154,6 +136,5 @@ export async function handleGameMenu() {
         attachGameMenuEvents();
     } catch (error) {
         console.error('Erreur dans handleGameMenu:', error);
-        // displayErrorMessage('#content', 'Erreur lors du chargement du menu du jeu.');
     }
 }

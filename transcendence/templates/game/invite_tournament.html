@@ -3,20 +3,9 @@
 	<h2 class="text-white texte-center mb-4" style="font-size: 2.5em;">{% trans "Invitez vos amis" %}</h2>
 
 
-		<!-- Liste d'amis -->
-		<div class="list-group mb-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4">
-			<!-- Exemple de bloc d'ami - sera généré dynamiquement par AJAX -->
-			<!-- <div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2">
-				<div class="d-flex align-items-center justify-content-between text-white p-2 mb-2 w-100">
-					<div class="position-relative">
-						<img src="png/1.avif" alt="Friend 1" class="rounded-circle me-2" style="width: 50px; height: 50px;">
-						<span class="status-indicator-friend online" id="friend1-status"></span>
-					</div>
-					<button class="friend-btn me-2">Friend1</button>
-					<button class="btn invite-button">Inviter
-						<span class="cancel-icon d-none">&times;</span>
-					</button>
-				</div> -->
+	<!-- Liste d'amis -->
+	<div class="list-group mb-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-4">
+
 
 		<div class="list-group-item d-flex flex-column align-items-center justify-content-between text-white p-2 mb-2 w-100">
 			<div class="text-white p-3 w-100">
@@ -43,7 +32,9 @@
 				<button id="setting-game-btn" class="btn btn-primary w-100 mb-3" disabled style="background-color: #2DB4F3" onclick="window.location.hash='#game-remote_menu'" >{% trans "Continuer" %}</button>
 			</div>
 		</div>
+		
 	</div>
+
 </div>
 <style>
 	body, html {

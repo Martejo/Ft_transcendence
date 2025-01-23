@@ -99,6 +99,8 @@ function initializeFriendInvitation() {
 
 
 
+
+
 export async function handleInviteGame() {
     console.log('Tentative d\'envoi d\'invitation...');
     try {

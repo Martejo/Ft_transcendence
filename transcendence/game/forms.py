@@ -1,42 +1,40 @@
 # game/forms.py
 
 from django import forms
-from game.models import GameParameters
+from game.models import GameParameters, GameInvitationParameters
 
 class GameParametersForm(forms.ModelForm):
-    """
-    Formulaire permettant de personnaliser les paramètres de jeu.
-    """
     class Meta:
         model = GameParameters
-        fields = [
-            'ball_speed',
-            'racket_size',
-            'bonus_obstacle',
-            'bonus_speed',
-            'bonus_shrink',
-            'bonus_frost',
-            'bonus_flash',
-            'bonus_mind',
-            'bonus_canon',
-        ]
+        fields = ['ball_speed', 'racket_size', 'bonus_malus_activation', 'bumpers_activation']
+        widgets = {
+            'ball_speed': forms.Select(attrs={'class': 'form-control'}),
+            'racket_size': forms.Select(attrs={'class': 'form-control'}),
+            'bonus_malus_activation': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'bumpers_activation': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'ball_speed': 'Vitesse de la balle',
+            'racket_size': 'Taille de la raquette',
+            'bonus_malus_activation': 'Activer les bonus/malus',
+            'bumpers_activation': 'Activer les bumpers/obstacles',
+        }
 
-    def __init__(self, *args, **kwargs):
-        """
-        Personnalisation des labels et widgets des champs.
-        """
-        super().__init__(*args, **kwargs)
-        self.fields['ball_speed'].label = "Vitesse de la balle"
-        self.fields['ball_speed'].widget.attrs.update({
-            'min': GameParameters.BALL_SPEED_MIN,
-            'max': GameParameters.BALL_SPEED_MAX,
-            'step': 0.1,
-        })
-        self.fields['racket_size'].label = "Taille de la raquette"
-        self.fields['bonus_obstacle'].label = "Activer bonus obstacle"
-        self.fields['bonus_speed'].label = "Activer bonus vitesse"
-        self.fields['bonus_shrink'].label = "Activer bonus rétrécissement"
-        self.fields['bonus_frost'].label = "Activer bonus gel"
-        self.fields['bonus_flash'].label = "Activer bonus éclair"
-        self.fields['bonus_mind'].label = "Activer bonus réflexion"
-        self.fields['bonus_canon'].label = "Activer bonus canon"
+class SendInvitationForm(forms.ModelForm):
+    """
+    Formulaire pour envoyer une invitation et stocker
+    les paramètres dans GameInvitationParameters.
+    """
+    friend_username = forms.CharField(
+        required=True,
+        label="Nom d'utilisateur de l'ami à inviter"
+    )
+
+    class Meta:
+        model = GameInvitationParameters
+        fields = [
+            'ball_speed', 
+            'racket_size',
+            'bonus_malus_activation',
+            'bumpers_activation'
+        ]

@@ -2,7 +2,7 @@ import { initializeHomeView } from './landing/coreHome.js';
 import { handleLogin } from './auth/index.js';
 import { initializeRegisterView } from './auth/index.js';
 import { initializeLogin2FAView } from './auth/index.js';
-import { initializeGameHomeView } from './game/index.js';
+import { handleInviteGame, initializeGameHomeView } from './game/index.js';
 import { handleAccountsManagement } from './accountManagement/index.js';
 import { handleViewProfile } from './userProfile/index.js';
 import {handleGameMenu} from './game/index.js';
@@ -59,6 +59,10 @@ export function initializeRouter() {
         .on('/game-options', () => {
             console.log('Route: game-options');
             handleGameMenu();
+        })
+        .on('/game-online', () => {
+            console.log('Route: game-options');
+            handleInviteGame();
         })
         .on('/profile/:friendUsername', ({ data }) => {
             const friendUsername = data.friendUsername; // Utilisez `data` pour extraire le paramètre
