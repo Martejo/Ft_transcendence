@@ -8,7 +8,7 @@ import { handleViewProfile } from './userProfile/index.js';
 import {handleGameMenu} from './game/index.js';
 import { handleFriendProfile } from './friends/index.js';
 import { handleNavbar } from './navbar/loadNavbar.js';
-import { handleSeclectTournament } from './game/index.js';
+import { handleSeclectTournament, startLoading } from './game/index.js';
 
 // Initialisation du routeur Navigo
 const router = new window.Navigo('/', { hash: false });
@@ -63,7 +63,14 @@ export function initializeRouter() {
         .on('/game-online', () => {
             console.log('Route: game-options');
             handleInviteGame();
+        
         })
+        .on('/game-loading', () => {
+            console.log('Route: game-options');
+            startLoading();
+        })
+
+
         .on('/profile/:friendUsername', ({ data }) => {
             const friendUsername = data.friendUsername; // Utilisez `data` pour extraire le paramètre
             console.log(`Route: Profile for ${friendUsername}`);

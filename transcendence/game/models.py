@@ -1,6 +1,6 @@
+# game/models.py
 from django.db import models
 from accounts.models import CustomUser
-from django.conf import settings
 from django.utils.timezone import now
 from datetime import timedelta
 import uuid
@@ -14,21 +14,29 @@ class GameInvitation(models.Model):
     from_user = models.ForeignKey(CustomUser, related_name='invitations_sent', on_delete=models.CASCADE)
     to_user = models.ForeignKey(CustomUser, related_name='invitations_received', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(default=default_expiration_time)  # Utilisation de la fonction définie
+    expires_at = models.DateTimeField(default=default_expiration_time)
     status = models.CharField(
         max_length=10,
         choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected'), ('expired', 'Expired')],
         default='pending',
     )
+    # NOUVEAU : permet de relier directement l'invitation à la session créée (si acceptée)
+    session = models.ForeignKey(
+        'GameSession',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='invitations'
+    )
 
     def is_expired(self):
-        """Retourne True si l'invitation a expiré."""
         return now() > self.expires_at
 
     def __str__(self):
         if self.status == 'expired':
             return f"Invitation expirée de {self.from_user.username} à {self.to_user.username}"
         return f"Invitation de {self.from_user.username} à {self.to_user.username} - {self.status}"
+
 
 class GameInvitationParameters(models.Model):
     """
@@ -51,28 +59,25 @@ class GameInvitationParameters(models.Model):
     bumpers_activation = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"(Invitation={self.invitation.id}) " \
-               f"BallSpeed={self.get_ball_speed_display()}, " \
-               f"RacketSize={self.get_racket_size_display()}, " \
-               f"Bonus={self.bonus_malus_activation}, Bumpers={self.bumpers_activation}"
+        return (f"(Invitation={self.invitation.id}) "
+                f"BallSpeed={self.get_ball_speed_display()}, "
+                f"RacketSize={self.get_racket_size_display()}, "
+                f"Bonus={self.bonus_malus_activation}, Bumpers={self.bumpers_activation}")
 
-
-    
 
 class GameSession(models.Model):
     """
-    Un enregistrement pour représenter une partie (en cours ou terminée).
+    Représente une partie (en cours ou terminée).
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     player_left = models.CharField(max_length=50, null=True, blank=True)
     player_right = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    # ex: "running", "finished"
-    status = models.CharField(max_length=10, default='running')
+    status = models.CharField(max_length=10, default='running')  # ex: "running", "finished"
 
     def __str__(self):
         return f"GameSession {self.id} (status={self.status})"
+
 
 class GameResult(models.Model):
     """
@@ -89,24 +94,22 @@ class GameResult(models.Model):
         return f"[{self.game.id}] winner={self.winner} looser={self.looser} => {self.score_left}-{self.score_right}"
 
 
-
-
 class GameParameters(models.Model):
+    """
+    Paramètres d'une partie créée (réelle).
+    """
     game_session = models.OneToOneField(GameSession, related_name='parameters', on_delete=models.CASCADE)
-    BALL_SPEED_CHOICES = [(1, 'Slow'), (2, 'Medium'), (3, 'Fast'),]
+    BALL_SPEED_CHOICES = [(1, 'Slow'), (2, 'Medium'), (3, 'Fast')]
     ball_speed = models.PositiveSmallIntegerField(choices=BALL_SPEED_CHOICES, default=2)
 
-    RACKET_SIZE_CHOICES = [(1, 'Small'), (2, 'Medium'), (3, 'Large'),]
+    RACKET_SIZE_CHOICES = [(1, 'Small'), (2, 'Medium'), (3, 'Large')]
     racket_size = models.PositiveSmallIntegerField(choices=RACKET_SIZE_CHOICES, default=2)
 
     bonus_malus_activation = models.BooleanField(default=True)
     bumpers_activation = models.BooleanField(default=False)
 
-
     def __str__(self):
         return (f"Ball speed: {self.get_ball_speed_display()}, "
                 f"Racket size: {self.get_racket_size_display()}, "
                 f"Bonus/Malus: {'On' if self.bonus_malus_activation else 'Off'}, "
-                f"Bumpers: {'On' if self.bumpers_activation else 'Off'}")
-
-
+                f"Bumpers: {'On' if self.bumpers_activation else 'Off'})")
