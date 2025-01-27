@@ -91,7 +91,15 @@ class SendInvitationView(View):
         invitation_params.save()
 
         logger.info(f"Invitation {invitation_id} créée avec paramètres pour {friend_username}.")
-        return self.create_json_response('success', 'Invitation envoyée avec succès.', 201)
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Invitation envoyée avec succès.',
+            'invitation': {
+                'id': invitation.id,
+                'to_user__username': friend.username,
+                'status': invitation.status
+            }
+        }, status=201)
 
     def validate_friend(self, user, friend_username):
         if not friend_username:

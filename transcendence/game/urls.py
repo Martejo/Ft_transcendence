@@ -30,6 +30,8 @@ urlpatterns = [
     path('create_local_game/', CreateGameLocalView.as_view(), name='create_local_game'),
     path('accept_invitation/<int:invitation_id>/', AcceptGameInvitationView.as_view(), name='accept_invitation'),
     path('respond_to_invitation/', RespondToInvitationView.as_view(), name='respond_to_invitation'),
+    path('list_invitations/', ListInvitationsView.as_view(), name='list_invitations'),
+
 
 
 ]
