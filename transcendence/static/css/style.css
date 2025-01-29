@@ -1,19 +1,19 @@
 @font-face {
+	font-family: "RussoOne";
+	src: url('fonts/RussoOne-Regular.ttf');
+
+}
+@font-face {
+
+	font-family: "RussoOne";
+	src: url('fonts/RussoOne-Regular.ttf');
+
+}
+
+@font-face {
+
 	font-family: "Jersey 10";
-	src: url('fonts/RussoOne-Regular.ttf');
-
-}
-@font-face {
-
-	font-family: "Jersey 25";
-	src: url('fonts/RussoOne-Regular.ttf');
-
-}
-
-@font-face {
-
-	font-family: "Jersey 1";
-	src: url('fonts/Jersey25-Regular.ttf');
+	src: url('fonts/Jersey10-Regular.ttf');
 
 }
 /* base pour tous les html */
@@ -28,13 +28,13 @@ html, body {
 	overflow: auto;
 	margin: 0;
 	padding: 0;
-	font-family: "Jersey 25";
+	font-family: "RussoOne";
 	font-size: 18px;
 }
 
 .navbar {
 	/* min-width: 300px;  */
-	font-family: "Jersey 1"!important;
+	font-family: "Jersey 10"!important;
 	height: 50px;
 	width: 100%;
     max-width: 100%;
@@ -48,7 +48,7 @@ html, body {
 }
 
 .navbar-brand {
-	font-family: "Jersey 1";
+	font-family: "Jersey 10";
 	color: white;
 	font-size: 40px;
 	text-align: center;
@@ -128,7 +128,7 @@ html, body {
 /* Pongame et login */
 
 .home-btn {
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	background-color: #2DB4F3;
 	color: white;
 	font-size: 2.2em;
@@ -155,7 +155,7 @@ html, body {
 
 
 .title{
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	color: white;
 }
 
@@ -185,7 +185,7 @@ html, body {
 /* Titre centré */
 .register-form h1, .login-form h1 {
 	color: white;
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	font-size: 36px; /* Taille de police augmentée */
 	text-align: center; /* Centre le titre */
 }
@@ -204,7 +204,7 @@ html, body {
 /* Libellés des champs */
 .form-group label {
 	color: white;
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	font-size: 24px; /* Taille de police augmentée */
 	display: block;
 	margin-bottom: 10px;
@@ -234,7 +234,7 @@ html, body {
 
 .forgot-password a {
 	color: #75d3ff;
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	font-size: 18px; /* Augmente la taille du texte pour le lien */
 	text-decoration: none;
 	opacity: 0.7;
@@ -261,12 +261,12 @@ html, body {
 	/* padding: 10px 20px; */
 	border-radius: 5px;
 	font-size: 1rem;
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	transition: background-color 0.3s;
 }
 
 .btn-primary {
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 	background-color: #2DB4F3;
 	border: none;
 	font-size: 1.2em;
@@ -283,7 +283,7 @@ html, body {
 
 .card-title {
 
-	font-family: "Jersey 10";
+	font-family: "RussoOne";
 }
 
 /* Terrain de base */
@@ -414,7 +414,7 @@ html, body {
 }
 
 #menu-btn i {
-	font-size: 35px;
+	font-size: 30px;
 	color: white;
 }
 
