@@ -1,17 +1,26 @@
 @font-face {
 	font-family: "Jersey 10";
-	src: url('fonts/Jersey10-Regular.ttf');
+	src: url('fonts/RussoOne-Regular.ttf');
 
 }
 @font-face {
 
 	font-family: "Jersey 25";
+	src: url('fonts/RussoOne-Regular.ttf');
+
+}
+
+@font-face {
+
+	font-family: "Jersey 1";
 	src: url('fonts/Jersey25-Regular.ttf');
 
 }
 /* base pour tous les html */
 
 html, body {
+	-webkit-font-smoothing: antialiased;
+	text-rendering: geometricPrecision;
 	height: 100%;
 	width: 100%;
 	background-color: #101A32;
@@ -25,6 +34,7 @@ html, body {
 
 .navbar {
 	/* min-width: 300px;  */
+	font-family: "Jersey 1"!important;
 	height: 50px;
 	width: 100%;
     max-width: 100%;
@@ -38,7 +48,7 @@ html, body {
 }
 
 .navbar-brand {
-	font-family: "Jersey 10";
+	font-family: "Jersey 1";
 	color: white;
 	font-size: 40px;
 	text-align: center;
